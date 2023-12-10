@@ -1,8 +1,12 @@
+
 import random
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from datetime import datetime
+from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -58,30 +62,46 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Client(models.Model):
 
+    email = models.EmailField(unique=True)
+    full_name = models.CharField(max_length=255, help_text="Full name of the client.")
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
-    last_contact = models.DateField(null=True, blank=True)
-    sales_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'role': User.ROLE_SALES})
+    last_contact = models.DateTimeField(null=True, blank=True)
+    sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'role': User.ROLE_SALES})
+    email_id = models.EmailField(null=True, blank=True, editable=False)
 
     class Meta:
-        ordering = ['-update_date']  # Tri par défaut, modification la plus récente en premier
+        ordering = ['-update_date']
 
     def __str__(self):
-        return f"{self.id} - {self.user.full_name}"
+        return f"Client {self.full_name} - Contact commercial {self.user.full_name}"
 
     def save(self, *args, **kwargs):
-        if not self.user_id:
-            # Si l'utilisateur n'est pas déjà défini, sélectionnez un utilisateur avec le rôle "ROLE_SALES"
-            sales_users = User.objects.filter(role=User.ROLE_SALES)
-            if not sales_users.exists():
-                raise ValidationError("Aucun utilisateur avec le rôle 'ROLE_SALES' trouvé.")
-            
-            random_sales_user = random.choice(sales_users)
-            self.user = random_sales_user
+        if not self.user:
+            sales_users_without_clients = User.objects.filter(
+                role=User.ROLE_SALES,
+                client_profile__isnull=True
+            )
+            if not sales_users_without_clients.exists():
+                raise ValidationError("Aucun utilisateur avec le rôle 'ROLE_SALES' et sans client trouvé.")
 
+            self.user = random.choice(sales_users_without_clients)
+
+        # Mettez à jour la colonne email_id avec l'e-mail de l'utilisateur associé
+        self.email_id = self.user.email
+        self.sales_contact_id = self.user.id
+        
         self.update_date = timezone.now()
         super(Client, self).save(*args, **kwargs)
 
+
+@receiver(pre_save, sender=Client)
+def set_sales_contact_id(sender, instance, **kwargs):
+    # Cette fonction sera appelée avant chaque enregistrement (save) d'un objet Client
+    # Vérifiez si sales_contact est défini et sales_contact_id n'est pas défini
+    if instance.sales_contact and not instance.sales_contact_id:
+        # Mettez à jour sales_contact_id avec l'ID de l'utilisateur associé
+        instance.sales_contact_id = instance.sales_contact.id

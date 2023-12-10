@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import pymysql
 from pathlib import Path
 from datetime import timedelta
 
@@ -18,12 +19,19 @@ from decouple import config
 from django.core.management.utils import get_random_secret_key
 
 
+pymysql.version_info = (1, 4, 6, 'final', 0) # (major, minor, micro, releaselevel, serial)
+pymysql.install_as_MySQLdb()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Chargement des variables d'environnement depuis le fichier .env
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('DJANGO_SECRET_KEY', default=get_random_secret_key())
+DB_NAME = config('DB_NAME', default='')
+DB_USER = config('DB_USER', default='')
+DB_PASSWORD = config('DB_PASSWORD', default='')
+DB_HOST = config('DB_HOST', default='')
+DB_PORT = config('DB_PORT', default='')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -88,10 +96,18 @@ WSGI_APPLICATION = 'EpicEvents.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
         'OPTIONS': {
-            'read_default_file': config('MYSQL_CONFIG_PATH', default=os.path.join(BASE_DIR, 'conf.cnf')),
+            'charset': 'utf8mb4',
+            'sql_mode': 'STRICT_ALL_TABLES',
+            'use_unicode': True,
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
         },
-    },
+    }
 }
 
 
