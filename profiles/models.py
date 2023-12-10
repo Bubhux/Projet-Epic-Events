@@ -1,3 +1,4 @@
+import random
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -58,6 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Client(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
+    phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
@@ -71,6 +73,15 @@ class Client(models.Model):
         return f"{self.id} - {self.user.full_name}"
 
     def save(self, *args, **kwargs):
-        self.update_date = datetime.now()
+        if not self.user_id:
+            # Si l'utilisateur n'est pas déjà défini, sélectionnez un utilisateur avec le rôle "ROLE_SALES"
+            sales_users = User.objects.filter(role=User.ROLE_SALES)
+            if not sales_users.exists():
+                raise ValidationError("Aucun utilisateur avec le rôle 'ROLE_SALES' trouvé.")
+            
+            random_sales_user = random.choice(sales_users)
+            self.user = random_sales_user
+
+        self.update_date = timezone.now()
         super(Client, self).save(*args, **kwargs)
 
