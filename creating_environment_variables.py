@@ -44,11 +44,13 @@ env_variable_names = [
     'DB_PASSWORD',
     'DB_HOST',
     'DB_PORT',
-    'SENTRY_DSN',
 ]
 
 # Générer la clé secrète aléatoire
 secret_key = get_random_secret_key()
+
+# Afficher un message pour indiquer que le script est en cours d'exécution
+print("Creating .env file...")
 
 # Ouvrir le fichier .env en mode écriture
 with open(".env", "w") as f:
@@ -59,3 +61,4 @@ with open(".env", "w") as f:
 
 # Afficher un message indiquant que le modèle de fichier .env a été créé
 print("\n.env file created!")
+
