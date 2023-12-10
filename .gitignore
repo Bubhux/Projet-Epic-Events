@@ -1,3 +1,5 @@
+**/__pycache__/
 /env
-/conf.cnf
 /.vscode
+/.env
+/conf.cnf
