@@ -34,9 +34,9 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
 
-    ROLE_MANAGEMENT = 'management team'
-    ROLE_SALES = 'sales team'
-    ROLE_SUPPORT = 'support team'
+    ROLE_MANAGEMENT = 'Management team'
+    ROLE_SALES = 'Sales team'
+    ROLE_SUPPORT = 'Support team'
 
     ROLE_CHOICES = (
         (ROLE_MANAGEMENT, 'Équipe Gestion'),
@@ -64,23 +64,23 @@ class Client(models.Model):
 
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
+    user_contact = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     last_contact = models.DateTimeField(null=True, blank=True)
     sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'role': User.ROLE_SALES})
-    email_id = models.EmailField(null=True, blank=True, editable=False)
+    email_contact_id = models.EmailField(null=True, blank=True, editable=False)
 
     class Meta:
         ordering = ['-update_date']
 
     def __str__(self):
-        return f"Client {self.full_name} - Contact commercial {self.user.full_name}"
+        return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
 
     def save(self, *args, **kwargs):
-        if not self.user:
+        if not self.user_contact:
             sales_users_without_clients = User.objects.filter(
                 role=User.ROLE_SALES,
                 client_profile__isnull=True
@@ -91,9 +91,8 @@ class Client(models.Model):
             self.user = random.choice(sales_users_without_clients)
 
         # Mettez à jour la colonne email_id avec l'e-mail de l'utilisateur associé
-        self.email_id = self.user.email
-        self.sales_contact_id = self.user.id
-        
+        self.email_contact_id = self.user_contact.email
+        self.sales_contact_id = self.user_contact.id
         self.update_date = timezone.now()
         super(Client, self).save(*args, **kwargs)
 
