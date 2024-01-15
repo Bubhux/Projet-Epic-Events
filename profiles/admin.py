@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
+from django.db.models import Count
+
 from .models import User, Client
 
 
 class CustomUserAdmin(UserAdmin):
 
-    list_display = ('full_name', 'email', 'is_staff', 'is_superuser', 'role')
+    list_display = ('full_name', 'email', 'is_active', 'is_staff', 'is_superuser', 'role')
     ordering = ('full_name',)
     search_fields = ('full_name', 'email')
 
@@ -19,17 +22,35 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2', 'is_active', 'is_staff', 'role'),
+            'fields': ('email', 'full_name', 'password1', 'password2', 'phone_number', 'is_active', 'is_staff', 'role', 'date_joined'),
         }),
     )
-
-admin.site.register(User, CustomUserAdmin)
 
 
 class ClientAdmin(admin.ModelAdmin):
 
-    list_display = ('full_name', 'email', 'company_name', 'user_contact', 'sales_contact', 'last_contact')
+    list_display = ('full_name', 'email', 'company_name', 'sales_contact', 'last_contact')
     ordering = ('full_name',)
     search_fields = ('full_name', 'email', 'company_name', 'user_contact__full_name', 'sales_contact__full_name')
 
+
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user_count')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(user_count=Count('user'))
+        return queryset
+
+    def user_count(self, obj):
+        return obj.user_count
+
+    user_count.short_description = "Nombre d'utilisateurs"
+
+
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(Client, ClientAdmin)
+
+# Enregistrer le nouveau admin.ModelAdmin pour Group
+admin.site.unregister(Group)
+admin.site.register(Group, GroupAdmin)

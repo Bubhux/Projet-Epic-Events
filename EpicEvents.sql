@@ -19,6 +19,6 @@ CREATE TABLE `client` (
   `last_contact` date DEFAULT NULL,
   `sales_contact` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`sales_contact`) REFERENCES `user`(`id`)
+  FOREIGN KEY (`sales_contact`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
 
