@@ -2,5 +2,5 @@
 /env
 /.vscode
 /conf.cnf
-.env/
+/.env
 .pytest_cache/
