@@ -91,3 +91,19 @@ class ClientDetailSerializer(serializers.ModelSerializer):
         model = Client
         fields = ['full_name', 'id', 'email', 'phone_number', 'company_name', 'creation_date',
                   'update_date', 'last_contact', 'sales_contact', 'email_contact_id']
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    clients = ClientListSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = ['full_name', 'id', 'email']
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    clients = ClientDetailSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = ['full_name', 'id', 'email', 'user_contact', 'role', 'is_staff', 'clients']

@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 
 from .models import User, Client
 from .permissions import ClientPermissions
-from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer
+from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserDetailSerializer
 
 
 class LoginViewSet(generics.CreateAPIView):
@@ -48,57 +48,41 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     queryset = Client.objects.all()
     serializer_class = ClientListSerializer
-    detail_serializer_class = ClientDetailSerializer
     permission_classes = [IsAuthenticated, ClientPermissions]
 
-    def perform_create(self, serializer):
-        """Sauvegarde l'objet Client avec l'utilisateur actuellement connecté en tant que gestionnaire du client."""
-        serializer.save(user_contact=self.request.user)
+    serializers = {
+        'list': ClientListSerializer,
+        'retrieve': ClientDetailSerializer,
+    }
 
     @action(detail=False, methods=['GET'])
-    def user_clients(self, request):
-        """Renvoie tous les clients associés à l'utilsateur."""
-        user = self.request.user
-        clients = Client.objects.filter(user_contact=user)
-        serializer = ClientListSerializer(clients, many=True)
+    def client_list(self, request):
 
-        # Messages de débogage
-        print(f"Utilisateur actuel : {user}")
+        clients = Client.objects.filter(user_contact=request.user)
+        serializer = ClientListSerializer(clients, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk=None):
-        """Met à jour l'objet Client spécifié par la clé primaire passée dans l'URL."""
+    @action(detail=True, methods=['GET'])
+    def client_details(self, request, pk=None):
+        """Renvoie les détails d'un client spécifique."""
         client = self.get_object()
-        data = request.data.copy()
-        data['user_contact'] = client.user_contact.id
-        serializer = ClientListSerializer(client, data=data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ClientDetailSerializer(client)
+        return Response(serializer.data)
 
-    def destroy(self, request, client_pk=None, pk=None):
-        """Supprime l'objet Client spécifié par la clé primaire passée dans l'URL."""
-        client = self.get_object()
-
-        # Utilise la permission pour vérifier si l'utilisateur est l'auteur du projet
-        if not self.request.user == client.user_contact:
-            return Response("You don't have permission to delete this client.", status=status.HTTP_403_FORBIDDEN)
-
-        client.delete()
-        return Response('Client successfully deleted.', status=status.HTTP_204_NO_CONTENT)
-
-
-class AllClientsDetailsViewSet(ModelViewSet):
-    """ViewSet d'API pour afficher les détails de tous les clients."""
-
-    queryset = Client.objects.all()
-    serializer_class = ClientDetailSerializer
-    permission_classes = [IsAuthenticated, ClientPermissions]
-
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    
     @action(detail=False, methods=['GET'])
     def all_details(self, request):
         """Renvoie les détails de tous les clients."""
         clients = Client.objects.all()
         serializer = ClientDetailSerializer(clients, many=True)
         return Response(serializer.data)
+
+
+class UserViewSet(ModelViewSet):
+
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer

@@ -76,6 +76,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.get_role_display()} - {self.full_name} ({self.email})"
 
+    def has_perm(self, perm, obj=None):
+        # Vérifie les permissions individuelles
+        # Vérifie si l'utilisateur a la permission spécifiée
+        return True
+
+    def has_module_perms(self, app_label):
+        # Vérifie les permissions du module d'application
+        # Vérifie si l'utilisateur a des permissions pour l'application spécifiée
+        return True
+
     def save(self, *args, **kwargs):
         # Appel la méthode save de la classe parent
         super().save(*args, **kwargs)

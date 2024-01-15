@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from profiles.views import LoginViewSet, ClientViewSet, AllClientsDetailsViewSet
+from profiles.views import LoginViewSet, ClientViewSet
 # from contracts.views import ContractClientViewSet
 
 
@@ -27,7 +27,8 @@ from profiles.views import LoginViewSet, ClientViewSet, AllClientsDetailsViewSet
 router = SimpleRouter()
 
 router.register(r"clients", ClientViewSet, basename="clients")
-router.register(r"clients/all_details", AllClientsDetailsViewSet, basename="all-clients-details")
+router.register(r"clients/all_details", ClientViewSet, basename="all-clients-details")
+#router.register(r'clients/(?P<client_pk>\d+)/', ClientViewSet, basename='clients-details')
 
 
 # router.register(r"clients/(?P<client_pk>\d+)/contracts", ContractClientViewSet, basename="clients")
@@ -44,7 +45,10 @@ urlpatterns = [
     path('crm/token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
 
     # Configurer le chemin pour l'action 'all_details'
-    path('crm/clients/all_details/', AllClientsDetailsViewSet.as_view({'get': 'all_details'}), name='all-clients-details'),
+    path('crm/clients/all_details/', ClientViewSet.as_view({'get': 'all_details'}), name='all-clients-details'),
+
+    # Configurer le chemin pour l'action 'client_details'
+    path('crm/clients/<int:pk>/', ClientViewSet.as_view({'get': 'client_details'}), name='client-details'),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))
