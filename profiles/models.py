@@ -89,7 +89,7 @@ class Client(models.Model):
 
     email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles')
+    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles', related_query_name='client_profile', default=None)
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -123,9 +123,6 @@ class Client(models.Model):
         # Imprime le nombre total de clients avant la sauvegarde
         print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
 
-        if not self.user_contact:
-            raise ValidationError("Le champ 'user_contact' doit être défini avant la sauvegarde.")
-
         # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
         self.email_contact_id = self.user_contact.email if self.user_contact else None
         self.sales_contact_id = self.user_contact.id if self.user_contact else None
@@ -142,6 +139,18 @@ class Client(models.Model):
 class UserGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
+@receiver(pre_delete, sender=Client)
+def delete_client_from_group(sender, instance, **kwargs):
+    # Vérifie si le groupe "Client" existe
+    client_group, created = Group.objects.get_or_create(name='Client')
+    # Retire l'instance du groupe si user_contact est défini
+    if instance.user_contact:
+        instance.user_contact.groups.remove(client_group)
+    elif instance.user_contact_id:
+        # Si user_contact_id est défini mais user_contact est None, utilisez-le pour retirer du groupe
+        user_contact = User.objects.get(id=instance.user_contact_id)
+        user_contact.groups.remove(client_group)
 
 @receiver(post_save, sender=Client)
 def add_client_to_group(sender, instance, **kwargs):
