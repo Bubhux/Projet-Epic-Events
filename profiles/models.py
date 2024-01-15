@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, role=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email, password, role, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -45,16 +45,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(unique=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=True, blank=True, editable=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    full_name = models.CharField(max_length=255, help_text="Full name of the user.")
+    full_name = models.CharField(max_length=255, unique=True, help_text="Full name of the user.")
     phone_number = models.CharField(max_length=20, help_text="Phone number of the user.")
+    date_joined = models.DateTimeField(default=timezone.now, verbose_name='date joined')
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['role', 'full_name', 'phone_number']
+    USERNAME_FIELD = 'full_name'
+    REQUIRED_FIELDS = ['email', 'role']
 
     def __str__(self):
         return f"{self.get_role_display()} - {self.full_name} ({self.email})"
@@ -74,7 +75,7 @@ class Client(models.Model):
     email_contact_id = models.EmailField(null=True, blank=True, editable=False)
 
     class Meta:
-        ordering = ['-update_date']
+        ordering = ['update_date']
 
     def __str__(self):
         return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
