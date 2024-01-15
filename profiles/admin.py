@@ -35,6 +35,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class GroupAdmin(admin.ModelAdmin):
+
     list_display = ('name', 'user_count')
 
     def get_queryset(self, request):

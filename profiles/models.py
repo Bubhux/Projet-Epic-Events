@@ -1,5 +1,3 @@
-import random
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.exceptions import ValidationError
@@ -28,7 +26,6 @@ class UserManager(BaseUserManager):
         print(f"Role de l'utilisateur : {user.get_role_display()}")
         print(f"Statut 'is_staff' de l'utilisateur : {user.is_staff}")
         print(f"Est superutilisateur : {user.is_superuser}")
-
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
@@ -90,22 +87,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Client(models.Model):
 
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user_contact = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
+    user_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles')
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     last_contact = models.DateTimeField(null=True, blank=True)
-    sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'role': User.ROLE_SALES})
-    email_contact_id = models.EmailField(null=True, blank=True, editable=False)
+    sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, editable=True, limit_choices_to={'role': User.ROLE_SALES})
+    email_contact_id = models.EmailField(null=True, blank=True, editable=True)
 
     class Meta:
         ordering = ['update_date']
 
     def __str__(self):
-        return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
+        if self.user_contact:
+            return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
+        else:
+            return f"Client {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
         print(f"ID du client : {self.id}")
@@ -120,24 +120,23 @@ class Client(models.Model):
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
 
     def save(self, *args, **kwargs):
+        # Imprime le nombre total de clients avant la sauvegarde
+        print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
+
         if not self.user_contact:
-            sales_users_without_clients = User.objects.filter(
-                role=User.ROLE_SALES,
-                client_profile__isnull=True
-            )
-            if not sales_users_without_clients.exists():
-                raise ValidationError("Aucun utilisateur avec le rôle 'ROLE_SALES' et sans client trouvé.")
+            raise ValidationError("Le champ 'user_contact' doit être défini avant la sauvegarde.")
 
-            self.user_contact = random.choice(sales_users_without_clients)
-
-        # Mets à jour la colonne email_id avec l'e-mail de l'utilisateur associé
-        self.email_contact_id = self.user_contact.email
-        self.sales_contact_id = self.user_contact.id
+        # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
+        self.email_contact_id = self.user_contact.email if self.user_contact else None
+        self.sales_contact_id = self.user_contact.id if self.user_contact else None
         self.update_date = timezone.now()
         super(Client, self).save(*args, **kwargs)
 
         # Imprime les détails après la sauvegarde
         self.print_details()
+
+        # Imprime le nombre total de clients après la sauvegarde
+        print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
 
 
 class UserGroup(models.Model):

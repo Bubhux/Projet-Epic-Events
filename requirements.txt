@@ -1,4 +1,11 @@
 asgiref==3.7.2
 Django==4.2.7
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.0
+PyJWT==2.8.0
+PyMySQL==1.1.0
+python-decouple==3.8
+pytz==2023.3.post1
+setuptools==69.0.2
 sqlparse==0.4.4
 tzdata==2023.3
