@@ -1,5 +1,6 @@
 **/__pycache__/
 /env
 /.vscode
-/.env
 /conf.cnf
+.env/
+.pytest_cache/

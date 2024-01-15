@@ -90,7 +90,7 @@ class Client(models.Model):
 
             self.user = random.choice(sales_users_without_clients)
 
-        # Mettez à jour la colonne email_id avec l'e-mail de l'utilisateur associé
+        # Mettre à jour la colonne email_id avec l'e-mail de l'utilisateur associé
         self.email_contact_id = self.user_contact.email
         self.sales_contact_id = self.user_contact.id
         self.update_date = timezone.now()
@@ -100,7 +100,7 @@ class Client(models.Model):
 @receiver(pre_save, sender=Client)
 def set_sales_contact_id(sender, instance, **kwargs):
     # Cette fonction sera appelée avant chaque enregistrement (save) d'un objet Client
-    # Vérifiez si sales_contact est défini et sales_contact_id n'est pas défini
+    # Vérifie si sales_contact est défini et sales_contact_id n'est pas défini
     if instance.sales_contact and not instance.sales_contact_id:
-        # Mettez à jour sales_contact_id avec l'ID de l'utilisateur associé
+        # Mettre à jour sales_contact_id avec l'ID de l'utilisateur associé
         instance.sales_contact_id = instance.sales_contact.id

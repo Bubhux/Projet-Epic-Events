@@ -1,7 +1,7 @@
 
 CREATE TABLE `user` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(30) NOT NULL UNIQUE,
+  `full_name` varchar(255) NOT NULL UNIQUE,
   `password` varchar(128) NOT NULL,
   `email` varchar(255) NOT NULL UNIQUE,
   `department` varchar(20) NOT NULL,
@@ -20,4 +20,21 @@ CREATE TABLE `client` (
   `sales_contact` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`sales_contact`) REFERENCES `user`(`id`)
+);
+
+
+CREATE TABLE `contract` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sales_contact_id` int DEFAULT NULL,
+  `client_id` int NOT NULL,
+  `creation_date` datetime NOT NULL,
+  `update_date` datetime NOT NULL,
+  `status_contract` tinyint(1) NOT NULL DEFAULT '0',
+  `total_amount` double NOT NULL DEFAULT '0',
+  `remaining_amount` double NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `sales_contact_id` (`sales_contact_id`),
+  KEY `client_id` (`client_id`),
+  CONSTRAINT `contract_ibfk_1` FOREIGN KEY (`sales_contact_id`) REFERENCES `user` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `contract_ibfk_2` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE
 );
