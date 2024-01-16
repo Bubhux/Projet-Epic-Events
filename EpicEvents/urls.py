@@ -29,6 +29,8 @@ router = SimpleRouter()
 router.register(r"clients", ClientViewSet, basename="clients")
 router.register(r"users", UserViewSet, basename="users")
 
+router.register(r"users/(?P<user_pk>\d+)/", UserViewSet, basename="users")
+
 router.register(r"clients/(?P<client_pk>\d+)/client_details", ClientViewSet, basename="client-details")
 router.register(r"users/(?P<user_pk>\d+)/user_details", UserViewSet, basename="user-details")
 

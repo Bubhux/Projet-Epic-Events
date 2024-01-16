@@ -1,1 +1,1 @@
-# Projet-Epic-Events
+# Epic-Events

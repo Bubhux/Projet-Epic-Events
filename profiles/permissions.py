@@ -93,17 +93,17 @@ class UserPermissions(permissions.BasePermission):
 
         Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion.
     """
-    def has_create_permission(self, request):
+    def has_create_permission(self, user):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouvel utilisateur
-        return request.user.role == User.ROLE_MANAGEMENT
+        return user.role == User.ROLE_MANAGEMENT
 
-    def has_update_permission(self, request, user):
+    def has_update_permission(self, user, obj=None):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un utilisateur spécifique
-        return request.user.role == User.ROLE_MANAGEMENT
+        return user.role == User.ROLE_MANAGEMENT
 
-    def has_delete_permission(self, request, user):
+    def has_delete_permission(self, user, obj=None):
         # Vérifie si l'utilisateur connecté a la permission de supprimer un utilisateur spécifique
-        return request.user.role == User.ROLE_MANAGEMENT
+        return user.role == User.ROLE_MANAGEMENT
 
     def has_permission(self, request, view):
         try:

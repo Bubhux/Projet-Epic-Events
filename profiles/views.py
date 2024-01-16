@@ -1,6 +1,6 @@
 from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -173,7 +173,9 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Crée un nouvel utilisateur."""
-        if not self.request.user.has_create_permission(request):
+        user_permissions = UserPermissions()
+
+        if not user_permissions.has_create_permission(request.user):
             return HttpResponseForbidden("You do not have permission to create a user.")
 
         serializer = self.get_serializer(data=request.data)
@@ -185,8 +187,10 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Met à jour un utilisateur existant."""
+        user_permissions = UserPermissions()
+
         instance = self.get_object()
-        if not self.request.user.has_update_permission(request, instance):
+        if not user_permissions.has_update_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to update this user.")
 
         serializer = self.get_serializer(instance, data=request.data)
@@ -197,8 +201,10 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Supprime un utilisateur existant."""
+        user_permissions = UserPermissions()
+
         instance = self.get_object()
-        if not self.request.user.has_delete_permission(request, instance):
+        if not user_permissions.has_delete_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to delete this user.")
 
         self.perform_destroy(instance)
