@@ -52,6 +52,6 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Client, ClientAdmin)
 
-# Enregistrer le nouveau admin.ModelAdmin pour Group
+# Enregistre le nouveau admin.ModelAdmin pour Group
 admin.site.unregister(Group)
 admin.site.register(Group, GroupAdmin)

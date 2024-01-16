@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import pre_save, pre_delete, post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.db.models import Count
+from itertools import cycle
 
 
 class UserManager(BaseUserManager):
@@ -129,6 +131,42 @@ class Client(models.Model):
             print(f"E-mail du contact commercial : {self.sales_contact.email}")
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
 
+    @classmethod
+    def assign_sales_contact(cls):
+        # Obtient tous les utilisateurs de l'équipe commerciale avec le nombre de clients associés à chacun
+        sales_team = User.objects.filter(role=User.ROLE_SALES)
+
+        if not sales_team.exists():
+            print("Aucun utilisateur dans l'équipe de vente.")
+            return
+
+        sales_counts = sales_team.annotate(client_count=Count('client'))
+
+        # Trie les utilisateurs par nombre de clients, puis par ordre d'ID
+        sorted_sales_team = sorted(sales_counts, key=lambda x: (x.client_count, x.id))
+
+        # Crée un itérateur cyclique pour la répartition équilibrée
+        sales_cycle = cycle(sorted_sales_team)
+
+        # Obtient le groupe "Client"
+        client_group, created = Group.objects.get_or_create(name='Client')
+
+        # Parcourt tous les clients non associés et leur assigne un contact commercial
+        unassigned_clients = cls.objects.filter(user_contact=None)
+        for client in unassigned_clients:
+            # Vérifie si user_contact est défini avant d'assigner le client à un contact commercial
+            if not client.user_contact:
+                # Obtient le prochain utilisateur dans la séquence cyclique
+                sales_contact = next(sales_cycle)
+
+                # Associe le client à l'utilisateur actuel
+                client.user_contact = sales_contact
+                client.sales_contact = sales_contact
+                client.save()
+
+                # Ajoute l'instance de Client au groupe Client
+                client.user_contact.groups.add(client_group)
+
     def save(self, *args, **kwargs):
         # Imprime le nombre total de clients avant la sauvegarde
         print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
@@ -137,7 +175,7 @@ class Client(models.Model):
         self.email_contact_id = self.user_contact.email if self.user_contact else None
         self.sales_contact_id = self.user_contact.id if self.user_contact else None
         self.update_date = timezone.now()
-        super(Client, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
         # Imprime les détails après la sauvegarde
         self.print_details()
@@ -166,13 +204,16 @@ def delete_client_from_group(sender, instance, **kwargs):
 def add_client_to_group(sender, instance, **kwargs):
     # Vérifie si le groupe "Client" existe
     client_group, created = Group.objects.get_or_create(name='Client')
-    # Ajoute l'instance de Client au groupe
-    instance.user_contact.groups.add(client_group)
+
+    # Ajoute l'instance de Client au groupe, même si user_contact est None
+    if instance.user_contact:
+        instance.user_contact.groups.add(client_group)
+    elif instance.sales_contact:
+        instance.sales_contact.groups.add(client_group)
 
 @receiver(pre_delete, sender=User)
 def delete_user_groups(sender, instance, **kwargs):
     # Supprime les enregistrements associés dans la table UserGroup
-    print(f"Deleting user groups for {instance}")
     UserGroup.objects.filter(user=instance).delete()
 
 @receiver(pre_save, sender=Client)

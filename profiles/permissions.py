@@ -12,23 +12,23 @@ class ClientPermissions(permissions.BasePermission):
 
     Méthode has_permission:
         - Récupère le client spécifié par la clé primaire 'client_pk' dans l'URL.
-        - Si 'client_pk' n'est pas spécifié dans l'URL, l'accès est autorisé sans restriction de permission.
+        - Si 'client_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
         - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires de clients et aux membres de l'équipe de support.
         - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe de gestion.
-        - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion et l'équipe support.
+        - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion et de l'équipe support.
 
     Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion et l'équipe de support.
     """
     def has_create_permission(self, request):
-        # Vérifier si l'utilisateur connecté a la permission de créer un nouveau client
+        # Vérifie si l'utilisateur connecté a la permission de créer un nouveau client
         return request.user.role in [User.ROLE_MANAGEMENT, User.ROLE_SUPPORT]
 
     def has_update_permission(self, request, user):
-        # Vérifier si l'utilisateur connecté a la permission de mettre à jour un client spécifique
+        # Vérifie si l'utilisateur connecté a la permission de mettre à jour un client spécifique
         return request.user.role == User.ROLE_MANAGEMENT or request.user == user
 
     def has_delete_permission(self, request, user):
-        # Vérifier si l'utilisateur connecté a la permission de supprimer un client spécifique
+        # Vérifie si l'utilisateur connecté a la permission de supprimer un client spécifique
         return request.user.role == User.ROLE_MANAGEMENT or request.user == user
 
     def has_permission(self, request, view):
@@ -55,7 +55,7 @@ class ClientPermissions(permissions.BasePermission):
             return request.user == client.user_contact
 
         except Http404:
-            # Si l'objet client_pk n'est pas trouvé, l'accès est refusé (aucune restriction de permission)
+            # Si l'objet client_pk n'est pas trouvé, l'accès est refusé
             return False
 
 
@@ -66,7 +66,7 @@ class UserPermissions(permissions.BasePermission):
 
     Méthode has_permission:
         - Récupère l'utilisateur spécifié par la clé primaire 'user_pk' dans l'URL.
-        - Si 'user_pk' n'est pas spécifié dans l'URL, l'accès est autorisé sans restriction de permission.
+        - Si 'user_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
         - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe gestion.
         - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion.
         - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion.
@@ -74,15 +74,15 @@ class UserPermissions(permissions.BasePermission):
     Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion.
     """
     def has_create_permission(self, request):
-        # Vérifier si l'utilisateur connecté a la permission de créer un nouvel utilisateur
+        # Vérifie si l'utilisateur connecté a la permission de créer un nouvel utilisateur
         return request.user.role == User.ROLE_MANAGEMENT
 
     def has_update_permission(self, request, user):
-        # Vérifier si l'utilisateur connecté a la permission de mettre à jour un utilisateur spécifique
+        # Vérifie si l'utilisateur connecté a la permission de mettre à jour un utilisateur spécifique
         return request.user.role == User.ROLE_MANAGEMENT
 
     def has_delete_permission(self, request, user):
-        # Vérifier si l'utilisateur connecté a la permission de supprimer un utilisateur spécifique
+        # Vérifie si l'utilisateur connecté a la permission de supprimer un utilisateur spécifique
         return request.user.role == User.ROLE_MANAGEMENT
 
     def has_permission(self, request, view):
@@ -99,9 +99,9 @@ class UserPermissions(permissions.BasePermission):
                 # Autoriser l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe de gestion
                 return user.role == User.ROLE_MANAGEMENT
 
-            # Vérifier les permissions pour les méthodes non sécurisées (POST, PUT, DELETE)
+            # Vérifie les permissions pour les méthodes non sécurisées (POST, PUT, DELETE)
             else:
-                # Vérifier si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion
+                # Vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion
                 if request.method == 'POST':
                     # Autoriser la création uniquement pour les membres de l'équipe de gestion
                     return user.role == User.ROLE_MANAGEMENT
@@ -109,5 +109,5 @@ class UserPermissions(permissions.BasePermission):
                     return user.role == User.ROLE_MANAGEMENT
 
         except Http404:
-            # Si l'objet user_pk n'est pas trouvé, l'accès est refusé (aucune restriction de permission)
+            # Si l'objet user_pk n'est pas trouvé, l'accès est refusé
             return False

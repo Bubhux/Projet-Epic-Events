@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
 
 from .models import User, Client
-from .permissions import ClientPermissions
+from .permissions import ClientPermissions, UserPermissions
 from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserListSerializer, UserDetailSerializer
 
 
@@ -82,7 +82,7 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserListSerializer
-    permission_classes = [IsAuthenticated, ClientPermissions]
+    permission_classes = [IsAuthenticated, UserPermissions]
 
     serializers = {
         'list': UserListSerializer,

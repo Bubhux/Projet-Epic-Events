@@ -38,19 +38,19 @@ class UserLoginSerializer(serializers.ModelSerializer):
     def get_tokens(self, user):
         """Méthode pour obtenir les jetons (tokens) d'authentification pour l'utilisateur"""
 
-        # Générer les jetons à l'aide de Django REST framework simplejwt
+        # Génére les jetons à l'aide de Django REST framework simplejwt
         tokens = RefreshToken.for_user(user)
         data = {
-            "refresh": str(tokens),  # Convertir le jeton d'actualisation en chaîne
-            "access": str(tokens.access_token)  # Convertir le jeton d'accès en chaîne
+            "refresh": str(tokens),  # Convertie le jeton d'actualisation en chaîne
+            "access": str(tokens.access_token)  # Convertie le jeton d'accès en chaîne
         }
-        # Retourner le dictionnaire contenant les jetons
+        # Retourne le dictionnaire contenant les jetons
         return data
 
     def create(self, validated_data):
         """Méthode pour créer un nouvel utilisateur dans la base de données"""
 
-        # Récupérer le mot de passe à partir des données validées
+        # Récupére le mot de passe à partir des données validées
         password = validated_data.get('password')
 
         # Créer un nouvel utilisateur avec les données validées
@@ -60,7 +60,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
             password=password,  # Utiliser le mot de passe récupéré
         )
 
-        # Définir le mot de passe haché à partir des données validées
+        # Définie le mot de passe haché à partir des données validées
         user.set_password(password)
         user.save()
         return user
