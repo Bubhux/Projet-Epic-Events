@@ -12,6 +12,32 @@ from .permissions import ClientPermissions, UserPermissions
 from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserListSerializer, UserDetailSerializer
 
 
+class AdminUserLoginViewSet(MultipleSerializerMixin, ModelViewSet):
+
+    serializer_class = UserLoginSerializer
+
+    def get_queryset(self):
+        return User.objects.all()
+
+
+class AdminUserViewSet(MultipleSerializerMixin, ModelViewSet):
+
+    serializer_class = UserListSerializer
+    detail_serializer_class = UserDetailSerializer
+
+    def get_queryset(self):
+        return User.objects.all()
+
+
+class AdminUserClientViewSet(MultipleSerializerMixin, ModelViewSet):
+
+    serializer_class = ClientListSerializer
+    detail_serializer_class = ClientDetailSerializer
+
+    def get_queryset(self):
+        return Client.objects.all()
+
+
 class LoginViewSet(generics.CreateAPIView):
     """
     Vue pour la connexion des utilisateurs.

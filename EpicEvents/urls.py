@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from profiles.views import LoginViewSet, ClientViewSet, UserViewSet
+from profiles.views import LoginViewSet, ClientViewSet, UserViewSet, AdminUserLoginViewSet, AdminUserViewSet, AdminUserClientViewSet
 # from contracts.views import ContractClientViewSet
 
 
@@ -31,6 +31,10 @@ router.register(r"users", UserViewSet, basename="users")
 
 router.register(r"clients/(?P<client_pk>\d+)/client_details", ClientViewSet, basename="client-details")
 router.register(r"users/(?P<user_pk>\d+)/user_details", UserViewSet, basename="user-details")
+
+router.register(r"admin/login", AdminUserLoginViewSet, basename="admin-login")
+router.register(r"admin/users", AdminUserViewSet, basename="admin-users")
+router.register(r"admin/clients", AdminUserClientViewSet, basename="admin-clients")
 
 # router.register(r"users/user_details", UserViewSet, basename="user-details")
 # router.register(r'clients/(?P<client_pk>\d+)/', ClientViewSet, basename='clients-details')

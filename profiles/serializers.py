@@ -33,7 +33,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # Champs du modèle User à inclure dans la sérialisation
-        fields = ['id', 'full_name', 'email', 'password', 'tokens']
+        fields = ['id', 'full_name', 'email', 'role', 'is_staff', 'is_active', 'password', 'tokens']
 
     def get_tokens(self, user):
         """Méthode pour obtenir les jetons (tokens) d'authentification pour l'utilisateur"""
@@ -57,6 +57,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             full_name=validated_data['full_name'],
             email=validated_data['email'],
+            role=validated_data['role'],
+            is_staff=True,
+            is_active=True,
             password=password,  # Utiliser le mot de passe récupéré
         )
 
