@@ -1,3 +1,4 @@
+from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -44,7 +45,7 @@ class LoginViewSet(generics.CreateAPIView):
 
 
 class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
-    """ViewSet d'API pour gérer les opérations CRUD sur les objets Client."""
+    """ViewSet pour gérer les opérations CRUD sur les objets Client (CRM)."""
 
     queryset = Client.objects.all()
     serializer_class = ClientListSerializer
@@ -68,7 +69,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         client = self.get_object()
         serializer = ClientDetailSerializer(client)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['GET'])
     def all_clients_details(self, request):
         """Renvoie les détails de tous les clients."""
@@ -76,9 +77,43 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         serializer = ClientDetailSerializer(clients, many=True)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        """Crée un nouveau client."""
+        if not self.request.user.has_create_permission(request):
+            return HttpResponseForbidden("You do not have permission to create a client.")
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        success_message = "Client successfully created."
+        return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        """Met à jour un client existant."""
+        instance = self.get_object()
+        if not self.request.user.has_update_permission(request, instance.user_contact):
+            return HttpResponseForbidden("You do not have permission to update this client.")
+
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        success_message = "Client successfully updated."
+        return Response({"message": success_message, "data": serializer.data})
+
+    def destroy(self, request, *args, **kwargs):
+        """Supprime un client existant."""
+        instance = self.get_object()
+        if not self.request.user.has_delete_permission(request, instance.user_contact):
+            return HttpResponseForbidden("You do not have permission to delete this client.")
+
+        self.perform_destroy(instance)
+        success_message = "Client successfully deleted."
+        return Response({"message": success_message}, status=204)
+
 
 class UserViewSet(MultipleSerializerMixin, ModelViewSet):
-    """ViewSet d'API pour gérer les opérations CRUD sur les objets User."""
+    """ViewSet pour gérer les opérations CRUD sur les objets Utilisateur (CRM)."""
 
     queryset = User.objects.all()
     serializer_class = UserListSerializer
@@ -109,3 +144,37 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         users = User.objects.all()
         serializer = UserDetailSerializer(users, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Crée un nouvel utilisateur."""
+        if not self.request.user.has_create_permission(request):
+            return HttpResponseForbidden("You do not have permission to create a user.")
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        success_message = "User successfully created."
+        return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        """Met à jour un utilisateur existant."""
+        instance = self.get_object()
+        if not self.request.user.has_update_permission(request, instance):
+            return HttpResponseForbidden("You do not have permission to update this user.")
+
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        success_message = "User successfully updated."
+        return Response({"message": success_message, "data": serializer.data})
+
+    def destroy(self, request, *args, **kwargs):
+        """Supprime un utilisateur existant."""
+        instance = self.get_object()
+        if not self.request.user.has_delete_permission(request, instance):
+            return HttpResponseForbidden("You do not have permission to delete this user.")
+
+        self.perform_destroy(instance)
+        success_message = "User successfully deleted."
+        return Response({"message": success_message}, status=204)

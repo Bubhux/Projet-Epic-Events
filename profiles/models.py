@@ -9,7 +9,19 @@ from itertools import cycle
 
 
 class UserManager(BaseUserManager):
+    """
+        Gestionnaire d'utilisateurs personnalisé pour la classe User.
 
+        Méthode create_user:
+            Crée et enregistre un utilisateur avec un e-mail, un mot de passe et un rôle.
+            Si l'utilisateur fait partie de l'équipe de gestion, définir is_superuser à True.
+            Imprime les détails de l'utilisateur après la création.
+
+        Méthode create_superuser:
+            Crée et enregistre un superutilisateur avec un e-mail, un mot de passe et des privilèges d'administration.
+            Appelle la méthode create_user pour créer le superutilisateur.
+            Imprime les détails du superutilisateur après la création.
+    """
     def create_user(self, email, password=None, role=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -51,7 +63,30 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+        Modèle d'utilisateur personnalisé avec prise en charge des rôles et des privilèges d'administration.
 
+        Attributs:
+            ROLE_MANAGEMENT: Constante pour le rôle de l'équipe de gestion.
+            ROLE_SALES: Constante pour le rôle de l'équipe commerciale.
+            ROLE_SUPPORT: Constante pour le rôle de l'équipe de support.
+            ROLE_CHOICES: Choix de rôles disponibles.
+
+        Champs:
+            email: Adresse e-mail de l'utilisateur.
+            role: Rôle de l'utilisateur.
+            is_active: Indique si l'utilisateur est actif.
+            is_staff: Indique si l'utilisateur a des privilèges d'administration.
+            full_name: Nom complet de l'utilisateur.
+            phone_number: Numéro de téléphone de l'utilisateur.
+            date_joined: Date d'adhésion de l'utilisateur.
+
+        Méthodes:
+            __str__: Renvoie une représentation en chaîne de l'utilisateur.
+            has_perm: Vérifie les permissions individuelles.
+            has_module_perms: Vérifie les permissions du module d'application.
+            save: Enregistre l'utilisateur et l'ajoute au groupe "Staff".
+    """
     ROLE_MANAGEMENT = 'Management team'
     ROLE_SALES = 'Sales team'
     ROLE_SUPPORT = 'Support team'
@@ -98,7 +133,27 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Client(models.Model):
+    """
+        Modèle représentant un client dans le CRM.
 
+        Champs:
+            email: Adresse e-mail du client.
+            full_name: Nom complet du client.
+            user_contact: Utilisateur associé au client.
+            phone_number: Numéro de téléphone du client.
+            company_name: Nom de l'entreprise du client.
+            creation_date: Date de création du client.
+            update_date: Date de mise à jour du client.
+            last_contact: Dernier contact du client.
+            sales_contact: Contact commercial associé au client.
+            email_contact_id: Identifiant de contact par e-mail.
+
+        Méthodes:
+            __str__: Renvoie une représentation en chaîne du client.
+            print_details: Imprime les détails du client.
+            assign_sales_contact: Affecte un contact commercial à un client non associé.
+            save: Enregistre le client avec gestion des erreurs d'intégrité.
+    """
     email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
     user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles', related_query_name='client_profile', default=None)
@@ -202,6 +257,12 @@ class Client(models.Model):
 
 
 class UserGroup(models.Model):
+    """
+        Modèle représentant un groupe d'utilisateurs dans le CRM.
+
+        Champs:
+            user: Utilisateur associé au groupe.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 

@@ -7,29 +7,42 @@ from .models import User, Client
 
 class ClientPermissions(permissions.BasePermission):
     """
-    Classe de permission personnalisée pour la vue de l'API gérant les opérations CRUD sur les objets Client.
-    Cette classe contrôle l'accès aux opérations CRUD sur les objets Client en fonction du rôle de l'utilisateur connecté.
+        Classe de permission personnalisée pour la vue d'un CRM gérant les opérations CRUD sur les objets Client.
+        Cette classe contrôle l'accès aux opérations CRUD sur les objets Client en fonction du rôle de l'utilisateur connecté.
+        ...
+        - 'ROLE_SALES': Rôle pour les gestionnaires commerciaux de clients.
+        - 'ROLE_SUPPORT': Rôle pour les membres de l'équipe de support.
+        ...
 
-    Méthode has_permission:
-        - Récupère le client spécifié par la clé primaire 'client_pk' dans l'URL.
-        - Si 'client_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
-        - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires de clients et aux membres de l'équipe de support.
-        - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe de gestion.
-        - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion et de l'équipe support.
+        Méthode has_create_permission:
+            Autorise la création d'un nouveau client uniquement pour les membres de l'équipe commerciale.
 
-    Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion et l'équipe de support.
+        Méthode has_update_permission:
+            Autorise la mise à jour d'un client spécifique par les gestionnaires du client ou l'utilisateur associé.
+
+        Méthode has_delete_permission:
+            Autorise la suppression d'un client spécifique par les gestionnaires du client ou l'utilisateur associé.
+
+        Méthode has_permission:
+            - Récupère le client spécifié par la clé primaire 'client_pk' dans l'URL.
+            - Si 'client_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
+            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès uniquement aux membres de l'équipe commerciale.
+            - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe commerciale.
+            - Pour la création (POST), autorise uniquement les membres de l'équipe commerciale.
+
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe commerciale et l'équipe de support.
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouveau client
-        return request.user.role in [User.ROLE_MANAGEMENT, User.ROLE_SUPPORT]
+        return request.user.role == User.ROLE_SALES
 
     def has_update_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un client spécifique
-        return request.user.role == User.ROLE_MANAGEMENT or request.user == user
+        return request.user.role == User.ROLE_SALES or request.user == user
 
     def has_delete_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de supprimer un client spécifique
-        return request.user.role == User.ROLE_MANAGEMENT or request.user == user
+        return request.user.role == User.ROLE_SALES or request.user == user
 
     def has_permission(self, request, view):
         try:
@@ -42,15 +55,12 @@ class ClientPermissions(permissions.BasePermission):
             client = get_object_or_404(Client, id=client_pk)
             # Méthodes sécurisées : GET, HEAD, OPTIONS
             if request.method in permissions.SAFE_METHODS:
-                # Autorise l'accès aux gestionnaires de clients et aux membres de l'équipe de support
-                if request.user.role == User.ROLE_MANAGEMENT or request.user.role == User.ROLE_SUPPORT:
-                    return True
-                # Vérifie si l'utilisateur connecté est le gestionnaire du client pour les méthodes sécurisées
-                return client.user_contact == request.user
+                # Autorise l'accès uniquement aux membres de l'équipe commerciale
+                return request.user.role == User.ROLE_SALES
 
             # Méthodes non sécurisées : POST, PUT, DELETE
-            # Vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe de gestion
-            if request.user.role == User.ROLE_MANAGEMENT:
+            # Vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe commerciale
+            if request.user.role == User.ROLE_SALES:
                 return True
             return request.user == client.user_contact
 
@@ -61,17 +71,27 @@ class ClientPermissions(permissions.BasePermission):
 
 class UserPermissions(permissions.BasePermission):
     """
-    Classe de permission personnalisée pour la vue de l'API gérant les opérations CRUD sur les objets User.
-    Cette classe contrôle l'accès aux opérations CRUD sur les objets User en fonction du rôle de l'utilisateur connecté.
+        Classe de permission personnalisée pour la vue d'un CRM gérant les opérations CRUD sur les objets User.
+        Cette classe contrôle l'accès aux opérations CRUD sur les objets User en fonction du rôle de l'utilisateur connecté.
+        ...
+        - 'ROLE_MANAGEMENT': Rôle pour les gestionnaires des utilisateurs.
+        ...
+        Méthode has_create_permission:
+            Autorise la création d'un nouvel utilisateur uniquement pour les membres de l'équipe de gestion.
 
-    Méthode has_permission:
-        - Récupère l'utilisateur spécifié par la clé primaire 'user_pk' dans l'URL.
-        - Si 'user_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
-        - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe gestion.
-        - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion.
-        - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion.
+        Méthode has_update_permission:
+            Autorise la mise à jour d'un utilisateur spécifique par les gestionnaires des utilisateurs.
 
-    Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion.
+        Méthode has_delete_permission:
+            Autorise la suppression d'un utilisateur spécifique par les gestionnaires des utilisateurs.
+        Méthode has_permission:
+            - Récupère l'utilisateur spécifié par la clé primaire 'user_pk' dans l'URL.
+            - Si 'user_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
+            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe gestion.
+            - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion.
+            - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion.
+
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion.
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouvel utilisateur

@@ -76,6 +76,9 @@ class GroupAdmin(admin.ModelAdmin):
         # La sous-requête Subquery retourne le nombre total d'objets dans le modèle Client associés au groupe actuel.
         # Cette valeur est utilisée comme annotation 'client_count' pour chaque objet Group dans la requête GroupAdmin.
         # Annoter chaque objet Group avec le résultat de la sous-requête, représentant le nombre total d'objets associés dans le modèle Client.
+        # Récupérer les valeurs de l'annotation 'count' pour le premier objet (le seul objet).
+        # Extrait la valeur de l'annotation count pour le premier objet (le seul objet en utilisant [:1]).
+        # Cela donne le nombre total d'objets dans le modèle Client associés au groupe actuel.
         # Retourner le queryset annoté
         queryset = queryset.annotate(
             client_count=Subquery(
