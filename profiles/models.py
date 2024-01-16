@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.exceptions import ValidationError
 from django.db.models.signals import pre_save, post_save, pre_delete
@@ -62,7 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         (ROLE_SUPPORT, 'Équipe Support'),
     )
 
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, editable=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=True, blank=True, editable=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
@@ -105,7 +105,7 @@ class Client(models.Model):
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
-    update_date = models.DateTimeField(auto_now=True)
+    update_date = models.DateTimeField(auto_now=True, editable=True)
     last_contact = models.DateTimeField(null=True, blank=True)
     sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, editable=True, limit_choices_to={'role': User.ROLE_SALES})
     email_contact_id = models.EmailField(null=True, blank=True, editable=True)
@@ -171,38 +171,39 @@ class Client(models.Model):
                 client.user_contact.groups.add(client_group)
 
     def save(self, *args, **kwargs):
-        # Imprime le nombre total de clients avant la sauvegarde
-        print()
-        print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
+        try:
+            # Vérifie si un client avec le même e-mail existe déjà
+            client_existant = Client.objects.filter(email=self.email).exclude(id=self.id).first()
 
-        # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
-        self.email_contact_id = self.user_contact.email if self.user_contact else None
-        self.sales_contact_id = self.user_contact.id if self.user_contact else None
-        self.update_date = timezone.now()
-        super().save(*args, **kwargs)
+            if client_existant:
+                raise IntegrityError("This user already exists in the database.")
+        except IntegrityError as e:
+            # Gère l'IntegrityError en imprimant le message d'erreur personnalisé
+            print(f"Erreur d'intégrité : {e}")
+            return
+        else:
+            # Imprime le nombre total de clients avant la sauvegarde
+            print()
+            print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
 
-        # Imprime les détails après la sauvegarde
-        self.print_details()
+            # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
+            self.email_contact_id = self.user_contact.email if self.user_contact else None
+            self.sales_contact_id = self.user_contact.id if self.user_contact else None
+            self.update_date = timezone.now()
 
-        # Imprime le nombre total de clients après la sauvegarde
-        print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
+            # Appelle la méthode save de la classe parent pour effectuer la sauvegarde réelle
+            super().save(*args, **kwargs)
+
+            # Imprime les détails après la sauvegarde
+            self.print_details()
+
+            # Imprime le nombre total de clients après la sauvegarde
+            print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
 
 
 class UserGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
-@receiver(pre_delete, sender=Client)
-def delete_client_from_group(sender, instance, **kwargs):
-    # Vérifie si le groupe "Client" existe
-    client_group, created = Group.objects.get_or_create(name='Client')
-    # Retire l'instance du groupe si user_contact est défini
-    if instance.user_contact:
-        instance.user_contact.groups.remove(client_group)
-    elif instance.user_contact_id:
-        # Si user_contact_id est défini mais user_contact est None, utilisez-le pour retirer du groupe
-        user_contact = User.objects.get(id=instance.user_contact_id)
-        user_contact.groups.remove(client_group)
 
 @receiver(post_save, sender=Client)
 def add_client_to_group(sender, instance, **kwargs):
