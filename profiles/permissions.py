@@ -38,11 +38,11 @@ class ClientPermissions(permissions.BasePermission):
 
     def has_update_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un client spécifique
-        return request.user.role == User.ROLE_SALES or request.user == user
+        return request.user.role == User.ROLE_SALES and request.user == user
 
     def has_delete_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de supprimer un client spécifique
-        return request.user.role == User.ROLE_SALES or request.user == user
+        return request.user.role == User.ROLE_SALES and request.user == user
 
     def has_permission(self, request, view):
         try:

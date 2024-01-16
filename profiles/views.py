@@ -80,7 +80,15 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     serializers = {
         'list': ClientListSerializer,
         'retrieve': ClientDetailSerializer,
+        'create' : ClientDetailSerializer,
+        'update' : ClientDetailSerializer
     }
+
+    client_permissions = None
+
+    def initialize_client_permissions(self):
+        """Initialise l'objet ClientPermissions."""
+        self.client_permissions = ClientPermissions()
 
     @action(detail=False, methods=['GET'])
     def client_list(self, request):
@@ -91,8 +99,14 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     @action(detail=True, methods=['GET'])
     def client_details(self, request, pk=None):
-        """Renvoie les détails d'un client spécifique."""
+        """Renvoie les détails d'un client spécifique associé à l'utilisateur."""
+        self.initialize_client_permissions()
         client = self.get_object()
+
+        # Vérifie si le client appartient à l'utilisateur actuellement authentifié
+        if client.user_contact != request.user:
+            return HttpResponseForbidden("You do not have permission to access this client.")
+
         serializer = ClientDetailSerializer(client)
         return Response(serializer.data)
 
@@ -105,10 +119,11 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Crée un nouveau client."""
-        if not self.request.user.has_create_permission(request):
+        self.initialize_client_permissions()
+        if not self.client_permissions.has_create_permission(request):
             return HttpResponseForbidden("You do not have permission to create a client.")
 
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.serializers['create'](data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -117,11 +132,12 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Met à jour un client existant."""
+        self.initialize_client_permissions()
         instance = self.get_object()
-        if not self.request.user.has_update_permission(request, instance.user_contact):
+        if not self.client_permissions.has_update_permission(request, instance.user_contact):
             return HttpResponseForbidden("You do not have permission to update this client.")
 
-        serializer = self.get_serializer(instance, data=request.data)
+        serializer = self.serializers['update'](instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         success_message = "Client successfully updated."
@@ -129,8 +145,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Supprime un client existant."""
+        self.initialize_client_permissions()
         instance = self.get_object()
-        if not self.request.user.has_delete_permission(request, instance.user_contact):
+        if not self.client_permissions.has_delete_permission(request, instance.user_contact):
             return HttpResponseForbidden("You do not have permission to delete this client.")
 
         self.perform_destroy(instance)
@@ -175,13 +192,6 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=False, methods=['GET'])
     def all_users_details(self, request):
         """Renvoie les détails de tous les utilisateurs."""
-        users = User.objects.all()
-        serializer = UserDetailSerializer(users, many=True)
-        return Response(serializer.data)
-
-    def all_users_details(self, request):
-        """Renvoie les détails de tous les utilisateurs."""
-        self.initialize_user_permissions()
         users = User.objects.all()
         serializer = UserDetailSerializer(users, many=True)
         return Response(serializer.data)
