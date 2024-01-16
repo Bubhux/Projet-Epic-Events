@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-from django.db.models import Count
+from django.db.models import Count, Subquery, OuterRef
 
 from .models import User, Client
 
@@ -36,17 +36,23 @@ class ClientAdmin(admin.ModelAdmin):
 
 class GroupAdmin(admin.ModelAdmin):
 
-    list_display = ('name', 'user_count')
+    list_display = ('name', 'total_users')
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(user_count=Count('user'))
+        queryset = queryset.annotate(
+            client_count=Subquery(Client.objects.filter(user_contact__groups=OuterRef('id')).values('user_contact__groups').annotate(count=Count('id')).values('count')[:1])
+        )
         return queryset
 
-    def user_count(self, obj):
-        return obj.user_count
+    def total_users(self, obj):
+        if obj.name == 'Client':
+            return obj.client_count
+        elif obj.name == 'Staff':
+            staff_group = Group.objects.get(name='Staff')
+            return staff_group.user_set.count()
 
-    user_count.short_description = "Nombre d'utilisateurs"
+    total_users.short_description = "Nombre d'utilisateurs"
 
 
 admin.site.register(User, CustomUserAdmin)

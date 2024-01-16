@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.exceptions import ValidationError
-from django.db.models.signals import pre_save, pre_delete, post_save
+from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db.models import Count
@@ -120,16 +120,19 @@ class Client(models.Model):
             return f"Client {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
+        print()
         print(f"ID du client : {self.id}")
         print(f"Nom du client : {self.full_name}")
         print(f"E-mail du client : {self.email}")
         print(f"Compagnie du client : {self.company_name}")
+        print()
 
         # Imprime les détails du contact commercial
         if self.sales_contact:
             print(f"Contact commercial : {self.sales_contact.full_name}")
             print(f"E-mail du contact commercial : {self.sales_contact.email}")
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
+            print()
 
     @classmethod
     def assign_sales_contact(cls):
@@ -169,6 +172,7 @@ class Client(models.Model):
 
     def save(self, *args, **kwargs):
         # Imprime le nombre total de clients avant la sauvegarde
+        print()
         print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
 
         # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
