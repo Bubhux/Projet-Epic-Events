@@ -53,15 +53,15 @@ urlpatterns = [
     # URL pour le rafraîchissement du token JWT
     path('crm/token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
 
-    # Configurer le chemin pour l'action 'all_details'
-    #path('crm/clients/all_clients_details/', ClientViewSet.as_view({'get': 'all_clients_details'}), name='all-clients-details'),
+    # Configurer le chemin pour l'action 'all_clients_details'
+    path('crm/clients/all_clients_details/', ClientViewSet.as_view({'get': 'all_clients_details'}), name='all-clients-details'),
     # Configurer le chemin pour l'action 'client_details'
-    #path('crm/clients/client_details/<int:pk>/', ClientViewSet.as_view({'get': 'client_details'}), name='client-details'),
+    path('crm/clients/client_details/<int:pk>/', ClientViewSet.as_view({'get': 'client_details'}), name='client-details'),
     
+    # Configurer le chemin pour l'action 'all_users_details'
+    path('crm/users/all_users_details/', UserViewSet.as_view({'get': 'all_users_details'}), name='all-users-details'),
     # Configurer le chemin pour l'action 'user_details'
-    #path('crm/users/all_users_details/', UserViewSet.as_view({'get': 'all_users_details'}), name='all-users-details'),
-    # Configurer le chemin pour l'action 'user_details'
-    #path('crm/users/user_details/<int:pk>/', UserViewSet.as_view({'get': 'user_details'}), name='user-details'),
+    path('crm/users/user_details/<int:pk>/', UserViewSet.as_view({'get': 'user_details'}), name='user-details'),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))
