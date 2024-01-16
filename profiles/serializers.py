@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from django.utils.translation import gettext_lazy as _
 
 from .models import User, Client
 
@@ -68,25 +67,14 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class ClientListSerializer(serializers.ModelSerializer):
-    """Sérialiseur pour afficher une liste d'objets Client.
 
-    Ce sérialiseur est utilisé pour représenter une liste d'objets Client
-    lorsqu'ils sont récupérés via une requête GET sur l'endpoint 'crm/clients/'.
-    Il inclut uniquement les champs 'full_name', 'id', 'email', 'phone_number', 'company_name' dans la réponse.
-    """
     class Meta:
         model = Client
         fields = ['full_name', 'id', 'email', 'phone_number', 'company_name']
 
 
 class ClientDetailSerializer(serializers.ModelSerializer):
-    """Sérialiseur pour afficher les détails d'un objet Client.
 
-    Ce sérialiseur est utilisé pour représenter les détails d'un objet Client
-    lorsqu'il est récupéré via une requête GET sur l'endpoint 'crm/clients/<pk>/'.
-    Il inclut les champs 'full_name', 'id', 'email', 'phone_number', 'company_name', 'creation_date',
-    'update_date', 'last_contact', 'sales_contact', 'email_contact_id' dans la réponse.
-    """
     class Meta:
         model = Client
         fields = ['full_name', 'id', 'email', 'phone_number', 'company_name', 'creation_date',
@@ -94,7 +82,6 @@ class ClientDetailSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    clients = ClientListSerializer(many=True)
 
     class Meta:
         model = User
@@ -102,8 +89,7 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    clients = ClientDetailSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['full_name', 'id', 'email', 'user_contact', 'role', 'is_staff', 'clients']
+        fields = ['full_name', 'id', 'email', 'role', 'is_staff']

@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 
 from .models import User, Client
 from .permissions import ClientPermissions
-from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserDetailSerializer
+from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserListSerializer, UserDetailSerializer
 
 
 class LoginViewSet(generics.CreateAPIView):
@@ -57,9 +57,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def client_list(self, request):
-
+        """Renvoie tous les clients."""
         clients = Client.objects.filter(user_contact=request.user)
-        serializer = ClientListSerializer(clients, many=True)
+        serializer = ClientDetailSerializer(clients, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['GET'])
@@ -68,21 +68,44 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         client = self.get_object()
         serializer = ClientDetailSerializer(client)
         return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
     
     @action(detail=False, methods=['GET'])
-    def all_details(self, request):
+    def all_clients_details(self, request):
         """Renvoie les détails de tous les clients."""
         clients = Client.objects.all()
         serializer = ClientDetailSerializer(clients, many=True)
         return Response(serializer.data)
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(MultipleSerializerMixin, ModelViewSet):
+    """ViewSet d'API pour gérer les opérations CRUD sur les objets User."""
 
     queryset = User.objects.all()
-    serializer_class = UserDetailSerializer
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated, ClientPermissions]
+
+    serializers = {
+        'list': UserListSerializer,
+        'retrieve': UserDetailSerializer,
+    }
+
+    @action(detail=False, methods=['GET'])
+    def user_list(self, request):
+        """Renvoie tous les utilisateurs."""
+        users = User.objects.all()
+        serializer = UserListSerializer(users, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['GET'])
+    def user_details(self, request, pk=None):
+        """Renvoie les détails d'un utilisateur spécifique."""
+        user = self.get_object()
+        serializer = UserDetailSerializer(user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'])
+    def all_users_details(self, request):
+        """Renvoie les détails de tous les utilisateurs."""
+        users = User.objects.all()
+        serializer = UserDetailSerializer(users, many=True)
+        return Response(serializer.data)
