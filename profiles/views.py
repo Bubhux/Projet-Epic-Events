@@ -148,7 +148,15 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     serializers = {
         'list': UserListSerializer,
         'retrieve': UserDetailSerializer,
+        'create': UserDetailSerializer,
+        'update': UserDetailSerializer,
     }
+
+    user_permissions = None
+
+    def initialize_user_permissions(self):
+        """Initialise l'objet UserPermissions."""
+        self.user_permissions = UserPermissions()
 
     @action(detail=False, methods=['GET'])
     def user_list(self, request):
@@ -171,14 +179,20 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         serializer = UserDetailSerializer(users, many=True)
         return Response(serializer.data)
 
+    def all_users_details(self, request):
+        """Renvoie les détails de tous les utilisateurs."""
+        self.initialize_user_permissions()
+        users = User.objects.all()
+        serializer = UserDetailSerializer(users, many=True)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         """Crée un nouvel utilisateur."""
-        user_permissions = UserPermissions()
-
-        if not user_permissions.has_create_permission(request.user):
+        self.initialize_user_permissions()
+        if not self.user_permissions.has_create_permission(request.user):
             return HttpResponseForbidden("You do not have permission to create a user.")
 
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.serializers['create'](data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -187,13 +201,12 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Met à jour un utilisateur existant."""
-        user_permissions = UserPermissions()
-
+        self.initialize_user_permissions()
         instance = self.get_object()
-        if not user_permissions.has_update_permission(self.request.user, instance):
+        if not self.user_permissions.has_update_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to update this user.")
 
-        serializer = self.get_serializer(instance, data=request.data)
+        serializer = self.serializers['update'](instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         success_message = "User successfully updated."
@@ -201,10 +214,9 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Supprime un utilisateur existant."""
-        user_permissions = UserPermissions()
-
+        self.initialize_user_permissions()
         instance = self.get_object()
-        if not user_permissions.has_delete_permission(self.request.user, instance):
+        if not self.user_permissions.has_delete_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to delete this user.")
 
         self.perform_destroy(instance)

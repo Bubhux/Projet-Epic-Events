@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
 
 from .models import User, Client
 
@@ -123,15 +125,33 @@ class UserListSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     """
-        Serializer pour les détails d'un utilisateur.
-        Ce serializer est utilisé pour représenter les détails d'un utilisateur spécifique dans le CRM.
+        Sérialiseur pour les détails d'un utilisateur.
+        Ce sérialiseur est utilisé pour représenter les détails d'un utilisateur spécifique dans le CRM.
 
-        Champ 'full_name': Nom complet de l'utilisateur.
-        Champ 'id': Identifiant unique de l'utilisateur.
-        Champ 'email': Adresse e-mail de l'utilisateur.
-        Champ 'role': Rôle de l'utilisateur dans le système.
-        Champ 'is_staff': Indique si l'utilisateur a des privilèges d'administration.
+        Champs :
+        - 'full_name': Nom complet de l'utilisateur.
+        - 'id': Identifiant unique de l'utilisateur.
+        - 'email': Adresse e-mail de l'utilisateur.
+        - 'role': Rôle de l'utilisateur dans le système.
+        - 'is_staff': Indique si l'utilisateur a des privilèges d'administration.
+        - 'is_active': Indique si le compte de l'utilisateur est actif.
+        - 'phone_number': Numéro de téléphone de l'utilisateur.
+        - 'password': Mot de passe de l'utilisateur (en écriture seule).
+
+        Méthodes :
+        - 'validate_password': Méthode de validation personnalisée pour le champ 'password'.
+        Assure que le mot de passe n'est pas vide et le hache avant de l'enregistrer.
+
+        Remarque : Le champ 'password' est en écriture seule et n'est pas inclus lors de la récupération des détails de l'utilisateur.
     """
     class Meta:
         model = User
-        fields = ['full_name', 'id', 'email', 'role', 'is_staff']
+        fields = ['full_name', 'id', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'password']
+
+    def validate_password(self, value):
+        # Vérifier que le mot de passe n'est pas vide
+        if value is not None:
+            # Hacher le mot de passe avant de l'enregistrer
+            return make_password(value)
+        # Le mot de passe est vide, lever une erreur de validation
+        raise ValidationError("Le mot de passe est vide")
