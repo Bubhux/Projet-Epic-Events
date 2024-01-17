@@ -177,6 +177,7 @@ class Client(models.Model):
             return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
+        """Affiche les détails de client dans la console."""
         print()
         print(f"ID du client : {self.id}")
         print(f"Nom du client : {self.full_name}")
@@ -194,6 +195,7 @@ class Client(models.Model):
         print()
 
     def assign_sales_contact(self):
+        """Affecte un contact commercial à un client non associé."""
         # Obtient tous les utilisateurs de l'équipe commerciale avec le nombre de clients associés à chacun
         sales_team = User.objects.filter(role=User.ROLE_SALES)
 
@@ -229,6 +231,13 @@ class Client(models.Model):
                 client.user_contact.groups.add(client_group)
 
     def save(self, *args, **kwargs):
+        """
+            Sauvegarde l'instance après vérification de la non-existence d'un client avec le même e-mail.
+            Met à jour les colonnes email_id et sales_contact_id.
+            Appelle la méthode save de la classe parent pour effectuer la sauvegarde réelle.
+            Imprime les détails avant et après la sauvegarde.
+            Exécute automatiquement la méthode assign_sales_contact après la sauvegarde.
+        """
         try:
             # Vérifie si un client avec le même e-mail existe déjà
             client_existant = Client.objects.filter(email=self.email).exclude(id=self.id).first()
@@ -274,6 +283,10 @@ class UserGroup(models.Model):
 
 @receiver(post_save, sender=Client)
 def add_client_to_group(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée après la sauvegarde d'une instance de Client.
+        Ajoute l'instance de Client au groupe "Client" si elle est associée à un contact utilisateur ou un utilisateur commercial.
+    """
     # Vérifie si le groupe "Client" existe
     client_group, created = Group.objects.get_or_create(name='Client')
 
@@ -285,13 +298,23 @@ def add_client_to_group(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=User)
 def delete_user_groups(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée avant la suppression d'une instance de User.
+        Supprime les enregistrements associés dans la table UserGroup.
+    """
     # Supprime les enregistrements associés dans la table UserGroup
     UserGroup.objects.filter(user=instance).delete()
 
 @receiver(pre_save, sender=Client)
 def set_sales_contact_id(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée avant chaque sauvegarde d'un objet Client.
+        Vérifie si sales_contact est défini et sales_contact_id n'est pas défini.
+        Mets à jour sales_contact_id avec l'ID de l'utilisateur associé.
+    """
     # Cette fonction sera appelée avant chaque enregistrement (save) d'un objet Client
     # Vérifie si sales_contact est défini et sales_contact_id n'est pas défini
     if instance.sales_contact and not instance.sales_contact_id:
         # Mets à jour sales_contact_id avec l'ID de l'utilisateur associé
         instance.sales_contact_id = instance.sales_contact.id
+

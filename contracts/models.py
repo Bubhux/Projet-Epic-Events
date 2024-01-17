@@ -38,6 +38,7 @@ class Contract(models.Model):
         return f"Contrat ID : {self.id} {status_contract_str} - {client_name}"
 
     def print_details(self):
+        """Affiche les détails de contrat dans la console."""
         print()
         print(f"ID du contrat : {self.id}")
 
@@ -50,12 +51,20 @@ class Contract(models.Model):
         print()
 
     def save(self, *args, **kwargs):
+        """
+            Enregistre le contrat.
+            
+            Si le contrat est nouvellement créé et le sales_contact n'est pas défini,
+            attribuez-le automatiquement en utilisant le sales_contact du client associé.
+            Met à jour la date de mise à jour avant de sauvegarder.
+            Imprime les détails après la sauvegarde.
+        """
         # Si le contrat est nouvellement créé et le sales_contact n'est pas défini,
         # attribuez-le automatiquement en utilisant le sales_contact du client associé
         if not self.id and not self.sales_contact and self.client and self.client.sales_contact:
             self.sales_contact = self.client.sales_contact
 
-        # Mettre à jour la date de mise à jour avant de sauvegarder
+        # Met à jour la date de mise à jour avant de sauvegarder
         self.update_date = timezone.now()
         super(Contract, self).save(*args, **kwargs)
 
