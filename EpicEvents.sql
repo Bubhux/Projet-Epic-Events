@@ -1,7 +1,7 @@
 
 CREATE TABLE `user` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(30) NOT NULL UNIQUE,
+  `full_name` varchar(255) NOT NULL UNIQUE,
   `password` varchar(128) NOT NULL,
   `email` varchar(255) NOT NULL UNIQUE,
   `department` varchar(20) NOT NULL,
@@ -19,5 +19,6 @@ CREATE TABLE `client` (
   `last_contact` date DEFAULT NULL,
   `sales_contact` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`sales_contact`) REFERENCES `user`(`id`)
+  FOREIGN KEY (`sales_contact`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
+

@@ -35,6 +35,8 @@ Exemple d'utilisation :
 """
 
 from django.core.management.utils import get_random_secret_key
+import os
+from tkinter import Tk, filedialog
 
 # Liste des noms de variables d'environnement
 env_variable_names = [
@@ -46,19 +48,48 @@ env_variable_names = [
     'DB_PORT',
 ]
 
-# Générer la clé secrète aléatoire
+# Génére la clé secrète aléatoire
 secret_key = get_random_secret_key()
 
-# Afficher un message pour indiquer que le script est en cours d'exécution
-print("Creating .env file...")
+# Créer une instance de la classe Tk
+root = Tk()
+
+# Cache la fenêtre principale
+root.withdraw()
+
+# Spécifie un nom de fichier par défaut
+default_file_name = ".env"
+
+# Demande à l'utilisateur de choisir l'emplacement du fichier .env
+env_file_path = filedialog.asksaveasfilename(
+    title="Choisissez l'emplacement du fichier .env",
+    defaultextension=".env",
+    initialfile=default_file_name,
+    filetypes=[("Fichiers .env", ".env"), ("Tous les fichiers", ".*")],
+)
+
+# Assure que l'utilisateur a bien sélectionné un emplacement
+if env_file_path:
+    print(f"Emplacement choisi pour le fichier .env : {env_file_path}")
+else:
+    print("Aucun emplacement choisi. Opération annulée.")
+
+# Vérifie si l'utilisateur a annulé la boîte de dialogue
+if not env_file_path:
+    print("Annulation de la création du fichier .env.")
+    exit()
+
+# Affiche un message pour indiquer que le script est en cours d'exécution
+print(f"Creating .env file at {env_file_path}...")
 
 # Ouvrir le fichier .env en mode écriture
-with open(".env", "w") as f:
+with open(env_file_path, "w") as f:
     # Écrire les noms des variables d'environnement avec leurs valeurs
     f.write(f"DJANGO_SECRET_KEY={secret_key}\n")
     for env_var in env_variable_names[1:]:
         f.write(f"{env_var}=\n")
 
-# Afficher un message indiquant que le modèle de fichier .env a été créé
+# Affiche un message indiquant que le modèle de fichier .env a été créé
 print("\n.env file created!")
+
 
