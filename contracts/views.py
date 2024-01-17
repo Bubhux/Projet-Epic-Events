@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 
 from .models import Contract
 from .permissions import ContractPermissions
-from .serializers import MultipleSerializerMixin, ContractListSerializer, ContractDetailSerializer
+from .serializers import MultipleSerializerMixin, ContractListSerializer, ContractDetailSerializer, ContractCreateUpdateSerializer
 
 
 class AdminContractViewSet(MultipleSerializerMixin, ModelViewSet):
@@ -43,8 +43,8 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
     serializers = {
         'list': ContractListSerializer,
         'retrieve': ContractDetailSerializer,
-        'create' : ContractDetailSerializer,
-        'update' : ContractDetailSerializer
+        'create': ContractCreateUpdateSerializer,
+        'update': ContractCreateUpdateSerializer
     }
 
     contract_permissions = None

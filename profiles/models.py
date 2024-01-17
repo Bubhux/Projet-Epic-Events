@@ -193,8 +193,7 @@ class Client(models.Model):
             print("Aucun contact commercial associé.")
         print()
 
-    @classmethod
-    def assign_sales_contact(cls):
+    def assign_sales_contact(self):
         # Obtient tous les utilisateurs de l'équipe commerciale avec le nombre de clients associés à chacun
         sales_team = User.objects.filter(role=User.ROLE_SALES)
 
@@ -214,7 +213,7 @@ class Client(models.Model):
         client_group, created = Group.objects.get_or_create(name='Client')
 
         # Parcourt tous les clients non associés et leur assigne un contact commercial
-        unassigned_clients = cls.objects.filter(user_contact=None)
+        unassigned_clients = Client.objects.filter(user_contact=None)
         for client in unassigned_clients:
             # Vérifie si user_contact est défini avant d'assigner le client à un contact commercial
             if not client.user_contact:
@@ -258,6 +257,9 @@ class Client(models.Model):
 
             # Imprime le nombre total de clients après la sauvegarde
             print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
+
+            # Exécute automatiquement la méthode assign_sales_contact après la sauvegarde
+            self.assign_sales_contact()
 
 
 class UserGroup(models.Model):

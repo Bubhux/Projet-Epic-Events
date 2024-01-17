@@ -16,13 +16,16 @@ class Contract(models.Model):
         - status_contract: Statut du contrat (signé ou non signé).
         - total_amount: Montant total du contrat.
         - remaining_amount: Montant restant à payer sur le contrat.
+
+        Méthodes:
+            __str__: Renvoie une représentation en chaîne du contrat.
+            print_details: Imprime les détails du contrat.
+            save: Enregistre le contrat.
     """
     sales_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sales Contact")
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='contracts', verbose_name="Client")
-
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
-
     status_contract = models.BooleanField(default=False, verbose_name="Contract signed")
     total_amount = models.FloatField(default=0.0)
     remaining_amount = models.FloatField(default=0.0)

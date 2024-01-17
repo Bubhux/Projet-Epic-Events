@@ -39,15 +39,29 @@ class ContractPermissions(permissions.BasePermission):
 
     def has_update_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un contrat spécifique.
-        # Autorise uniquement les membres de l'équipe gestion et si l'utilisateur connecté est le gestionnaire du contrat
-        # ou le responsable commercial associé au client du contrat.
-        return request.user.role == User.ROLE_MANAGEMENT and (request.user == user or request.user == user.sales_contact)
+        # Autorise les membres de l'équipe gestion et les membres de l'équipe commerciale associés au contrat et au client.
+        return (
+            request.user.role == User.ROLE_MANAGEMENT or
+            (
+                request.user.role == User.ROLE_SALES and (
+                    request.user == user or
+                    (hasattr(user, 'client') and request.user in user.client.sales_contact.all())
+                )
+            )
+        )
 
     def has_delete_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de supprimer un contrat spécifique.
-        # Autorise uniquement les membres de l'équipe gestion et si l'utilisateur connecté est le gestionnaire du contrat
-        # ou le responsable commercial associé au client du contrat.
-        return request.user.role == User.ROLE_MANAGEMENT and (request.user == user or request.user == user.sales_contact)
+        # Autorise les membres de l'équipe gestion et les membres de l'équipe commerciale associés au contrat et au client.
+        return (
+            request.user.role == User.ROLE_MANAGEMENT or
+            (
+                request.user.role == User.ROLE_SALES and (
+                    request.user == user or
+                    (hasattr(user, 'client') and request.user in user.client.sales_contact.all())
+                )
+            )
+        )
 
     def has_permission(self, request, view):
         try:
@@ -57,18 +71,14 @@ class ContractPermissions(permissions.BasePermission):
             if not contract_pk:
                 return True
 
-            contract = get_object_or_404(Contract, id=contract_pk)
             # Méthodes sécurisées : GET, HEAD, OPTIONS
             if request.method in permissions.SAFE_METHODS:
-                # Autorise l'accès uniquement aux membres de l'équipe gestion
-                return request.user.role == User.ROLE_MANAGEMENT
+                # Autorise l'accès uniquement aux membres de l'équipe gestion et de l'équipe commerciale
+                return request.user.role in [User.ROLE_MANAGEMENT, User.ROLE_SALES]
 
             # Méthodes non sécurisées : POST, PUT, DELETE
-            # Vérifie si l'utilisateur connecté est le gestionnaire du contrat ou membre de l'équipe gestion
-            if request.user.role == User.ROLE_MANAGEMENT or request.user == contract.sales_contact:
-                return True
-
-            return False
+            # Vérifie si l'utilisateur connecté est le gestionnaire du contrat ou membre de l'équipe gestion ou commerciale
+            return request.user.role in [User.ROLE_MANAGEMENT, User.ROLE_SALES]
 
         except Http404:
             # Si l'objet contract_pk n'est pas trouvé, l'accès est refusé

@@ -3,6 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.serializers import ModelSerializer
 
 from .models import Contract
+from profiles.models import User, Client
 
 
 class MultipleSerializerMixin:
@@ -20,6 +21,31 @@ class MultipleSerializerMixin:
                 self.action == 'destroy') and self.detail_serializer_class is not None:
             return self.detail_serializer_class
         return super().get_serializer_class()
+
+
+class ContractCreateUpdateSerializer(serializers.ModelSerializer):
+    """
+        Sérialiseur pour la création et la mise à jour d'instances de Contrat.
+
+        Ce sérialiseur est utilisé pour gérer la création et la mise à jour d'objets Contrat
+        au sein du CRM. Il inclut des champs permettant de spécifier le client, le contact commercial,
+        le statut, le montant total et le montant restant.
+
+        Champs :
+        - 'client': Un SlugRelatedField représentant le client associé au contrat.
+                    Il permet de spécifier le client en utilisant son nom complet.
+        - 'sales_contact': Un SlugRelatedField représentant le contact commercial associé au contrat.
+                        Il permet de spécifier le contact commercial en utilisant son nom complet.
+        - 'status_contract': Un champ booléen représentant le statut du contrat.
+        - 'total_amount': Un champ double représentant le montant total du contrat.
+        - 'remaining_amount': Un champ double représentant le montant restant à payer sur le contrat.
+    """
+    client = serializers.SlugRelatedField(slug_field='full_name', queryset=Client.objects.all())
+    sales_contact = serializers.SlugRelatedField(slug_field='full_name', queryset=User.objects.filter(role=User.ROLE_SALES))
+
+    class Meta:
+        model = Contract
+        fields = ['client', 'sales_contact', 'status_contract', 'total_amount', 'remaining_amount']
 
 
 class ContractListSerializer(serializers.ModelSerializer):

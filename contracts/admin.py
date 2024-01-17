@@ -9,7 +9,7 @@ class ContractAdmin(admin.ModelAdmin):
     Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
     """
 
-    list_display = ( 'client', 'status_contract', 'sales_contact', 'creation_date', 'update_date')
+    list_display = ( 'client', 'status_contract', 'sales_contact', 'creation_date')
     ordering = ('status_contract',)
     search_fields = ('sales_contact__full_name', 'client__full_name')
 
