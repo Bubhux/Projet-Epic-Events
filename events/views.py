@@ -57,7 +57,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=False, methods=['GET'])
     def events_list(self, request):
         """Renvoie tous les événements."""
-        events = Event.objects.filter(sales_contact=request.user)
+        events = Event.objects.filter(support_contact=request.user)
         serializer = EventDetailSerializer(events, many=True)
         return Response(serializer.data)
 

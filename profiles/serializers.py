@@ -110,14 +110,14 @@ class ClientDetailSerializer(serializers.ModelSerializer):
         - 'update_date': Date de mise à jour du client.
         - 'last_contact': Dernier contact du client.
         - 'sales_contact': Gestionnaire des ventes en charge du client.
-        - 'email_contact_id': Identifiant de contact par e-mail.
+        - 'email_contact': E-mail du contact commercial.
     """
     sales_contact = serializers.ReadOnlyField(source='sales_contact.full_name')
 
     class Meta:
         model = Client
         fields = ['id', 'full_name', 'email', 'phone_number', 'company_name', 'creation_date',
-                  'update_date', 'last_contact', 'sales_contact', 'email_contact_id']
+                  'update_date', 'last_contact', 'sales_contact', 'email_contact']
 
 
 class UserListSerializer(serializers.ModelSerializer):

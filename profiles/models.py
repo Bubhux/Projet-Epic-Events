@@ -164,7 +164,7 @@ class Client(models.Model):
     update_date = models.DateTimeField(auto_now=True, editable=True)
     last_contact = models.DateTimeField(null=True, blank=True)
     sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, editable=True, limit_choices_to={'role': User.ROLE_SALES})
-    email_contact_id = models.EmailField(null=True, blank=True, editable=True)
+    email_contact = models.EmailField(null=True, blank=True, editable=True)
 
     class Meta:
         ordering = ['update_date']
