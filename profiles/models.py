@@ -157,7 +157,7 @@ class Client(models.Model):
     """
     email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles', related_query_name='client_profile', default=None)
+    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='user_contact_clients', related_query_name='user_contact_client', default=None)
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)

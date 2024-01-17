@@ -26,13 +26,13 @@ class Event(models.Model):
             save: Surcharge la méthode save pour mettre à jour client_name et client_contact avant la sauvegarde.
     """
     event = models.CharField(max_length=255, blank=True)
-    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, blank=True, related_name='events', verbose_name="Contract")
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='events', verbose_name="Client")
+    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, blank=True, related_name='contract_events', verbose_name="Contract")
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='client_events', verbose_name="Client")
     client_name = models.CharField(max_length=255, blank=True)
     client_contact = models.CharField(max_length=255, blank=True)
     event_date_start = models.DateTimeField(null=True, blank=True)
     event_date_end = models.DateTimeField(null=True, blank=True)
-    support_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='events', verbose_name="Support Contact", limit_choices_to={'role': User.ROLE_SUPPORT})
+    support_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='support_contact_events', verbose_name="Support Contact", limit_choices_to={'role': User.ROLE_SUPPORT})
     location = models.TextField(blank=True)
     attendees = models.PositiveIntegerField(default=0)
     notes = models.TextField(blank=True)

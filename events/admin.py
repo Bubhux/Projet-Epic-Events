@@ -5,8 +5,8 @@ from .models import Event
 
 class EventAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Event.
-    Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
+        Personnalisation de l'interface d'administration pour le modèle Event.
+        Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
     """
 
     list_display = ( 'client', 'event', 'contract', 'support_contact')

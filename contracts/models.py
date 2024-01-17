@@ -23,7 +23,7 @@ class Contract(models.Model):
             save: Enregistre le contrat.
     """
     sales_contact = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sales Contact")
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='contracts', verbose_name="Client")
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='client_contracts', verbose_name="Client")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     status_contract = models.BooleanField(default=False, verbose_name="Contract signed")
