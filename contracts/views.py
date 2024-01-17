@@ -1,71 +1,115 @@
-from rest_framework import status, serializers
+from django.http import HttpResponseForbidden
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import get_object_or_404
-from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
 
-
 from .models import Contract
-from profiles.serializers import MultipleSerializerMixin
+from .permissions import ContractPermissions
+from .serializers import MultipleSerializerMixin, ContractListSerializer, ContractDetailSerializer
 
 
-class ContractClientViewSet(MultipleSerializerMixin, ModelViewSet):
-    """ViewSet d'API pour gérer les contrats d'un objet Client spécifique."""
+class AdminContractViewSet(MultipleSerializerMixin, ModelViewSet):
 
-    # serializer_class = ContractListSerializer
-    # detail_serializer_class = ContractDetailSerializer
-    # permission_classes = [IsAuthenticated, ContractPermissions]
-
-    def get_contract(self, contract_pk):
-        """Récupère l'objet Contract spécifié par la clé primaire passée dans l'URL."""
-        return get_object_or_404(Contract, id=contract_pk)
+    serializer_class = ContractListSerializer
+    detail_serializer_class = ContractDetailSerializer
 
     def get_queryset(self):
-        """Renvoie les contrats associées à l'objet Client spécifié dans l'URL."""
-        contract_pk = self.kwargs.get('contract_pk')
-        coontract = self.get_project(conrtract_pk)
-        return Contract.objects.filter(client=client)
+        return Contract.objects.all()
 
-    def perform_create(self, serializer):
-        """Sauvegarde un nouvel objet Contract associé à l'objet Client spécifié et à l'auteur actuellement connecté."""
-        contract_pk = self.kwargs.get('contract_pk')
-        contract = self.get_contract(contract_pk)
-        assignee_id = self.request.data.get('assignee')
-        print(f"Assignee ID from request data: {assignee_id}")
-        if assignee_id:
-            try:
-                assignee = get_user_model().objects.get(id=assignee_id)
-                serializer.save(client=client, author=self.request.user, assignee=assignee)
-                print(f"Assignee found: {assignee}")
-            except get_user_model().DoesNotExist:
-                print("Assignee not found")
-                try:
-                    assignee = get_user_model().objects.get(id=assignee_id)
-                except get_user_model().DoesNotExist:
-                    raise serializers.ValidationError("Invalid assignee ID")
-        else:
-            serializer.save(project=project, author=self.request.user)
 
-    def update(self, request, client_pk, pk):
-        """Met à jour l'objet Contract spécifié associé à l'objet Client spécifié."""
-        contract = self.get_object()
-        serializer = self.serializer_class(contract, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
+    """ViewSet pour gérer les opérations CRUD sur les objets Contract (CRM)."""
 
+    def __init__(self, *args, **kwargs):
+        """
+            Initialise une nouvelle instance de ContractViewSet.
+
+            Args:
+                *args: Arguments positionnels.
+                **kwargs: Arguments nommés.
+
+            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            avec les arguments reçus, puis initialise les permissions du contrat.
+        """
+        super().__init__(*args, **kwargs)
+        self.initialize_contract_permissions()
+
+    queryset = Contract.objects.all()
+    serializer_class = ContractListSerializer
+    permission_classes = [IsAuthenticated, ContractPermissions]
+
+    serializers = {
+        'list': ContractListSerializer,
+        'retrieve': ContractDetailSerializer,
+        'create' : ContractDetailSerializer,
+        'update' : ContractDetailSerializer
+    }
+
+    contract_permissions = None
+
+    def initialize_contract_permissions(self):
+        """Initialise l'objet ContractPermissions."""
+        if self.contract_permissions is None:
+            self.contract_permissions = ContractPermissions()
+
+    @action(detail=False, methods=['GET'])
+    def contracts_list(self, request):
+        """Renvoie tous les contrats."""
+        contracts = Contract.objects.filter(sales_contact=request.user)
+        serializer = ContractDetailSerializer(contracts, many=True)
         return Response(serializer.data)
 
-    def create(self, request, client_pk):
-        """Crée un nouvel objet Contract associé à l'objet Client spécifié."""
-        serializer = self.serializer_class(data=request.data)
+    @action(detail=True, methods=['GET'])
+    def contract_details(self, request, pk=None):
+        """Renvoie les détails d'un contrat spécifique associé à l'utilisateur."""
+        contract = self.get_object()
+
+        # Vérifie si le contrat appartient à l'utilisateur actuellement authentifié
+        if contract.sales_contact != request.user:
+            return HttpResponseForbidden("You do not have permission to access this contract.")
+
+        serializer = ContractDetailSerializer(contract)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'])
+    def all_contracts_details(self, request):
+        """Renvoie les détails de tous les contrats."""
+        contracts = Contract.objects.all()
+        serializer = ContractDetailSerializer(contracts, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """Crée un nouveau contrat."""
+        if not self.contract_permissions.has_create_permission(request):
+            return HttpResponseForbidden("You do not have permission to create a contract.")
+
+        serializer = self.serializers['create'](data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        headers = self.get_success_headers(serializer.data)
+        success_message = "Contract successfully created."
+        return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
 
-    def destroy(self, request, client_pk, pk):
-        """Supprime l'objet Contract spécifié associé à l'objet Client spécifié."""
-        contract = self.get_object()
-        contract.delete()
-        return Response('Contract successfully deleted.', status=status.HTTP_204_NO_CONTENT)
+    def update(self, request, *args, **kwargs):
+        """Met à jour un contrat existant."""
+        instance = self.get_object()
+        if not self.contract_permissions.has_update_permission(request, instance.sales_contact):
+            return HttpResponseForbidden("You do not have permission to update this contract.")
+
+        serializer = self.serializers['update'](instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        success_message = "Contract successfully updated."
+        return Response({"message": success_message, "data": serializer.data})
+
+    def destroy(self, request, *args, **kwargs):
+        """Supprime un contrat existant."""
+        instance = self.get_object()
+        if not self.contract_permissions.has_delete_permission(request, instance.sales_contact):
+            return HttpResponseForbidden("You do not have permission to delete this contract.")
+
+        self.perform_destroy(instance)
+        success_message = "Contract successfully deleted."
+        return Response({"message": success_message}, status=204)

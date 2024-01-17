@@ -112,7 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         """Renvoie une représentation lisible de l'instance de User."""
-        return f"{self.get_role_display()} - {self.full_name} ({self.email})"
+        return f"User ID : {self.id} {self.get_role_display()} - {self.full_name} ({self.email})"
 
     def has_perm(self, perm, obj=None):
         # Vérifie les permissions individuelles
@@ -172,9 +172,9 @@ class Client(models.Model):
     def __str__(self):
         """Renvoie une représentation lisible de l'instance de Client."""
         if self.user_contact:
-            return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
+            return f"Client ID : {self.id} {self.full_name} - Contact commercial {self.user_contact.full_name}"
         else:
-            return f"Client {self.full_name} - Aucun contact commercial associé"
+            return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
         print()
@@ -189,7 +189,9 @@ class Client(models.Model):
             print(f"Contact commercial : {self.sales_contact.full_name}")
             print(f"E-mail du contact commercial : {self.sales_contact.email}")
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
-            print()
+        else:
+            print("Aucun contact commercial associé.")
+        print()
 
     @classmethod
     def assign_sales_contact(cls):

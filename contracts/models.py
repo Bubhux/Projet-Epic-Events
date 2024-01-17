@@ -32,11 +32,12 @@ class Contract(models.Model):
         client_name = f"{self.client.full_name}" if self.client else "No Client"
         status_contract_str = "Contract signed" if self.status_contract else "Contract not signed"
 
-        return f"Contrat ID: {self.id} {status_contract_str} - {client_name}"
+        return f"Contrat ID : {self.id} {status_contract_str} - {client_name}"
 
     def print_details(self):
         print()
         print(f"ID du contrat : {self.id}")
+
         if self.client:
             print(f"Nom du client : {self.client.full_name}")
             print(f"E-mail du client : {self.client.email}")

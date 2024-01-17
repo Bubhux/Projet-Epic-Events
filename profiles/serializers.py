@@ -75,15 +75,16 @@ class ClientListSerializer(serializers.ModelSerializer):
         Serializer pour la liste des clients.
         Ce serializer est utilisé pour représenter les données de la liste des clients dans le CRM.
 
-        Champ 'full_name': Nom complet du client.
-        Champ 'id': Identifiant unique du client.
-        Champ 'email': Adresse e-mail du client.
-        Champ 'phone_number': Numéro de téléphone du client.
-        Champ 'company_name': Nom de l'entreprise du client.
+        Champs :
+        - 'id': Identifiant unique du client.
+        - 'full_name': Nom complet du client.
+        - 'email': Adresse e-mail du client.
+        - 'phone_number': Numéro de téléphone du client.
+        - 'company_name': Nom de l'entreprise du client.
     """
     class Meta:
         model = Client
-        fields = ['full_name', 'id', 'email', 'phone_number', 'company_name']
+        fields = ['id', 'full_name', 'email', 'phone_number', 'company_name']
 
 
 class ClientDetailSerializer(serializers.ModelSerializer):
@@ -91,20 +92,23 @@ class ClientDetailSerializer(serializers.ModelSerializer):
         Serializer pour les détails d'un client.
         Ce serializer est utilisé pour représenter les détails d'un client spécifique dans le CRM.
 
-        Champ 'full_name': Nom complet du client.
-        Champ 'id': Identifiant unique du client.
-        Champ 'email': Adresse e-mail du client.
-        Champ 'phone_number': Numéro de téléphone du client.
-        Champ 'company_name': Nom de l'entreprise du client.
-        Champ 'creation_date': Date de création du client.
-        Champ 'update_date': Date de mise à jour du client.
-        Champ 'last_contact': Dernier contact du client.
-        Champ 'sales_contact': Gestionnaire des ventes en charge du client.
-        Champ 'email_contact_id': Identifiant de contact par e-mail.
+        Champs :
+        - 'id': Identifiant unique du client.
+        - 'full_name': Nom complet du client.
+        - 'email': Adresse e-mail du client.
+        - 'phone_number': Numéro de téléphone du client.
+        - 'company_name': Nom de l'entreprise du client.
+        - 'creation_date': Date de création du client.
+        - 'update_date': Date de mise à jour du client.
+        - 'last_contact': Dernier contact du client.
+        - 'sales_contact': Gestionnaire des ventes en charge du client.
+        - 'email_contact_id': Identifiant de contact par e-mail.
     """
+    sales_contact = serializers.ReadOnlyField(source='sales_contact.full_name')
+
     class Meta:
         model = Client
-        fields = ['full_name', 'id', 'email', 'phone_number', 'company_name', 'creation_date',
+        fields = ['id', 'full_name', 'email', 'phone_number', 'company_name', 'creation_date',
                   'update_date', 'last_contact', 'sales_contact', 'email_contact_id']
 
 
@@ -113,13 +117,14 @@ class UserListSerializer(serializers.ModelSerializer):
         Serializer pour la liste des utilisateurs.
         Ce serializer est utilisé pour représenter les données de la liste des utilisateurs dans le CRM.
 
-        Champ 'full_name': Nom complet de l'utilisateur.
-        Champ 'id': Identifiant unique de l'utilisateur.
-        Champ 'email': Adresse e-mail de l'utilisateur.
+        Champs :
+        - 'id': Identifiant unique de l'utilisateur.
+        - 'full_name': Nom complet de l'utilisateur.
+        - 'email': Adresse e-mail de l'utilisateur.
         """
     class Meta:
         model = User
-        fields = ['full_name', 'id', 'email']
+        fields = ['id', 'full_name', 'email']
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -128,8 +133,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
         Ce sérialiseur est utilisé pour représenter les détails d'un utilisateur spécifique dans le CRM.
 
         Champs :
-        - 'full_name': Nom complet de l'utilisateur.
         - 'id': Identifiant unique de l'utilisateur.
+        - 'full_name': Nom complet de l'utilisateur.
         - 'email': Adresse e-mail de l'utilisateur.
         - 'role': Rôle de l'utilisateur dans le système.
         - 'is_staff': Indique si l'utilisateur a des privilèges d'administration.
@@ -145,7 +150,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ['full_name', 'id', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'password']
+        fields = ['id', 'full_name', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'password']
 
     def validate_password(self, value):
         # Vérifier que le mot de passe n'est pas vide

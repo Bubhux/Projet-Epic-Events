@@ -26,18 +26,39 @@ class ContractListSerializer(serializers.ModelSerializer):
     """
         Serializer pour la liste des contrats.
         Ce serializer est utilisé pour représenter les données de la liste des contrats dans le CRM.
+
+        Champs :
+        - 'id': Identifiant unique du contrat.
+        - 'client': Nom complet du client.
+        - 'sales_contact': Nom complet du contact commercial.
     """
+    client = serializers.ReadOnlyField(source='client.full_name')
+    sales_contact = serializers.ReadOnlyField(source='sales_contact.full_name')
+
     class Meta:
         model = Contract
-        fields = ['client', 'id', 'sales_contact']
+        fields = ['id', 'client', 'sales_contact']
 
 
 class ContractDetailSerializer(serializers.ModelSerializer):
     """
         Serializer pour les détails d'un contrat.
         Ce serializer est utilisé pour représenter les détails d'un contrat spécifique dans le CRM.
+
+        Champs :
+        - 'id': Identifiant unique du contrat.
+        - 'client': Nom complet du client.
+        - 'sales_contact': Nom complet du contact commercial.
+        - 'status_contract': Status du contrat.
+        - 'total_amount': Montant total du contrat.
+        - 'remaining_amount': Montant restant à payer sur le contrat.
+        - 'creation_date': Date de création du contrat.
+        - 'update_date': Date de mise à jour du contrat.
     """
+    client = serializers.ReadOnlyField(source='client.full_name')
+    sales_contact = serializers.ReadOnlyField(source='sales_contact.full_name')
+
     class Meta:
         model = Contract
-        fields = ['client', 'id', 'sales_contact', 'status_contract', 'total_amount',
+        fields = ['id', 'client', 'sales_contact', 'status_contract', 'total_amount',
                   'remaining_amount', 'creation_date', 'update_date']
