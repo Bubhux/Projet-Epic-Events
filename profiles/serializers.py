@@ -9,14 +9,22 @@ from .models import User, Client
 
 
 class MultipleSerializerMixin:
-    """Mixin pour utiliser plusieurs classes de sérialiseur dans une vue."""
+    """
+        Mixin pour utiliser plusieurs classes de sérialiseur dans une vue.
 
-    # Par défaut, la variable detail_serializer_class est définie sur None.
-    # Ce qui signifie qu'il n'y a pas de sérialiseur spécifique défini pour les actions de type
-    # "retrieve", "create", "update" et "destroy".
+        Par défaut, la variable detail_serializer_class est définie sur None.
+        Ce qui signifie qu'il n'y a pas de sérialiseur spécifique défini pour les actions de type
+        "retrieve", "create", "update" et "destroy".
+    """
     detail_serializer_class = None
 
     def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+
+            Si l'action est 'retrieve', 'create', 'update' ou 'destroy' et qu'un sérialiseur détaillé
+            est spécifié, retourne le sérialiseur détaillé. Sinon, retourne le sérialiseur par défaut.
+        """
         if (self.action == 'retrieve' or
                 self.action == 'create' or
                 self.action == 'update' or
@@ -150,7 +158,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'password']
+        fields = ['id', 'full_name', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'is_superuser', 'password']
 
     def validate_password(self, value):
         # Vérifier que le mot de passe n'est pas vide
