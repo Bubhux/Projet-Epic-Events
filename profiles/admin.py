@@ -45,9 +45,17 @@ class ClientAdmin(admin.ModelAdmin):
     Affiche et configure les champs spécifiques pour l'administration des clients.
     """
 
-    list_display = ('full_name', 'email', 'company_name', 'sales_contact', 'last_contact')
+    list_display = ('full_name', 'email', 'company_name', 'sales_contact', 'last_contact', 'creation_date')
     ordering = ('full_name',)
     search_fields = ('full_name', 'email', 'company_name', 'user_contact__full_name', 'sales_contact__full_name')
+
+    def get_readonly_fields(self, request, obj=None):
+        # Retourne une liste de champs en lecture seule
+        readonly_fields = super().get_readonly_fields(request, obj=obj)
+        if obj:
+            # Ajoute 'creation_date' à la liste des champs en lecture seule lors de la modification d'un objet existant
+            readonly_fields += ('creation_date',)
+        return readonly_fields
 
 
 class GroupAdmin(admin.ModelAdmin):

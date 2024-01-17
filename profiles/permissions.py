@@ -7,11 +7,10 @@ from .models import User, Client
 
 class ClientPermissions(permissions.BasePermission):
     """
-        Classe de permission personnalisée pour la vue d'un CRM gérant les opérations CRUD sur les objets Client.
+        Classe de permission personnalisée pour la vue du CRM gérant les opérations CRUD sur les objets Client.
         Cette classe contrôle l'accès aux opérations CRUD sur les objets Client en fonction du rôle de l'utilisateur connecté.
         ...
         - 'ROLE_SALES': Rôle pour les gestionnaires commerciaux de clients.
-        - 'ROLE_SUPPORT': Rôle pour les membres de l'équipe de support.
         ...
 
         Méthode has_create_permission:
@@ -30,7 +29,7 @@ class ClientPermissions(permissions.BasePermission):
             - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe commerciale.
             - Pour la création (POST), autorise uniquement les membres de l'équipe commerciale.
 
-        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe commerciale et l'équipe de support.
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe commerciale.
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouveau client
@@ -71,7 +70,7 @@ class ClientPermissions(permissions.BasePermission):
 
 class UserPermissions(permissions.BasePermission):
     """
-        Classe de permission personnalisée pour la vue d'un CRM gérant les opérations CRUD sur les objets User.
+        Classe de permission personnalisée pour la vue du CRM gérant les opérations CRUD sur les objets User.
         Cette classe contrôle l'accès aux opérations CRUD sur les objets User en fonction du rôle de l'utilisateur connecté.
         ...
         - 'ROLE_MANAGEMENT': Rôle pour les gestionnaires des utilisateurs.

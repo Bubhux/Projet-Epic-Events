@@ -3,4 +3,3 @@
 /.vscode
 /conf.cnf
 /.env
-.pytest_cache/

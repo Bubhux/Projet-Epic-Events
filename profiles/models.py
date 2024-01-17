@@ -111,7 +111,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['role']
 
     def __str__(self):
-        return f"{self.get_role_display()} - {self.full_name} ({self.email})"
+        """Renvoie une représentation lisible de l'instance de User."""
+        return f"User ID : {self.id} {self.get_role_display()} - {self.full_name} ({self.email})"
 
     def has_perm(self, perm, obj=None):
         # Vérifie les permissions individuelles
@@ -156,25 +157,27 @@ class Client(models.Model):
     """
     email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='client_profiles', related_query_name='client_profile', default=None)
+    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='user_contact_clients', related_query_name='user_contact_client', default=None)
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True, editable=True)
     last_contact = models.DateTimeField(null=True, blank=True)
     sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, editable=True, limit_choices_to={'role': User.ROLE_SALES})
-    email_contact_id = models.EmailField(null=True, blank=True, editable=True)
+    email_contact = models.EmailField(null=True, blank=True, editable=True)
 
     class Meta:
         ordering = ['update_date']
 
     def __str__(self):
+        """Renvoie une représentation lisible de l'instance de Client."""
         if self.user_contact:
-            return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
+            return f"Client ID : {self.id} {self.full_name} - Contact commercial {self.user_contact.full_name}"
         else:
-            return f"Client {self.full_name} - Aucun contact commercial associé"
+            return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
+        """Affiche les détails de client dans la console."""
         print()
         print(f"ID du client : {self.id}")
         print(f"Nom du client : {self.full_name}")
@@ -187,10 +190,12 @@ class Client(models.Model):
             print(f"Contact commercial : {self.sales_contact.full_name}")
             print(f"E-mail du contact commercial : {self.sales_contact.email}")
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
-            print()
+        else:
+            print("Aucun contact commercial associé.")
+        print()
 
-    @classmethod
-    def assign_sales_contact(cls):
+    def assign_sales_contact(self):
+        """Affecte un contact commercial à un client non associé."""
         # Obtient tous les utilisateurs de l'équipe commerciale avec le nombre de clients associés à chacun
         sales_team = User.objects.filter(role=User.ROLE_SALES)
 
@@ -210,7 +215,7 @@ class Client(models.Model):
         client_group, created = Group.objects.get_or_create(name='Client')
 
         # Parcourt tous les clients non associés et leur assigne un contact commercial
-        unassigned_clients = cls.objects.filter(user_contact=None)
+        unassigned_clients = Client.objects.filter(user_contact=None)
         for client in unassigned_clients:
             # Vérifie si user_contact est défini avant d'assigner le client à un contact commercial
             if not client.user_contact:
@@ -226,6 +231,13 @@ class Client(models.Model):
                 client.user_contact.groups.add(client_group)
 
     def save(self, *args, **kwargs):
+        """
+            Sauvegarde l'instance après vérification de la non-existence d'un client avec le même e-mail.
+            Met à jour les colonnes email_id et sales_contact_id.
+            Appelle la méthode save de la classe parent pour effectuer la sauvegarde réelle.
+            Imprime les détails avant et après la sauvegarde.
+            Exécute automatiquement la méthode assign_sales_contact après la sauvegarde.
+        """
         try:
             # Vérifie si un client avec le même e-mail existe déjà
             client_existant = Client.objects.filter(email=self.email).exclude(id=self.id).first()
@@ -255,6 +267,9 @@ class Client(models.Model):
             # Imprime le nombre total de clients après la sauvegarde
             print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
 
+            # Exécute automatiquement la méthode assign_sales_contact après la sauvegarde
+            self.assign_sales_contact()
+
 
 class UserGroup(models.Model):
     """
@@ -268,6 +283,10 @@ class UserGroup(models.Model):
 
 @receiver(post_save, sender=Client)
 def add_client_to_group(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée après la sauvegarde d'une instance de Client.
+        Ajoute l'instance de Client au groupe "Client" si elle est associée à un contact utilisateur ou un utilisateur commercial.
+    """
     # Vérifie si le groupe "Client" existe
     client_group, created = Group.objects.get_or_create(name='Client')
 
@@ -279,13 +298,23 @@ def add_client_to_group(sender, instance, **kwargs):
 
 @receiver(pre_delete, sender=User)
 def delete_user_groups(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée avant la suppression d'une instance de User.
+        Supprime les enregistrements associés dans la table UserGroup.
+    """
     # Supprime les enregistrements associés dans la table UserGroup
     UserGroup.objects.filter(user=instance).delete()
 
 @receiver(pre_save, sender=Client)
 def set_sales_contact_id(sender, instance, **kwargs):
+    """
+        Fonction de réception appelée avant chaque sauvegarde d'un objet Client.
+        Vérifie si sales_contact est défini et sales_contact_id n'est pas défini.
+        Mets à jour sales_contact_id avec l'ID de l'utilisateur associé.
+    """
     # Cette fonction sera appelée avant chaque enregistrement (save) d'un objet Client
     # Vérifie si sales_contact est défini et sales_contact_id n'est pas défini
     if instance.sales_contact and not instance.sales_contact_id:
         # Mets à jour sales_contact_id avec l'ID de l'utilisateur associé
         instance.sales_contact_id = instance.sales_contact.id
+

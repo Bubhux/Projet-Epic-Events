@@ -40,10 +40,10 @@ class AdminUserClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
 class LoginViewSet(generics.CreateAPIView):
     """
-    Vue pour la connexion des utilisateurs.
-    Cette vue permet à un utilisateur de se connecter en fournissant,
-    une adresse e-mail, un mot de passe.
-    l'utilisateur est authentifié pendant le processus de connexion.
+        Vue pour la connexion des utilisateurs.
+        Cette vue permet à un utilisateur de se connecter en fournissant,
+        une adresse e-mail, un mot de passe.
+        l'utilisateur est authentifié pendant le processus de connexion.
     """
     permission_classes = (AllowAny,)
     serializer_class = UserLoginSerializer
@@ -73,6 +73,20 @@ class LoginViewSet(generics.CreateAPIView):
 class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Client (CRM)."""
 
+    def __init__(self, *args, **kwargs):
+        """
+            Initialise une nouvelle instance de ClientViewSet.
+
+            Args:
+                *args: Arguments positionnels.
+                **kwargs: Arguments nommés.
+
+            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            avec les arguments reçus, puis initialise les permissions du contrat.
+        """
+        super().__init__(*args, **kwargs)
+        self.initialize_client_permissions()
+
     queryset = Client.objects.all()
     serializer_class = ClientListSerializer
     permission_classes = [IsAuthenticated, ClientPermissions]
@@ -88,10 +102,11 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def initialize_client_permissions(self):
         """Initialise l'objet ClientPermissions."""
-        self.client_permissions = ClientPermissions()
+        if self.client_permissions is None:
+            self.client_permissions = ClientPermissions()
 
     @action(detail=False, methods=['GET'])
-    def client_list(self, request):
+    def clients_list(self, request):
         """Renvoie tous les clients."""
         clients = Client.objects.filter(user_contact=request.user)
         serializer = ClientDetailSerializer(clients, many=True)
@@ -100,7 +115,6 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=True, methods=['GET'])
     def client_details(self, request, pk=None):
         """Renvoie les détails d'un client spécifique associé à l'utilisateur."""
-        self.initialize_client_permissions()
         client = self.get_object()
 
         # Vérifie si le client appartient à l'utilisateur actuellement authentifié
@@ -119,7 +133,6 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Crée un nouveau client."""
-        self.initialize_client_permissions()
         if not self.client_permissions.has_create_permission(request):
             return HttpResponseForbidden("You do not have permission to create a client.")
 
@@ -132,7 +145,6 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Met à jour un client existant."""
-        self.initialize_client_permissions()
         instance = self.get_object()
         if not self.client_permissions.has_update_permission(request, instance.user_contact):
             return HttpResponseForbidden("You do not have permission to update this client.")
@@ -145,7 +157,6 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Supprime un client existant."""
-        self.initialize_client_permissions()
         instance = self.get_object()
         if not self.client_permissions.has_delete_permission(request, instance.user_contact):
             return HttpResponseForbidden("You do not have permission to delete this client.")
@@ -157,6 +168,20 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
 class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Utilisateur (CRM)."""
+
+    def __init__(self, *args, **kwargs):
+        """
+            Initialise une nouvelle instance de UserViewSet.
+
+            Args:
+                *args: Arguments positionnels.
+                **kwargs: Arguments nommés.
+
+            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            avec les arguments reçus, puis initialise les permissions du contrat.
+        """
+        super().__init__(*args, **kwargs)
+        self.initialize_user_permissions()
 
     queryset = User.objects.all()
     serializer_class = UserListSerializer
@@ -173,10 +198,11 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def initialize_user_permissions(self):
         """Initialise l'objet UserPermissions."""
-        self.user_permissions = UserPermissions()
+        if self.user_permissions is None:
+            self.user_permissions = UserPermissions()
 
     @action(detail=False, methods=['GET'])
-    def user_list(self, request):
+    def users_list(self, request):
         """Renvoie tous les utilisateurs."""
         users = User.objects.all()
         serializer = UserListSerializer(users, many=True)
@@ -198,7 +224,6 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Crée un nouvel utilisateur."""
-        self.initialize_user_permissions()
         if not self.user_permissions.has_create_permission(request.user):
             return HttpResponseForbidden("You do not have permission to create a user.")
 
@@ -211,7 +236,6 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Met à jour un utilisateur existant."""
-        self.initialize_user_permissions()
         instance = self.get_object()
         if not self.user_permissions.has_update_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to update this user.")
@@ -224,7 +248,6 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         """Supprime un utilisateur existant."""
-        self.initialize_user_permissions()
         instance = self.get_object()
         if not self.user_permissions.has_delete_permission(self.request.user, instance):
             return HttpResponseForbidden("You do not have permission to delete this user.")
