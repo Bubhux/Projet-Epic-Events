@@ -111,6 +111,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['role']
 
     def __str__(self):
+        """Renvoie une représentation lisible de l'instance de User."""
         return f"{self.get_role_display()} - {self.full_name} ({self.email})"
 
     def has_perm(self, perm, obj=None):
@@ -169,6 +170,7 @@ class Client(models.Model):
         ordering = ['update_date']
 
     def __str__(self):
+        """Renvoie une représentation lisible de l'instance de Client."""
         if self.user_contact:
             return f"Client {self.full_name} - Contact commercial {self.user_contact.full_name}"
         else:
