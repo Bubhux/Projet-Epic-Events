@@ -59,8 +59,8 @@ class Contract(models.Model):
             Met à jour la date de mise à jour avant de sauvegarder.
             Imprime les détails après la sauvegarde.
         """
-        # Si le contrat est nouvellement créé et le sales_contact n'est pas défini,
-        # attribuez-le automatiquement en utilisant le sales_contact du client associé
+        # Si le contrat est nouvellement créé et le sales_contact n'est pas défini
+        # attribution automatique en utilisant le sales_contact du client associé
         if not self.id and not self.sales_contact and self.client and self.client.sales_contact:
             self.sales_contact = self.client.sales_contact
 

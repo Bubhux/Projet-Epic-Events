@@ -73,9 +73,15 @@ urlpatterns = [
     path('crm/contract/all_contracts_details/', ContractViewSet.as_view({'get': 'all_contracts_details'}), name='all-contracts-details'),
     path('crm/contract/contract_details/<int:pk>/', ContractViewSet.as_view({'get': 'contract_details'}), name='contract-details'),
 
+    # Ajoutez l'URL pour accéder au filtre des contrats non signés
+    path('crm/contracts/filtered_contracts/', ContractViewSet.as_view({'get': 'filtered_contracts'}), name='filtered-contracts'),
+
     # Configure le chemin pour l'action 'all_contracts_details' et 'contract_details'
     path('crm/event/all_events_details/', EventViewSet.as_view({'get': 'all_events_details'}), name='all-events-details'),
     path('crm/event/event_details/<int:pk>/', EventViewSet.as_view({'get': 'event_details'}), name='event-details'),
+
+    # Configure le chemin pour l'action 'events_without_support'
+    path('crm/events/events_without_support/', EventViewSet.as_view({'get': 'events_without_support'}), name='events-without-support'),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))

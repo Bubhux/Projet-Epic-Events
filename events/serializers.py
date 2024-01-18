@@ -56,6 +56,7 @@ class EventDetailSerializer(serializers.ModelSerializer):
 
         Champs :
         - 'id': Identifiant unique du événement.
+        - 'event_name': Nom de l'événement.
         - 'client': Nom complet du client associé à l'événement.
         - 'contract': ID du contrat associé à l'événement.
         - 'event_date_start': Date de début de l'événement.
@@ -71,5 +72,5 @@ class EventDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ['id', 'event', 'client', 'client_contact', 'contract', 'event_date_start',
+        fields = ['id', 'event_name', 'client', 'client_contact', 'contract', 'event_date_start',
                   'event_date_end', 'support_contact', 'location', 'attendees', 'notes']

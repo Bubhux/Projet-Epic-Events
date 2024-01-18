@@ -4,10 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 
 from .models import Event
 from .permissions import EventPermissions
 from .serializers import MultipleSerializerMixin, EventListSerializer, EventDetailSerializer
+from contracts.models import Contract
 
 
 class AdminEventiewSet(MultipleSerializerMixin, ModelViewSet):
@@ -56,7 +58,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def events_list(self, request):
-        """Renvoie tous les événements."""
+        """Renvoie tous les événements associé à l'utilisateur connecté."""
         events = Event.objects.filter(support_contact=request.user)
         serializer = EventDetailSerializer(events, many=True)
         return Response(serializer.data)
@@ -80,12 +82,34 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
         serializer = EventDetailSerializer(events, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['GET'])
+    def events_without_support(self, request):
+        """Renvoie tous les événements qui n'ont pas de support associé."""
+        events_without_support = Event.objects.filter(support_contact=None)
+        serializer = EventDetailSerializer(events_without_support, many=True)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         """Crée un nouvel événement."""
         if not self.event_permissions.has_create_permission(request):
-            return HttpResponseForbidden("You do not have permission to create a event.")
+            return HttpResponseForbidden("You do not have permission to create an event.")
 
-        serializer = self.serializers['create'](data=request.data)
+        # Récupérer les données de la requête
+        data = request.data
+
+        # Vérifier si le contrat associé est signé
+        contract_id = data.get('contract')
+        contract = get_object_or_404(Contract, id=contract_id)
+        if not contract.status_contract:
+            return HttpResponseForbidden("The associated contract is not signed. Cannot create the event.")
+
+        # Vérifier si un événement existe déjà pour ce contrat
+        existing_event = Event.objects.filter(contract=contract).first()
+        if existing_event:
+            return HttpResponseForbidden("An event already exists for this contract. Cannot create another event.")
+
+        # Créer l'événement uniquement si le contrat est signé
+        serializer = self.serializers['create'](data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
