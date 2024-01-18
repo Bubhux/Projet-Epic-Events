@@ -147,7 +147,7 @@ class Client(models.Model):
             update_date: Date de mise à jour du client.
             last_contact: Dernier contact du client.
             sales_contact: Contact commercial associé au client.
-            email_contact_id: Identifiant de contact par e-mail.
+            email_contact: E-mail du contact commercial.
 
         Méthodes:
             __str__: Renvoie une représentation en chaîne du client.
@@ -178,13 +178,6 @@ class Client(models.Model):
 
     def print_details(self):
         """Affiche les détails de client dans la console."""
-        print()
-        print(f"ID du client : {self.id}")
-        print(f"Nom du client : {self.full_name}")
-        print(f"E-mail du client : {self.email}")
-        print(f"Compagnie du client : {self.company_name}")
-        print()
-
         # Imprime les détails du contact commercial
         if self.sales_contact:
             print(f"Contact commercial : {self.sales_contact.full_name}")
@@ -230,6 +223,10 @@ class Client(models.Model):
                 # Ajoute l'instance de Client au groupe Client
                 client.user_contact.groups.add(client_group)
 
+                # Actualise l'instance avec les données actuelles de la base de données
+                # Cela garantit que les changements persistants dans la base de données sont reflétés dans l'instance
+                self.refresh_from_db()
+
     def save(self, *args, **kwargs):
         """
             Sauvegarde l'instance après vérification de la non-existence d'un client avec le même e-mail.
@@ -249,13 +246,12 @@ class Client(models.Model):
             print(f"Erreur d'intégrité : {e}")
             return
         else:
-            # Imprime le nombre total de clients avant la sauvegarde
-            print()
-            print(f"Nombre total de clients avant la sauvegarde : {Client.objects.count()}")
+            # Récupère l'utilisateur associé à partir de user_contact_id
+            user_contact = User.objects.filter(id=self.user_contact_id).first()
 
-            # Met à jour la colonne email_id avec l'e-mail de l'utilisateur associé
-            self.email_contact_id = self.user_contact.email if self.user_contact else None
-            self.sales_contact_id = self.user_contact.id if self.user_contact else None
+            # Met à jour la colonne email_contact avec l'e-mail de l'utilisateur associé
+            self.email_contact = self.user_contact.email if self.user_contact else None
+            self.sales_contact = self.user_contact if self.user_contact else None
             self.update_date = timezone.now()
 
             # Appelle la méthode save de la classe parent pour effectuer la sauvegarde réelle
@@ -263,9 +259,6 @@ class Client(models.Model):
 
             # Imprime les détails après la sauvegarde
             self.print_details()
-
-            # Imprime le nombre total de clients après la sauvegarde
-            print(f"Nombre total de clients après la sauvegarde : {Client.objects.count()}")
 
             # Exécute automatiquement la méthode assign_sales_contact après la sauvegarde
             self.assign_sales_contact()
