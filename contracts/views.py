@@ -58,6 +58,12 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
         if self.contract_permissions is None:
             self.contract_permissions = ContractPermissions()
 
+    def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+        """
+        return self.serializers.get(self.action, self.serializer_class)
+
     @action(detail=False, methods=['GET'])
     def contracts_list(self, request):
         """Renvoie tous les contrats associé à l'utilisateur connecté."""

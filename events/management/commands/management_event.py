@@ -122,7 +122,7 @@ class Command(BaseCommand):
                 # Récupère l'instance du contact de support à partir de la base de données
                 support_contact = User.objects.get(full_name=support_contact_name) if support_contact_name else None
 
-                # Convertie les chaînes en objets datetime avec information sur le fuseau horaire
+                # Convertit les chaînes en objets datetime avec information sur le fuseau horaire
                 event_date_start = timezone.make_aware(datetime.strptime(event_date_start_str, '%Y-%m-%d %H:%M'))
                 event_date_end = timezone.make_aware(datetime.strptime(event_date_end_str, '%Y-%m-%d %H:%M'))
 
@@ -220,7 +220,7 @@ class Command(BaseCommand):
                 return
             new_notes = self.colored_prompt('Nouvelles notes', color=Fore.CYAN)
 
-            # Convertie les chaînes en objets datetime avec information sur le fuseau horaire
+            # Convertit les chaînes en objets datetime avec information sur le fuseau horaire
             new_event_date_start = timezone.make_aware(datetime.strptime(new_event_date_start_str, '%Y-%m-%d %H:%M'))
             new_event_date_end = timezone.make_aware(datetime.strptime(new_event_date_end_str, '%Y-%m-%d %H:%M'))
 

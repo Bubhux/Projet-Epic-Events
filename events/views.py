@@ -22,6 +22,7 @@ class AdminEventiewSet(MultipleSerializerMixin, ModelViewSet):
     def get_queryset(self):
         return Event.objects.all()
 
+
 @method_decorator(csrf_protect, name='dispatch')
 class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Event (CRM)."""
@@ -57,6 +58,12 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
         """Initialise l'objet EventPermissions."""
         if self.event_permissions is None:
             self.event_permissions = EventPermissions()
+
+    def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+        """
+        return self.serializers.get(self.action, self.serializer_class)
 
     @action(detail=False, methods=['GET'])
     def events_list(self, request):

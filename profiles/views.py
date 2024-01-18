@@ -109,6 +109,12 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         if self.client_permissions is None:
             self.client_permissions = ClientPermissions()
 
+    def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+        """
+        return self.serializers.get(self.action, self.serializer_class)
+
     @action(detail=False, methods=['GET'])
     def clients_list(self, request):
         """Renvoie tous les clients."""
@@ -205,6 +211,12 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         """Initialise l'objet UserPermissions."""
         if self.user_permissions is None:
             self.user_permissions = UserPermissions()
+
+    def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+        """
+        return self.serializers.get(self.action, self.serializer_class)
 
     @action(detail=False, methods=['GET'])
     def users_list(self, request):

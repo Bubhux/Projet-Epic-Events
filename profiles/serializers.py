@@ -50,8 +50,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
         # Génére les jetons à l'aide de Django REST framework simplejwt
         tokens = RefreshToken.for_user(user)
         data = {
-            "refresh": str(tokens),  # Convertie le jeton d'actualisation en chaîne
-            "access": str(tokens.access_token)  # Convertie le jeton d'accès en chaîne
+            "refresh": str(tokens),  # Convertit le jeton d'actualisation en chaîne
+            "access": str(tokens.access_token)  # Convertit le jeton d'accès en chaîne
         }
         # Retourne le dictionnaire contenant les jetons
         return data

@@ -368,6 +368,10 @@ class TestClientViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
+
     def test_client_details(self):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
@@ -390,6 +394,10 @@ class TestClientViewSet(TestCase):
         # Vérifie que l'accès a bien été autorisé
         self.assertIn('id', response.data)
         self.assertIn('full_name', response.data)
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
 
     def test_client_details_unauthorized_user(self):
         # Assure que le client2 est associé à sales_user2
@@ -671,6 +679,10 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
+
     def test_user_details(self):
         # Crée un jeton d'accès pour support_user
         refresh_support = RefreshToken.for_user(self.support_user)
@@ -694,6 +706,10 @@ class TestUserViewSet(TestCase):
         # Vérifie que l'utilisateur a les données de l'utilisateur
         self.assertEqual(response.data['id'], self.sales_user.pk)
         self.assertEqual(response.data['full_name'], self.sales_user.full_name)
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
 
     def test_all_users_details(self):
         # Test la vue all_users_details

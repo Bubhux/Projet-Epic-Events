@@ -1,6 +1,7 @@
 import pytest
 import json
 import datetime
+import pendulum
 from django.test import TestCase, Client
 from django.utils import timezone
 from django.utils.timezone import make_aware
@@ -212,7 +213,7 @@ class TestEventsApp(TestCase):
             notes="Event notes"
         )
 
-        # Associez le contrat et le client à l'événement
+        # Associe le contrat et le client à l'événement
         new_event.contract = self.contract_user1
         new_event.client = self.client_user1
 
@@ -302,6 +303,14 @@ class TestEventViewSet(TestCase):
         """
             Met en place les données nécessaires pour les tests.
         """
+        self.management_user1 = self.create_user(
+            email='Milhouse@EpicEvents-Management.com',
+            role=User.ROLE_MANAGEMENT,
+            full_name='Milhouse Van Houten',
+            phone_number='+567891234',
+            is_staff=True
+        )
+
         self.sales_user1 = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
             role=User.ROLE_SALES,
@@ -326,14 +335,6 @@ class TestEventViewSet(TestCase):
             is_staff=True
         )
 
-        self.management_user1 = self.create_user(
-            email='Milhouse@EpicEvents-Management.com',
-            role=User.ROLE_MANAGEMENT,
-            full_name='Milhouse Van Houten',
-            phone_number='+567891234',
-            is_staff=True
-        )
-
         self.client_user1 = self.create_client(
             email='Ned@EpicEvents.com',
             full_name='Ned Flanders',
@@ -342,9 +343,25 @@ class TestEventViewSet(TestCase):
             sales_contact=self.sales_user1,
         )
 
+        self.client_user2 = self.create_client(
+            email='Ralph@EpicEvents.com',
+            full_name='Ralph Wiggum',
+            phone_number='+654321987',
+            company_name='Wiggum Gum & Co',
+            sales_contact=self.sales_user1,
+        )
+
         self.contract_user1 = self.create_contract(
             client=self.client_user1,
             total_amount=1500.0,
+            remaining_amount=0.0,
+            status_contract=True,
+            sales_contact=self.sales_user1
+        )
+
+        self.contract_user2 = self.create_contract(
+            client=self.client_user2,
+            total_amount=1200.0,
             remaining_amount=0.0,
             status_contract=True,
             sales_contact=self.sales_user1
@@ -361,6 +378,20 @@ class TestEventViewSet(TestCase):
             support_contact=self.support_user1,
             location="Rome",
             attendees=1,
+            notes="Event notes"
+        )
+
+        self.event_user2 = self.create_event(
+            event_name="Event Wiggum",
+            contract=self.contract_user2,
+            client=self.client_user2,
+            client_name=self.client_user2.full_name,
+            client_contact=f"{self.client_user2.email} {self.client_user2.phone_number}",
+            event_date_start=make_aware(datetime.datetime(2024, 3, 16, 13, 55)),
+            event_date_end=make_aware(datetime.datetime(2024, 4, 22, 16, 30)),
+            support_contact=None,
+            location="Japon",
+            attendees=100,
             notes="Event notes"
         )
 
@@ -398,19 +429,131 @@ class TestEventViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
+        # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
 
     def test_event_details(self):
-        pass
+        # Assure que event_user1 est associé à support_user1
+        self.assertEqual(self.event_user1.support_contact, self.support_user1)
+
+        # Crée un jeton d'accès pour support_user1
+        refresh_support1 = RefreshToken.for_user(self.support_user1)
+        access_token_support1 = str(refresh_support1.access_token)
+
+        # Test de la vue event_details pour l'événement associé à support_user1
+        url = f'/crm/events/{self.event_user1.pk}/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_support1}')
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
+
+        # Vérifie que les données de la réponse correspondent aux détails de l'événement
+        self.assertEqual(response.data['id'], self.event_user1.pk)
+        self.assertEqual(response.data['event_name'], self.event_user1.event_name)
+        self.assertEqual(response.data['client'], self.client_user1.full_name)
+        self.assertEqual(response.data['client_contact'], f"{self.client_user1.email} {self.client_user1.phone_number}")
+        self.assertEqual(response.data['contract'], self.contract_user1.pk)
+        self.assertEqual(response.data['support_contact'], self.support_user1.full_name)
+        self.assertEqual(response.data['location'], self.event_user1.location)
+        self.assertEqual(response.data['attendees'], self.event_user1.attendees)
+        self.assertEqual(response.data['notes'], self.event_user1.notes)
+
+        # Vérifie event_date_start et event_date_end
+        expected_start_date = self.event_user1.event_date_start
+        expected_end_date = self.event_user1.event_date_end
+
+        # Convertit la chaîne de date dans la réponse JSON en un objet Pendulum
+        response_start_date_str = response.data['event_date_start']
+        response_start_date = pendulum.parse(response_start_date_str)
+
+        response_end_date_str = response.data['event_date_end']
+        response_end_date = pendulum.parse(response_end_date_str)
+
+        self.assertEqual(response_start_date, expected_start_date)
+        self.assertEqual(response_end_date, expected_end_date)
 
     def test_event_details_unauthorized_user(self):
-        pass
+        # Assure que event_user1 est associé à support_user1
+        self.assertEqual(self.event_user1.support_contact, self.support_user1)
+
+        # Crée un jeton d'accès pour support_user2
+        refresh_support2 = RefreshToken.for_user(self.support_user2)
+        access_token_support2 = str(refresh_support2.access_token)
+
+        # Test de la vue event_details pour event_user1 associé à support_user1 avec le jeton d'accès de support_user2
+        url = f'/crm/events/{self.event_user1.pk}/event_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_support2}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to access this event.", response.content.decode())
 
     def test_all_events_details(self):
-        pass
+        # Test la vue all_events_details
+        url = '/crm/events/all_events_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_support1}')
 
-    def test_filtered_events(self):
-        pass
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_events_without_support(self):
+        # Créer un jeton d'accès pour management_user1
+        refresh_management_user1 = RefreshToken.for_user(self.management_user1)
+        access_token_management_user1 = str(refresh_management_user1.access_token)
+
+        # Effectue une requête GET vers la vue events_without_support avec le token d'accès de management_user1
+        url = '/crm/events/events_without_support/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_management_user1}')
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        #print(json.dumps(response.data, indent=2))
+
+        # Vérifie que la réponse a le statut HTTP 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Assure que la réponse est une liste JSON
+        self.assertIsInstance(response.data, list)
+
+        # Assure que la liste ne contient qu'un seul élément
+        self.assertEqual(len(response.data), 1)
+
+        # Assure que l'élément dans la liste correspond à event_user2
+        event_data = response.data[0]
+        self.assertEqual(event_data['id'], self.event_user2.id)
+        self.assertEqual(event_data['event_name'], self.event_user2.event_name)
+        self.assertEqual(event_data['contract'], self.event_user2.contract.id)
+        self.assertEqual(event_data['client'], self.event_user2.client.full_name)
+        self.assertEqual(event_data['client_contact'], self.event_user2.client_contact)
+        self.assertEqual(event_data['support_contact'], None)
+        self.assertEqual(event_data['location'], self.event_user2.location)
+        self.assertEqual(event_data['attendees'], self.event_user2.attendees)
+        self.assertEqual(event_data['notes'], self.event_user2.notes)
+
+        # Vérifie event_date_start et event_date_end
+        expected_start_date = self.event_user2.event_date_start
+        expected_end_date = self.event_user2.event_date_end
+
+        # Convertit la chaîne de date dans la réponse JSON en un objet Pendulum
+        response_start_date_str = event_data['event_date_start']
+        response_start_date = pendulum.parse(response_start_date_str)
+
+        response_end_date_str = event_data['event_date_end']
+        response_end_date = pendulum.parse(response_end_date_str)
+
+        self.assertEqual(response_start_date, expected_start_date)
+        self.assertEqual(response_end_date, expected_end_date)
 
     def test_create_event(self):
         pass
