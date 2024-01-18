@@ -56,13 +56,6 @@ class UserManager(BaseUserManager):
         # Appel la méthode create_user pour créer le superutilisateur
         superuser = self.create_user(email, password, **extra_fields)
 
-        # Imprime les détails du superutilisateur
-        #print()
-        #print(f"Nom du superutilisateur : {superuser.full_name}")
-        #print(f"Role du superutilisateur : {superuser.get_role_display()}")
-        #print(f"Statut 'is_staff' du superutilisateur : {superuser.is_staff}")
-        #print(f"Statut 'is_superuser' du superutilisateur : {superuser.is_superuser}")
-
 
 class User(AbstractBaseUser, PermissionsMixin):
     """

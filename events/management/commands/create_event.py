@@ -37,13 +37,13 @@ class Command(BaseCommand):
         event_view_set = EventViewSet()
 
         if options['display_events']:
-            # Call the method all_events_details to retrieve information about events
+            # Appele la méthode all_events_details pour lire les informations des événements
             response = event_view_set.all_events_details(request=None)
 
-            # Use the property data of the Response object to access the JSON content
+            # Utilise la propriété data de l'objet Response pour accéder au contenu JSON
             data = response.data
 
-            # Display the data in tabular form using rich
+            # Affiche les données sous forme de tableau avec rich
             table = Table(show_header=True, header_style="bold magenta")
             table.add_column("ID", style="cyan")
             table.add_column("Nom de l'événement", style="cyan")
