@@ -16,16 +16,7 @@ from .serializers import MultipleSerializerMixin, EventListSerializer, EventDeta
 from contracts.models import Contract
 
 
-class AdminEventiewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = EventListSerializer
-    detail_serializer_class = EventDetailSerializer
-
-    def get_queryset(self):
-        return Event.objects.all()
-
-
-# @method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Event (CRM)."""
 

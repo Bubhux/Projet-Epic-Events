@@ -16,33 +16,7 @@ from .permissions import ClientPermissions, UserPermissions
 from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserListSerializer, UserDetailSerializer
 
 
-class AdminUserLoginViewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = UserLoginSerializer
-
-    def get_queryset(self):
-        return User.objects.all()
-
-
-class AdminUserViewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = UserListSerializer
-    detail_serializer_class = UserDetailSerializer
-
-    def get_queryset(self):
-        return User.objects.all()
-
-
-class AdminUserClientViewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = ClientListSerializer
-    detail_serializer_class = ClientDetailSerializer
-
-    def get_queryset(self):
-        return Client.objects.all()
-
-
-# @method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 class LoginViewSet(generics.CreateAPIView):
     """
         Vue pour la connexion des utilisateurs.
@@ -75,7 +49,7 @@ class LoginViewSet(generics.CreateAPIView):
             return Response({"detail": "Invalid credentials or account inactive"}, status=400)
 
 
-# @method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Client (CRM)."""
 
@@ -190,7 +164,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message}, status=204)
 
 
-# @method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Utilisateur (CRM)."""
 

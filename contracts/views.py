@@ -15,16 +15,7 @@ from .permissions import ContractPermissions
 from .serializers import MultipleSerializerMixin, ContractListSerializer, ContractDetailSerializer
 
 
-class AdminContractViewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = ContractListSerializer
-    detail_serializer_class = ContractDetailSerializer
-
-    def get_queryset(self):
-        return Contract.objects.all()
-
-
-# @method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
 class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Contract (CRM)."""
 
