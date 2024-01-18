@@ -304,4 +304,3 @@ def set_sales_contact_id(sender, instance, **kwargs):
     if instance.sales_contact and not instance.sales_contact_id:
         # Mets à jour sales_contact_id avec l'ID de l'utilisateur associé
         instance.sales_contact_id = instance.sales_contact.id
-

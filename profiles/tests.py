@@ -1,4 +1,5 @@
 import pytest
+import json
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from rest_framework import status
@@ -6,7 +7,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, Client, Group
-from .serializers import UserLoginSerializer, ClientListSerializer, ClientDetailSerializer
 
 
 @pytest.mark.django_db
@@ -252,7 +252,9 @@ class TestLoginViewSet(TestCase):
 
 @pytest.mark.django_db
 class TestClientViewSet(TestCase):
-
+    """
+        Classe de tests pour les vues (ClientViewSet).
+    """
     def create_user(self, email, role, full_name, phone_number, is_staff=True):
         """
             Crée et retourne un utilisateur avec les paramètres spécifiés.
@@ -299,6 +301,14 @@ class TestClientViewSet(TestCase):
             is_staff=True
         )
 
+        self.support_user1 = self.create_user(
+            email='Homer@EpicEvents-Support.com',
+            role=User.ROLE_SUPPORT,
+            full_name='Homer Simpson',
+            phone_number='+345678912',
+            is_staff=True
+        )
+
         self.client1 = self.create_client(
             email='Jeff@EpicEvents.com',
             full_name='Jeff Albertson',
@@ -318,13 +328,17 @@ class TestClientViewSet(TestCase):
         )
 
         # Créer un jeton d'accès pour sales_user1
-        refresh = RefreshToken.for_user(self.sales_user1)
-        self.access_token = str(refresh.access_token)
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        self.access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Créer un jeton d'accès pour support_user1
+        refresh_support_user1 = RefreshToken.for_user(self.support_user1)
+        self.access_token_support_user1 = str(refresh_support_user1.access_token)
 
     def test_clients_list(self):
-        # Test la vue clients_list
+        # Test de la vue clients_list
         url = '/crm/clients/'
-        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales_user1}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
@@ -333,12 +347,12 @@ class TestClientViewSet(TestCase):
         self.assertEqual(self.client1.user_contact, self.sales_user1)
 
         # Crée un jeton d'accès pour sales_user1
-        refresh = RefreshToken.for_user(self.sales_user1)
-        access_token = str(refresh.access_token)
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
         # Test de la vue client_details pour le client associé à sales_user1
         url = f'/crm/clients/{self.client1.pk}/'
-        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token}')
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
 
         # Vérifie que la réponse a le statut HTTP 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -360,12 +374,12 @@ class TestClientViewSet(TestCase):
         self.assertEqual(self.client2.user_contact, self.sales_user2)
 
         # Crée un jeton d'accès pour sales_user1
-        refresh = RefreshToken.for_user(self.sales_user1)
-        access_token = str(refresh.access_token)
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
         # Test de la vue client_details pour le client associé à sales_user2 avec le jeton d'accès de sales_user1
         url = f'/crm/clients/{self.client2.pk}/client_details/'
-        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token}')
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -375,3 +389,472 @@ class TestClientViewSet(TestCase):
 
         # Vérifie que le texte spécifié est présent dans la réponse
         self.assertIn("You do not have permission to access this client.", response.content.decode())
+
+    def test_all_clients_details(self):
+        # Test la vue all_clients_details
+        url = '/crm/clients/all_clients_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_support_user1}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_create_client(self):
+        # Créer un jeton d'accès pour sales_user1
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Données du nouveau client à créer
+        new_client_data = {
+            'email': 'Ned@EpicEvents.com',
+            'full_name': 'Ned Flanders',
+            'phone_number': '+987654321',
+            'company_name': 'Flanders & Co'
+        }
+
+        # Test de la vue create pour créer un nouveau client
+        url = '/crm/clients/'
+        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 201 (Created) car le client a été créé avec succès
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Affiche la réponse pour vérifier le message de succès
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("Client successfully created.", response.data.get("message"))
+
+        # Vérifie que les données du client créé sont présentes dans la réponse
+        self.assertIn("data", response.data)
+        self.assertEqual(response.data["data"]["full_name"], new_client_data["full_name"])
+        self.assertEqual(response.data["data"]["email"], new_client_data["email"])
+
+    def test_create_clients_unauthorized_user(self):
+        # Créer un jeton d'accès pour support_user1
+        refresh_support_user1 = RefreshToken.for_user(self.support_user1)
+        access_token_support_user1 = str(refresh_support_user1.access_token)
+
+        # Données du nouveau client à créer
+        new_client_data = {
+            'email': 'Ned@EpicEvents.com',
+            'full_name': 'Ned Flanders',
+            'phone_number': '+987654321',
+            'company_name': 'Flanders & Co'
+        }
+
+        # Test de la vue create pour créer un nouveau client avec le jeton d'accès de support_user1
+        url = '/crm/clients/'
+        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to create a client.", response.content.decode())
+
+    def test_update_client(self):
+        # Assure que le client1 est associé à sales_user1
+        self.assertEqual(self.client1.user_contact, self.sales_user1)
+
+        # Créer un jeton d'accès pour sales_user1
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Données du client mis à jour
+        update_client_data = {
+            'email': 'Jeff@EpicEvents.com',
+            'full_name': 'Jeffrey Albertsons',
+            'phone_number': '+123456789',
+            'company_name': 'Albertson & Co'
+        }
+
+        # Test de la vue update pour mettre à jour le client1
+        url = f'/crm/clients/{self.client1.pk}/'
+        response = self.client.put(url, data=json.dumps(update_client_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 200 (OK) car le client a été mis à jour avec succès
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Affiche la réponse pour vérifier le message de succès
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("Client successfully updated.", response.data.get("message"))
+
+        # Vérifie que les données mises à jour du client créé sont présentes dans la réponse
+        self.assertIn("data", response.data)
+        self.assertEqual(response.data["data"]["full_name"], update_client_data["full_name"])
+        self.assertEqual(response.data["data"]["email"], update_client_data["email"])
+
+    def test_update_client_unauthorized_user(self):
+        # Assure que le client2 est associé à sales_user2
+        self.assertEqual(self.client2.user_contact, self.sales_user2)
+
+        # Créer un jeton d'accès pour sales_user1
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Données du client mis à jour
+        update_client_data = {
+            'email': 'Troyf@EpicEvents.com',
+            'full_name': 'Troy Boy McClure',
+            'phone_number': '+123456789',
+            'company_name': 'McClure & Co'
+        }
+
+        # Test de la vue update pour mettre à jour le client2 avec le jeton d'accès de sales_user1
+        url = f'/crm/clients/{self.client2.pk}/'
+        response = self.client.put(url, data=update_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to update this client.", response.content.decode())
+
+    def test_destroy_client(self):
+        # Assure que le client1 est associé à sales_user1
+        self.assertEqual(self.client1.user_contact, self.sales_user1)
+
+        # Créer un jeton d'accès pour sales_user1
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Données du client à supprimer
+        destroy_client_data = {
+            'email': 'Ned@EpicEvents.com',
+            'full_name': 'Ned Flanders',
+            'phone_number': '+987654321',
+            'company_name': 'Flanders & Co'
+        }
+
+        # Test de la vue destroy pour supprimer le client1
+        url = f'/crm/clients/{self.client1.pk}/'
+        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 204 (No Content) car le client a été supprimé avec succès
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("Client successfully deleted.", response.data.get("message"))
+
+    def test_destroy_client_unauthorized_user(self):
+        # Assure que le client2 est associé à sales_user2
+        self.assertEqual(self.client2.user_contact, self.sales_user2)
+
+        # Créer un jeton d'accès pour sales_user1
+        refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
+        access_token_sales_user1 = str(refresh_sales_user1.access_token)
+
+        # Données du clientà supprimer
+        destroy_client_data = {
+            'email': 'Troyf@EpicEvents.com',
+            'full_name': 'Troy Boy McClure',
+            'phone_number': '+123456789',
+            'company_name': 'McClure & Co'
+        }
+
+        # Test de la vue update pour supprimer le client2 avec le jeton d'accès de sales_user1
+        url = f'/crm/clients/{self.client2.pk}/'
+        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to delete this client.", response.content.decode())
+
+
+@pytest.mark.django_db
+class TestUserViewSet(TestCase):
+    """
+        Classe de tests pour les vues (UserViewSet).
+    """
+    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+        """
+            Crée et retourne un utilisateur avec les paramètres spécifiés.
+        """
+        return User.objects.create_user(
+            email=email,
+            password='Pingou123',
+            role=role,
+            full_name=full_name,
+            phone_number=phone_number,
+            is_staff=is_staff,
+        )
+
+    def setUp(self):
+        """
+            Met en place les données nécessaires pour les tests.
+        """
+        self.management_user = self.create_user(
+            email='Milhouse@EpicEvents-Management.com',
+            role=User.ROLE_MANAGEMENT,
+            full_name='Milhouse Van Houten',
+            phone_number='+567891234',
+            is_staff=True
+        )
+
+        self.sales_user = self.create_user(
+            email='Joe@EpicEvents-Sales.com',
+            role=User.ROLE_SALES,
+            full_name='Joe Quimby',
+            phone_number='+456789123',
+            is_staff=True
+        )
+
+        self.support_user = self.create_user(
+            email='Homer@EpicEvents-Support.com',
+            role=User.ROLE_SUPPORT,
+            full_name='Homer Simpson',
+            phone_number='+345678912',
+            is_staff=True
+        )
+
+        # Créer un jeton d'accès pour management_user
+        refresh_management = RefreshToken.for_user(self.management_user)
+        self.access_token_management = str(refresh_management.access_token)
+
+        # Créer un jeton d'accès pour sales_user
+        refresh_sales = RefreshToken.for_user(self.sales_user)
+        self.access_token_sales = str(refresh_sales.access_token)
+
+        # Créer un jeton d'accès pour support_user
+        refresh_support = RefreshToken.for_user(self.support_user)
+        self.access_token_support = str(refresh_support.access_token)
+
+    def test_users_list(self):
+        # Test la vue users_list
+        url = '/crm/users/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_support}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_user_details(self):
+        # Crée un jeton d'accès pour support_user
+        refresh_support = RefreshToken.for_user(self.support_user)
+        access_token_support = str(refresh_support.access_token)
+
+        # Test de la vue user_details pour l'utilisateur support_user
+        url = f'/crm/users/{self.sales_user.pk}/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_support}')
+
+        # Vérifie que la réponse a le statut HTTP 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie que les données de la réponse correspondent aux détails de l'utilisateur
+        self.assertEqual(response.data['id'], self.sales_user.pk)
+        self.assertEqual(response.data['full_name'], self.sales_user.full_name)
+
+        # Vérifie que l'accès a bien été autorisé
+        self.assertIn('id', response.data)
+        self.assertIn('full_name', response.data)
+
+        # Vérifie que l'utilisateur a les données de l'utilisateur
+        self.assertEqual(response.data['id'], self.sales_user.pk)
+        self.assertEqual(response.data['full_name'], self.sales_user.full_name)
+
+    def test_all_users_details(self):
+        # Test la vue all_users_details
+        url = '/crm/users/all_users_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_support}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_create_user(self):
+        # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
+        self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
+
+        # Créer un jeton d'accès pour management_user
+        refresh_management = RefreshToken.for_user(self.management_user)
+        access_token_management = str(refresh_management.access_token)
+
+        # Données du nouvel utilisateur à créer
+        new_user_data = {
+            'email': 'Marge@EpicEvents-Sales.com',
+            'full_name': 'Marge Simpson',
+            'phone_number': '+123456789',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue create pour créer un nouvel utilisateur
+        url = '/crm/users/'
+        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management}')
+
+        # Vérifie que la réponse a le statut HTTP 201 (Created) car l'utilisateur a été créé avec succès
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Affiche la réponse pour vérifier le message de succès
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("User successfully created.", response.data.get("message"))
+
+        # Vérifie que les données de l'utilisateur créé sont présentes dans la réponse
+        self.assertIn("data", response.data)
+        self.assertEqual(response.data["data"]["full_name"], new_user_data["full_name"])
+        self.assertEqual(response.data["data"]["email"], new_user_data["email"])
+
+    def test_create_user_unauthorized_user(self):
+        # Créer un jeton d'accès pour sales_user
+        refresh_sales = RefreshToken.for_user(self.sales_user)
+        access_token_sales = str(refresh_sales.access_token)
+
+        # Données du nouvel utilisateur à créer
+        new_user_data = {
+            'email': 'Marge@EpicEvents-Sales.com',
+            'full_name': 'Marge Simpson',
+            'phone_number': '+123456789',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue create pour créer un nouvel utilisateur avec le jeton d'accès de sales_user
+        url = '/crm/users/'
+        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to create a user.", response.content.decode())
+
+    def test_update_user(self):
+        # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
+        self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
+
+        # Créer un jeton d'accès pour management_user
+        refresh_management = RefreshToken.for_user(self.management_user)
+        access_token_management = str(refresh_management.access_token)
+
+        # Données de l'utilisateur mis à jour
+        update_user_data = {
+            'email': 'Joe@EpicEvents-Sales.com',
+            'full_name': 'Joey Quimby',
+            'phone_number': '+456789123',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue update pour mettre à jour l'utilisateur
+        url = f'/crm/users/{self.sales_user.pk}/'
+        response = self.client.put(url, data=json.dumps(update_user_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_management}')
+
+        # Vérifie que la réponse a le statut HTTP 200 (OK) car l'utilisateur a été mis à jour avec succès
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Affiche la réponse pour vérifier le message de succès
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("User successfully updated.", response.data.get("message"))
+
+        # Vérifie que les données mises à jour du client créé sont présentes dans la réponse
+        self.assertIn("data", response.data)
+        self.assertEqual(response.data["data"]["full_name"], update_user_data["full_name"])
+        self.assertEqual(response.data["data"]["email"], update_user_data["email"])
+
+    def test_update_user_unauthorized_user(self):
+        # Créer un jeton d'accès pour support_user
+        refresh_support = RefreshToken.for_user(self.support_user)
+        access_token_support = str(refresh_support.access_token)
+
+        # Données de l'utilisateur mis à jour
+        update_user_data = {
+            'email': 'Joe@EpicEvents-Sales.com',
+            'full_name': 'Joey Quimby',
+            'phone_number': '+456789123',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue update pour mettre à jour sales_user avec le jeton d'accès de support_user
+        url = f'/crm/users/{self.sales_user.pk}/'
+        response = self.client.put(url, data=update_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to update this user.", response.content.decode())
+
+    def test_destroy_user(self):
+        # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
+        self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
+
+        # Créer un jeton d'accès pour management_user
+        refresh_management = RefreshToken.for_user(self.management_user)
+        access_token_management = str(refresh_management.access_token)
+
+        # Données de l'utilisateur à supprimer
+        destroy_user_data = {
+            'email': 'Marge@EpicEvents-Sales.com',
+            'full_name': 'Marge Simpson',
+            'phone_number': '+123456789',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue destroy pour supprimer sales_user
+        url = f'/crm/users/{self.sales_user.pk}/'
+        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management}')
+
+        # Vérifie que la réponse a le statut HTTP 204 (No Content) car l'utilisateur a été supprimé avec succès
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.data)
+
+        # Vérifie que le message de succès est présent dans la réponse
+        self.assertIn("User successfully deleted.", response.data.get("message"))
+
+    def test_destroy_user_unauthorized_user(self):
+        # Créer un jeton d'accès pour support_user
+        refresh_support = RefreshToken.for_user(self.support_user)
+        access_token_support = str(refresh_support.access_token)
+
+        # Données de l'utilisateur à supprimer
+        destroy_user_data = {
+            'email': 'Marge@EpicEvents-Sales.com',
+            'full_name': 'Marge Simpson',
+            'phone_number': '+123456789',
+            'role': User.ROLE_SALES,
+            'password': 'Pingou123',
+            'is_staff': 'True'
+        }
+
+        # Test de la vue destroy pour supprimer sales_user avec le jeton d'accès de support_user
+        url = f'/crm/users/{self.sales_user.pk}/'
+        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to delete this user.", response.content.decode())
