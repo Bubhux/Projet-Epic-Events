@@ -362,8 +362,12 @@ class TestLoginViewSet(TestCase):
         """
             Teste la connexion réussie d'un utilisateur.
         """
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
+
+        # Envoie une demande POST à la vue
         url = reverse('obtain_token')
-        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'Pingou123'}
+        data = {'email': user.email, 'password': 'Pingou123'}
         response = self.client.post(url, data, format='json')
 
         # Affiche la réponse pour vérifier le message
@@ -375,8 +379,12 @@ class TestLoginViewSet(TestCase):
         """
             Teste la connexion avec des identifiants invalides.
         """
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
+
+        # Envoie une demande POST à la vue
         url = reverse('obtain_token')
-        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'wrongpassword'}
+        data = {'email': user.email, 'password': 'wrongpassword'}
         response = self.client.post(url, data, format='json')
 
         # Affiche la réponse pour vérifier le message
@@ -390,11 +398,16 @@ class TestLoginViewSet(TestCase):
         """
             Teste la connexion avec un utilisateur inactif.
         """
-        self.user.is_active = False
-        self.user.save()
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
 
+        # Désactive l'utilisateur
+        user.is_active = False
+        user.save()
+
+        # Envoie une demande POST à la vue
         url = reverse('obtain_token')
-        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'Pingou123'}
+        data = {'email': user.email, 'password': 'Pingou123'}
         response = self.client.post(url, data, format='json')
 
         # Affiche la réponse pour vérifier le message
