@@ -1,5 +1,8 @@
 **/__pycache__/
 /env
 /.vscode
-/conf.cnf
 /.env
+/conf.cnf
+/utils/create_env.spec
+/utils/build/create_env
+/utils/build

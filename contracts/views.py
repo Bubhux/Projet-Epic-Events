@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from django.db.models import Q
 
 from .models import Contract
 from .permissions import ContractPermissions
@@ -56,7 +57,7 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def contracts_list(self, request):
-        """Renvoie tous les contrats."""
+        """Renvoie tous les contrats associé à l'utilisateur connecté."""
         contracts = Contract.objects.filter(sales_contact=request.user)
         serializer = ContractDetailSerializer(contracts, many=True)
         return Response(serializer.data)
@@ -77,6 +78,20 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
     def all_contracts_details(self, request):
         """Renvoie les détails de tous les contrats."""
         contracts = Contract.objects.all()
+        serializer = ContractDetailSerializer(contracts, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'])
+    def filtered_contracts(self, request):
+        """
+            Renvoie tous les contrats associés à l'utilisateur connecté en fonction des filtres suivants:
+            - Non signés et non entièrement payés
+            - Signés mais non entièrement payés
+        """
+        contracts = Contract.objects.filter(
+            Q(sales_contact=request.user, status_contract=False, remaining_amount__gt=0.0) |
+            Q(sales_contact=request.user, status_contract=True, remaining_amount__gt=0.0)
+        )
         serializer = ContractDetailSerializer(contracts, many=True)
         return Response(serializer.data)
 
