@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 
 from .models import User, Client
 from .permissions import ClientPermissions, UserPermissions
@@ -38,6 +40,7 @@ class AdminUserClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Client.objects.all()
 
 
+@method_decorator(csrf_protect, name='dispatch')
 class LoginViewSet(generics.CreateAPIView):
     """
         Vue pour la connexion des utilisateurs.
@@ -70,6 +73,7 @@ class LoginViewSet(generics.CreateAPIView):
             return Response({"detail": "Invalid credentials or account inactive"}, status=400)
 
 
+@method_decorator(csrf_protect, name='dispatch')
 class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Client (CRM)."""
 
@@ -166,6 +170,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message}, status=204)
 
 
+@method_decorator(csrf_protect, name='dispatch')
 class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Utilisateur (CRM)."""
 
