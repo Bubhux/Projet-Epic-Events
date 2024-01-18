@@ -46,6 +46,7 @@ env_variable_names = [
     'DB_PASSWORD',
     'DB_HOST',
     'DB_PORT',
+    'SENTRY_DSN',
 ]
 
 # Génére la clé secrète aléatoire

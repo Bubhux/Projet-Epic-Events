@@ -1,3 +1,5 @@
+import sentry_sdk
+from sentry_sdk import capture_exception
 from django.http import HttpResponseForbidden
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +25,7 @@ class AdminEventiewSet(MultipleSerializerMixin, ModelViewSet):
         return Event.objects.all()
 
 
-@method_decorator(csrf_protect, name='dispatch')
+# @method_decorator(csrf_protect, name='dispatch')
 class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Event (CRM)."""
 
@@ -79,6 +81,9 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
 
         # Vérifie si l'événement appartient à l'utilisateur actuellement authentifié
         if event.support_contact != request.user:
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to event_details"))
+
             return HttpResponseForbidden("You do not have permission to access this event.")
 
         serializer = EventDetailSerializer(event)
@@ -101,6 +106,9 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Crée un nouvel événement."""
         if not self.event_permissions.has_create_permission(request):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to create method"))
+
             return HttpResponseForbidden("You do not have permission to create an event.")
 
         # Récupérer les données de la requête
@@ -129,6 +137,9 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
         """Met à jour un événement existant."""
         instance = self.get_object()
         if not self.event_permissions.has_update_permission(request, instance.support_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to update method"))
+
             return HttpResponseForbidden("You do not have permission to update this event.")
 
         serializer = self.serializers['update'](instance, data=request.data)
@@ -141,6 +152,9 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
         """Supprime un événement existant."""
         instance = self.get_object()
         if not self.event_permissions.has_delete_permission(request, instance.support_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to destroy method"))
+
             return HttpResponseForbidden("You do not have permission to delete this event.")
 
         self.perform_destroy(instance)

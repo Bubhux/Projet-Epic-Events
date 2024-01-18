@@ -1,3 +1,5 @@
+import sentry_sdk
+from sentry_sdk import capture_exception
 from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from rest_framework import generics, status
@@ -40,7 +42,7 @@ class AdminUserClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Client.objects.all()
 
 
-@method_decorator(csrf_protect, name='dispatch')
+# @method_decorator(csrf_protect, name='dispatch')
 class LoginViewSet(generics.CreateAPIView):
     """
         Vue pour la connexion des utilisateurs.
@@ -73,7 +75,7 @@ class LoginViewSet(generics.CreateAPIView):
             return Response({"detail": "Invalid credentials or account inactive"}, status=400)
 
 
-@method_decorator(csrf_protect, name='dispatch')
+# @method_decorator(csrf_protect, name='dispatch')
 class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Client (CRM)."""
 
@@ -129,6 +131,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
         # Vérifie si le client appartient à l'utilisateur actuellement authentifié
         if client.user_contact != request.user:
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to client_details"))
+
             return HttpResponseForbidden("You do not have permission to access this client.")
 
         serializer = ClientDetailSerializer(client)
@@ -144,6 +149,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Crée un nouveau client."""
         if not self.client_permissions.has_create_permission(request):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to create method"))
+
             return HttpResponseForbidden("You do not have permission to create a client.")
 
         serializer = self.serializers['create'](data=request.data)
@@ -157,6 +165,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         """Met à jour un client existant."""
         instance = self.get_object()
         if not self.client_permissions.has_update_permission(request, instance.user_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to update method"))
+
             return HttpResponseForbidden("You do not have permission to update this client.")
 
         serializer = self.serializers['update'](instance, data=request.data)
@@ -169,6 +180,9 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         """Supprime un client existant."""
         instance = self.get_object()
         if not self.client_permissions.has_delete_permission(request, instance.user_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to destroy method"))
+
             return HttpResponseForbidden("You do not have permission to delete this client.")
 
         self.perform_destroy(instance)
@@ -176,7 +190,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message}, status=204)
 
 
-@method_decorator(csrf_protect, name='dispatch')
+# @method_decorator(csrf_protect, name='dispatch')
 class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Utilisateur (CRM)."""
 
@@ -242,6 +256,9 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Crée un nouvel utilisateur."""
         if not self.user_permissions.has_create_permission(request.user):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to create method"))
+
             return HttpResponseForbidden("You do not have permission to create a user.")
 
         serializer = self.serializers['create'](data=request.data)
@@ -255,6 +272,9 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         """Met à jour un utilisateur existant."""
         instance = self.get_object()
         if not self.user_permissions.has_update_permission(self.request.user, instance):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to update method"))
+
             return HttpResponseForbidden("You do not have permission to update this user.")
 
         serializer = self.serializers['update'](instance, data=request.data)
@@ -267,6 +287,9 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         """Supprime un utilisateur existant."""
         instance = self.get_object()
         if not self.user_permissions.has_delete_permission(self.request.user, instance):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to destroy method"))
+
             return HttpResponseForbidden("You do not have permission to delete this user.")
 
         self.perform_destroy(instance)
