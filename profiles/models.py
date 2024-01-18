@@ -36,6 +36,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
 
         # Imprime les détails de l'utilisateur
+        print()
         print(f"Nom de l'utilisateur : {user.full_name}")
         print(f"Role de l'utilisateur : {user.get_role_display()}")
         print(f"Statut 'is_staff' de l'utilisateur : {user.is_staff}")
@@ -56,10 +57,11 @@ class UserManager(BaseUserManager):
         superuser = self.create_user(email, password, **extra_fields)
 
         # Imprime les détails du superutilisateur
-        print(f"Nom du superutilisateur : {superuser.full_name}")
-        print(f"Role du superutilisateur : {superuser.get_role_display()}")
-        print(f"Statut 'is_staff' du superutilisateur : {superuser.is_staff}")
-        print(f"Statut 'is_superuser' du superutilisateur : {superuser.is_superuser}")
+        #print()
+        #print(f"Nom du superutilisateur : {superuser.full_name}")
+        #print(f"Role du superutilisateur : {superuser.get_role_display()}")
+        #print(f"Statut 'is_staff' du superutilisateur : {superuser.is_staff}")
+        #print(f"Statut 'is_superuser' du superutilisateur : {superuser.is_superuser}")
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -180,12 +182,11 @@ class Client(models.Model):
         """Affiche les détails de client dans la console."""
         # Imprime les détails du contact commercial
         if self.sales_contact:
+            print()
             print(f"Contact commercial : {self.sales_contact.full_name}")
             print(f"E-mail du contact commercial : {self.sales_contact.email}")
             print(f"Téléphone du contact commercial : {self.sales_contact.phone_number}")
-        else:
-            print("Aucun contact commercial associé.")
-        print()
+            print()
 
     def assign_sales_contact(self):
         """Affecte un contact commercial à un client non associé."""

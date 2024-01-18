@@ -45,6 +45,7 @@ class Event(models.Model):
         """
             Affiche les détails de l'événement dans la console.
         """
+        print()
         print(f"ID de l'événement : {self.id}")
 
         attributes = [
