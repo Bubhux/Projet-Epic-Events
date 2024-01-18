@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse, resolve
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User, Client, Group
 from .serializers import UserLoginSerializer, ClientListSerializer, ClientDetailSerializer
@@ -196,6 +197,7 @@ class TestProfilesApp(TestCase):
         self.assertEqual(view.func.view_class, TokenRefreshView)
 
 
+@pytest.mark.django_db
 class TestLoginViewSet(TestCase):
     """
         Classe de tests pour les vues de connexion (LoginViewSet).
@@ -246,3 +248,130 @@ class TestLoginViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn('detail', response.data)
         self.assertIn('No active account found', response.data['detail'])
+
+
+@pytest.mark.django_db
+class TestClientViewSet(TestCase):
+
+    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+        """
+            Crée et retourne un utilisateur avec les paramètres spécifiés.
+        """
+        return User.objects.create_user(
+            email=email,
+            password='Pingou123',
+            role=role,
+            full_name=full_name,
+            phone_number=phone_number,
+            is_staff=is_staff,
+        )
+
+    def create_client(self, email, full_name, phone_number, company_name, sales_contact, user_contact):
+        """
+            Crée et retourne un client avec les paramètres spécifiés.
+        """
+        return Client.objects.create(
+            email=email,
+            full_name=full_name,
+            phone_number=phone_number,
+            company_name=company_name,
+            sales_contact=sales_contact,
+            user_contact=user_contact,
+        )
+
+    def setUp(self):
+        """
+            Met en place les données nécessaires pour les tests.
+        """
+        self.sales_user1 = self.create_user(
+            email='Timothy@EpicEvents-Sales.com',
+            role=User.ROLE_SALES,
+            full_name='Timothy Lovejoy',
+            phone_number='+345678912',
+            is_staff=True
+        )
+
+        self.sales_user2 = self.create_user(
+            email='Joe@EpicEvents-Sales.com',
+            role=User.ROLE_SALES,
+            full_name='Joe Quimby',
+            phone_number='+45678913',
+            is_staff=True
+        )
+
+        self.client1 = self.create_client(
+            email='Jeff@EpicEvents.com',
+            full_name='Jeff Albertson',
+            phone_number='+123456789',
+            company_name='Albertson & Co',
+            sales_contact=self.sales_user1,
+            user_contact=self.sales_user1
+        )
+
+        self.client2 = self.create_client(
+            email='Troyf@EpicEvents.com',
+            full_name='Troy McClure',
+            phone_number='+56781234',
+            company_name='McClure & Co',
+            sales_contact=self.sales_user2,
+            user_contact=self.sales_user2
+        )
+
+        # Créer un jeton d'accès pour sales_user1
+        refresh = RefreshToken.for_user(self.sales_user1)
+        self.access_token = str(refresh.access_token)
+
+    def test_clients_list(self):
+        # Test la vue clients_list
+        url = '/crm/clients/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_client_details(self):
+        # Assure que le client1 est associé à sales_user1
+        self.assertEqual(self.client1.user_contact, self.sales_user1)
+
+        # Crée un jeton d'accès pour sales_user1
+        refresh = RefreshToken.for_user(self.sales_user1)
+        access_token = str(refresh.access_token)
+
+        # Test de la vue client_details pour le client associé à sales_user1
+        url = f'/crm/clients/{self.client1.pk}/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        # Vérifie que la réponse a le statut HTTP 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie que les données de la réponse correspondent aux détails du client
+        self.assertEqual(response.data['id'], self.client1.pk)
+        self.assertEqual(response.data['full_name'], self.client1.full_name)
+
+        # Vérifie que l'accès a bien été autorisé
+        self.assertIn('id', response.data)
+        self.assertIn('full_name', response.data)
+
+        # Vérifie que l'utilisateur a les données du client
+        self.assertEqual(response.data['id'], self.client1.pk)
+        self.assertEqual(response.data['full_name'], self.client1.full_name)
+
+    def test_client_details_unauthorized_user(self):
+        # Assure que le client2 est associé à sales_user2
+        self.assertEqual(self.client2.user_contact, self.sales_user2)
+
+        # Crée un jeton d'accès pour sales_user1
+        refresh = RefreshToken.for_user(self.sales_user1)
+        access_token = str(refresh.access_token)
+
+        # Test de la vue client_details pour le client associé à sales_user2 avec le jeton d'accès de sales_user1
+        url = f'/crm/clients/{self.client2.pk}/client_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token}')
+
+        # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Affiche la réponse pour vérifier que le message spécifié est présent
+        print(response.content.decode())
+
+        # Vérifie que le texte spécifié est présent dans la réponse
+        self.assertIn("You do not have permission to access this client.", response.content.decode())
