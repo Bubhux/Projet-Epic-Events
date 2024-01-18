@@ -90,6 +90,11 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
             Renvoie tous les contrats associés à l'utilisateur connecté en fonction des filtres suivants:
             - Non signés et non entièrement payés
             - Signés mais non entièrement payés
+            - Exclue les contrats signés et entièrement payés
+            
+            :param self: L'instance de la vue.
+            :param request: L'objet de requête.
+            :return: Une réponse HTTP contenant les données des contrats filtrés.
         """
         
         contracts = Contract.objects.filter(

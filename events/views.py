@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 
 from .models import Event
 from .permissions import EventPermissions
@@ -20,7 +22,7 @@ class AdminEventiewSet(MultipleSerializerMixin, ModelViewSet):
     def get_queryset(self):
         return Event.objects.all()
 
-
+@method_decorator(csrf_protect, name='dispatch')
 class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Event (CRM)."""
 

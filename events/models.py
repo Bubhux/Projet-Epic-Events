@@ -50,6 +50,7 @@ class Event(models.Model):
 
         attributes = [
             ("Nom de l'événement", self.event_name if self.event_name else None),
+            ("ID du contrat associé", self.contract.id if self.contract else None),
             ("Nom du client", self.client.full_name if self.client else None),
             ("E-mail du client", self.client.email if self.client else None),
             ("Compagnie du client", self.client.company_name if self.client else None),

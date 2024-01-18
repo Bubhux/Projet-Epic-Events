@@ -245,6 +245,7 @@ class TestContractViewSet(TestCase):
             total_amount=2000.0,
             remaining_amount=2000.0,
             status_contract=False,
+            sales_contact=self.sales_user1
         )
 
         self.contract_user3 = self.create_contract(
@@ -252,6 +253,7 @@ class TestContractViewSet(TestCase):
             total_amount=2000.0,
             remaining_amount=0.0,
             status_contract=True,
+            sales_contact=self.sales_user1
         )
 
         # Créer un jeton d'accès pour sales_user1
@@ -343,12 +345,12 @@ class TestContractViewSet(TestCase):
         url = '/crm/contracts/filtered_contracts/'
         response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
 
-        # Vérifier que la réponse a le statut HTTP 200 (OK)
+        # Vérifie que la réponse a le statut HTTP 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Vérifier que les données renvoyées correspondent aux contrats filtrés
-        # (vous devrez adapter cette partie en fonction des résultats attendus)
-        self.assertGreater(len(response.data), 0)
+        # Vérifie que les données renvoyées correspondent aux contrats filtrés
+        # Vérifie que le nombre de contrats renvoyés est égal à 2
+        self.assertEqual(len(response.data), 2)
 
         # Vérifie que les contrats renvoyés sont les contrats associés à sales_user1
         self.assertIn(self.contract_user1.id, [contract['id'] for contract in response.data])
