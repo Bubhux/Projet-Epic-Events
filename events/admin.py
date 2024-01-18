@@ -20,13 +20,13 @@ class EventAdmin(admin.ModelAdmin):
             - get_form : Surcharge de la méthode pour ajuster le queryset du champ 'contract'
                         en fonction du client associé lors de l'édition.
     """
-    list_display = ('client', 'event', 'contract', 'support_contact')
+    list_display = ('client', 'event_name', 'contract', 'support_contact')
     ordering = ('client',)
-    search_fields = ('client', 'event')
+    search_fields = ('client', 'event_name')
 
     fieldsets = (
         ("Informations de l'événement", {
-            'fields': ('client', 'client_name', 'event', 'contract', 'event_date_start', 'event_date_end',
+            'fields': ('client', 'client_name', 'event_name', 'contract', 'event_date_start', 'event_date_end',
                        'client_contact', 'support_contact', 'location', 'attendees', 'notes'),
         }),
     )

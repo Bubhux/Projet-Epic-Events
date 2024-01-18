@@ -8,7 +8,7 @@ class Event(models.Model):
         Modèle représentant un événement lié à un contrat et à un client.
 
         Attributes:
-            event (str): Le nom de l'événement.
+            event_name (str): Le nom de l'événement.
             contract (Contract): Le contrat associé à l'événement.
             client (Client): Le client associé à l'événement.
             client_name (str): Le nom complet du client.
@@ -25,7 +25,7 @@ class Event(models.Model):
             print_details: Affiche les détails de l'événement dans la console.
             save: Surcharge la méthode save pour mettre à jour client_name et client_contact avant la sauvegarde.
     """
-    event = models.CharField(max_length=255, blank=True)
+    event_name = models.CharField(max_length=255, blank=True)
     contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, blank=True, related_name='contract_events', verbose_name="Contract")
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='client_events', verbose_name="Client")
     client_name = models.CharField(max_length=255, blank=True)
@@ -39,16 +39,17 @@ class Event(models.Model):
 
     def __str__(self):
         """Renvoie une représentation lisible de l'instance de Event."""
-        return f"Evénement ID: {self.id} {self.event} - {self.client_name}"
+        return f"Evénement ID: {self.id} {self.event_name} - {self.client_name}"
 
     def print_details(self):
         """
             Affiche les détails de l'événement dans la console.
         """
+        print()
         print(f"ID de l'événement : {self.id}")
 
         attributes = [
-            ("Nom de l'événement", self.event if self.event else None),
+            ("Nom de l'événement", self.event_name if self.event_name else None),
             ("Nom du client", self.client.full_name if self.client else None),
             ("E-mail du client", self.client.email if self.client else None),
             ("Compagnie du client", self.client.company_name if self.client else None),
