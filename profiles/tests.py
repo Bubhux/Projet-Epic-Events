@@ -5,8 +5,11 @@ from django.urls import reverse, resolve
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.status import HTTP_401_UNAUTHORIZED
+from django.contrib.auth import authenticate, login
+from rest_framework.response import Response
 
-from .models import User, Client, Group
+from .models import User, Client, Group, add_client_to_group
 
 
 @pytest.mark.django_db
@@ -17,7 +20,15 @@ class TestProfilesApp(TestCase):
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
         des fonctionnalités liées aux profils d'utilisateurs et aux clients dans l'application.
     """
-    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+    def create_superuser(self, email, role, full_name, phone_number, **extra_fields):
+        """
+            Crée et retourne un superutilisateur avec les paramètres spécifiés.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, role, full_name, phone_number, **extra_fields)
+
+    def create_user(self, email, role, full_name, phone_number, is_staff=True, is_superuser=False):
         """
             Crée et retourne un utilisateur avec les paramètres spécifiés.
         """
@@ -28,9 +39,10 @@ class TestProfilesApp(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             is_staff=is_staff,
+            is_superuser=is_superuser,
         )
 
-    def create_client(self, email, full_name, phone_number, company_name):
+    def create_client(self, email, full_name, phone_number, company_name, user_contact=None, sales_contact=None):
         """
             Crée et retourne un client avec les paramètres spécifiés.
         """
@@ -39,6 +51,8 @@ class TestProfilesApp(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             company_name=company_name,
+            user_contact=user_contact,
+            sales_contact=sales_contact,
         )
 
     def setUp(self):
@@ -82,6 +96,8 @@ class TestProfilesApp(TestCase):
             full_name='Jeff Albertson',
             phone_number='+123456789',
             company_name='Albertson & Co',
+            user_contact=self.sales_user1,
+            sales_contact=self.sales_user1,
         )
 
         self.client2 = self.create_client(
@@ -89,6 +105,8 @@ class TestProfilesApp(TestCase):
             full_name='Troy McClure',
             phone_number='+56781234',
             company_name='McClure & Co',
+            user_contact=None,
+            sales_contact=None,
         )
 
     def tearDown(self):
@@ -99,6 +117,27 @@ class TestProfilesApp(TestCase):
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
         Client.objects.all().delete()
+
+    def test_create_superuser(self):
+        """
+            Teste la création d'un superutilisateur avec la méthode create_superuser.
+
+            Vérifie que la méthode create_superuser crée un superutilisateur avec les paramètres par défaut
+            (is_staff=True, is_superuser=True, role=User.ROLE_MANAGEMENT).
+        """
+        email = 'admin@example.com'
+        password = 'adminpass'
+
+        # Utilise la méthode create_superuser de la classe de test
+        superuser = self.create_superuser(email, User.ROLE_MANAGEMENT, 'Admin User', '+123456789')
+
+        # Vérifie que les attributs is_staff, is_superuser et role sont correctement définis
+        assert superuser.is_staff is True
+        assert superuser.is_superuser is True
+        assert superuser.role == User.ROLE_MANAGEMENT
+
+        # Vérifie que l'utilisateur a été correctement enregistré dans la base de données
+        assert User.objects.filter(email=email).exists()
 
     def test_create_user_management(self):
         """
@@ -205,13 +244,86 @@ class TestProfilesApp(TestCase):
         view = resolve(url)
         self.assertEqual(view.func.view_class, TokenRefreshView)
 
+    def test_create_user_with_empty_email(self):
+        """
+            Teste la levée de l'exception ValueError lorsque la méthode create_user est appelée avec un e-mail vide.
+
+            Vérifie que la création d'un utilisateur avec un e-mail vide déclenche une exception de type ValueError
+            avec le message 'The Email field must be set'.
+        """
+        with pytest.raises(ValueError, match='The Email field must be set'):
+            User.objects.create_user(email='', password='Pingou123', role=User.ROLE_MANAGEMENT, full_name='John Doe', phone_number='+123456789', is_staff=True)
+
+    def test_create_superuser_invalid_attributes(self):
+        """
+            Teste la levée d'exceptions lorsque la méthode create_superuser est appelée avec des paramètres invalides.
+
+            Vérifie que la méthode create_superuser lève une exception ValueError lorsque les paramètres
+            is_staff ou is_superuser sont définis à False.
+        """
+        with pytest.raises(ValueError, match='Superuser must have is_staff=True.'):
+            User.objects.create_superuser('admin@example.com', 'adminpass', is_staff=False)
+
+        with pytest.raises(ValueError, match='Superuser must have is_superuser=True.'):
+            User.objects.create_superuser('admin@example.com', 'adminpass', is_superuser=False)
+
+    def test_has_perm(self):
+        # Teste la méthode has_perm
+        perm = 'some_permission'
+        self.assertTrue(self.management_user.has_perm(perm))
+
+    def test_has_module_perms(self):
+        # Teste la méthode has_module_perms
+        app_label = 'some_app'
+        self.assertTrue(self.management_user.has_module_perms(app_label))
+
+    def test_str_method_with_sales_contact(self):
+        # Teste la méthode __str__ avec un contact commercial associé
+        expected_str = f"Client ID : {self.client1.id} Jeff Albertson - Contact commercial {self.sales_user1.full_name}"
+        self.assertEqual(str(self.client1), expected_str)
+
+    def test_add_client_to_group(self):
+        # Crée une instance de Client avec le contact commercial déjà existant
+        client_instance = Client.objects.create(
+            email='client@example.com',
+            full_name='Test Client',
+            phone_number='1234567890',
+            company_name='Test Company',
+            user_contact=self.sales_user1,
+            sales_contact=self.sales_user1
+        )
+
+        # Supprime tous les groupes "Client" existants avant le test
+        Group.objects.filter(name='Client').delete()
+
+        # Vérifie si le groupe "Client" existe avant l'appel à la fonction add_client_to_group
+        assert not Group.objects.filter(name='Client').exists()
+
+        # Appelle la fonction add_client_to_group
+        add_client_to_group(sender=None, instance=client_instance)
+
+        # Vérifie si le groupe "Client" existe après l'appel à la fonction add_client_to_group
+        assert Group.objects.filter(name='Client').exists()
+
+        # Actualise l'instance avec les données actuelles de la base de données
+        client_instance.refresh_from_db()
+
+        # Vérifie si l'instance de Client est associée au groupe "Client"
+        assert client_instance.sales_contact.groups.filter(name='Client').exists()
+
+        # Vérifie si user_contact est correctement défini après l'appel à add_client_to_group
+        assert client_instance.user_contact is not None
+
+        # Réinitialise les groupes pour éviter des effets de bord sur d'autres tests
+        client_instance.sales_contact.groups.clear()
+
 
 @pytest.mark.django_db
 class TestLoginViewSet(TestCase):
     """
         Classe de tests pour les vues de connexion (LoginViewSet).
     """
-    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+    def create_user(self, email, role, full_name, phone_number, is_staff=True, is_active=True):
         """
             Crée et retourne un utilisateur avec les paramètres spécifiés.
         """
@@ -222,6 +334,7 @@ class TestLoginViewSet(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             is_staff=is_staff,
+            is_active=is_active,
         )
 
     def setUp(self):
@@ -233,7 +346,8 @@ class TestLoginViewSet(TestCase):
             role=User.ROLE_SALES,
             full_name='Timothy Lovejoy',
             phone_number='+345678912',
-            is_staff=True
+            is_staff=True,
+            is_active=True
         )
 
     def tearDown(self):
@@ -252,6 +366,9 @@ class TestLoginViewSet(TestCase):
         data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'Pingou123'}
         response = self.client.post(url, data, format='json')
 
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_login_invalid_credentials(self):
@@ -262,9 +379,30 @@ class TestLoginViewSet(TestCase):
         data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'wrongpassword'}
         response = self.client.post(url, data, format='json')
 
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
+
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn('detail', response.data)
         self.assertIn('No active account found', response.data['detail'])
+
+    def test_user_login_inactive_account(self):
+        """
+            Teste la connexion avec un utilisateur inactif.
+        """
+        self.user.is_active = False
+        self.user.save()
+
+        url = reverse('obtain_token')
+        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'Pingou123'}
+        response = self.client.post(url, data, format='json')
+
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
+
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertIn('detail', response.data)
+        self.assertIn('No active account found with the given credentials', response.data['detail'])
 
 
 @pytest.mark.django_db

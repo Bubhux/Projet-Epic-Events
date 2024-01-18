@@ -1,0 +1,11 @@
+[run]
+omit = 
+    EpicEvents/*
+    */tests.py
+    **/admin.py
+    **/migrations/**
+    **/permissions.py
+    **/serializers.py
+    **/apps.py
+    **/__init__.py
+    **/manage.py

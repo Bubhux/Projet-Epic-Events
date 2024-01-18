@@ -168,8 +168,8 @@ class Client(models.Model):
         """Renvoie une représentation lisible de l'instance de Client."""
         if self.user_contact:
             return f"Client ID : {self.id} {self.full_name} - Contact commercial {self.user_contact.full_name}"
-        else:
-            return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
+        #else:
+        #    return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
         """Affiche les détails de client dans la console."""
