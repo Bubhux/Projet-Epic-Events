@@ -52,24 +52,24 @@ class LoginViewSet(generics.CreateAPIView):
     serializer_class = UserLoginSerializer
 
     def create(self, request, *args, **kwargs):
-        # Obtenir le sérialiseur avec les données de la requête
+        # Obtiens le sérialiseur avec les données de la requête
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Authentifier l'utilisateur avec le nom d'utilisateur (adresse e-mail) et le mot de passe
+        # Authentifie l'utilisateur avec le nom d'utilisateur (adresse e-mail) et le mot de passe
         user = authenticate(
             request,
             username=serializer.validated_data['email'],
             password=serializer.validated_data['password']
         )
 
-        # Vérifier si l'authentification a réussi et si l'utilisateur est actif
+        # Vérifie si l'authentification a réussi et si l'utilisateur est actif
         if user and user.is_active:
-            # Connecter l'utilisateur
+            # Connecte l'utilisateur
             login(request, user)
             return Response({"detail": "Login successful"})
         else:
-            # Retourner une réponse indiquant des identifiants invalides ou un compte inactif
+            # Retourne une réponse indiquant des identifiants invalides ou un compte inactif
             return Response({"detail": "Invalid credentials or account inactive"}, status=400)
 
 

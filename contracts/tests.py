@@ -413,7 +413,7 @@ class TestContractViewSet(TestCase):
         self.assertEqual(response.data["data"]["sales_contact"], new_contract_data["sales_contact"])
 
     def test_create_contract_unauthorized_user(self):
-        # Créer un jeton d'accès pour management_user
+        # Créer un jeton d'accès pour sales_user2
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
@@ -513,7 +513,7 @@ class TestContractViewSet(TestCase):
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
-        # Données du nouveau contrat à supprimer
+        # Données du contrat à supprimer
         destroy_contract_data = {
             'client': 'Ned Flanders',
             'total_amount': '1500.0',
@@ -543,7 +543,7 @@ class TestContractViewSet(TestCase):
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
-        # Données du nouveau contrat à supprimer
+        # Données du contrat à supprimer
         destroy_contract_data = {
             'client': 'Ned Flanders',
             'total_amount': '1500.0',
