@@ -70,7 +70,7 @@ class Command(BaseCommand):
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
-            role = self.colored_prompt('Rôle de l\'utilisateur (Management/Sales/Support)', color=Fore.CYAN)
+            role = self.colored_prompt('Rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN)
             if self.should_exit():
                 return
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
-            role = self.colored_prompt('Rôle de l\'utilisateur (Management/Sales/Support)', color=Fore.CYAN)
+            role = self.colored_prompt('Rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN)
             if self.should_exit():
                 return
             full_name = self.colored_prompt('Nom complet', color=Fore.CYAN)

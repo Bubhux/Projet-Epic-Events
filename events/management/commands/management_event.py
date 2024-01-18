@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
                 table.add_row(
                     str(event['id']),
-                    str(event['event']),
+                    str(event['event_name']),
                     str(event['client']),
                     str(event.get('client_contact', '')),
                     str(event.get('event_date_start', '')),
@@ -97,9 +97,16 @@ class Command(BaseCommand):
             event_date_end_str = self.colored_prompt('Date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
             if self.should_exit():
                 return
-            support_contact_name = self.colored_prompt('Nom complet du contact de support', color=Fore.CYAN)
-            if self.should_exit():
-                return
+
+            # Le champ support_contact_name est facultatif
+            use_support_contact = click.confirm('Voulez-vous spécifier un contact de support ?', default=False)
+            support_contact_name = None
+
+            if use_support_contact:
+                support_contact_name = self.colored_prompt('Nom complet du contact de support', color=Fore.CYAN)
+                if self.should_exit():
+                    return
+
             location = self.colored_prompt('Lieu de l\'événement', color=Fore.CYAN)
             if self.should_exit():
                 return
@@ -109,19 +116,19 @@ class Command(BaseCommand):
             notes = self.colored_prompt('Notes sur l\'événement', color=Fore.CYAN)
 
             try:
-                # Récupére l'instance du client à partir de la base de données
+                # Récupère l'instance du client à partir de la base de données
                 client = Client.objects.get(full_name=client_name)
 
-                # Récupére l'instance du contact de support à partir de la base de données
-                support_contact = User.objects.get(full_name=support_contact_name)
+                # Récupère l'instance du contact de support à partir de la base de données
+                support_contact = User.objects.get(full_name=support_contact_name) if support_contact_name else None
 
                 # Convertie les chaînes en objets datetime avec information sur le fuseau horaire
                 event_date_start = timezone.make_aware(datetime.strptime(event_date_start_str, '%Y-%m-%d %H:%M'))
                 event_date_end = timezone.make_aware(datetime.strptime(event_date_end_str, '%Y-%m-%d %H:%M'))
 
-                # Créer un nouvel événement
+                # Crée un nouvel événement
                 event = Event.objects.create(
-                    event=event_name,
+                    event_name=event_name,
                     client=client,
                     event_date_start=event_date_start,
                     event_date_end=event_date_end,
@@ -172,7 +179,7 @@ class Command(BaseCommand):
             table.add_column("Valeurs actuelles", style="cyan")
 
             table.add_row("ID", str(event.id))
-            table.add_row("Nom de l'événement", str(event.event))
+            table.add_row("Nom de l'événement", str(event.event_name))
             table.add_row("Nom du client", str(event.client))
             table.add_row("Contact du client", str(event.client_contact))
             table.add_row("Date de début de l'événement", str(event.event_date_start))
@@ -185,7 +192,7 @@ class Command(BaseCommand):
             console.print(table)
 
             # Demande les nouvelles informations
-            new_event = self.colored_prompt('Nouveau nom de l\'événement', color=Fore.CYAN)
+            new_event_name = self.colored_prompt('Nouveau nom de l\'événement', color=Fore.CYAN)
             if self.should_exit():
                 return
             new_event_date_start_str = self.colored_prompt('Nouvelle date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
@@ -194,6 +201,17 @@ class Command(BaseCommand):
             new_event_date_end_str = self.colored_prompt('Nouvelle date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
             if self.should_exit():
                 return
+
+            # Demande le nom du contact de support seulement si l'utilisateur le souhaite
+            use_new_support_contact = click.confirm('Voulez-vous spécifier un nouveau contact de support ?', default=False)
+            new_support_contact_name = None
+
+            if use_new_support_contact:
+                new_support_contact_name = self.colored_prompt('Nouveau nom du contact de support', color=Fore.CYAN)
+                if self.should_exit():
+                    return
+
+            # Laisse l'utilisateur saisir les informations suivantes même si le contact de support n'est pas renseigné
             new_location = self.colored_prompt('Nouveau lieu de l\'événement', color=Fore.CYAN)
             if self.should_exit():
                 return
@@ -206,10 +224,14 @@ class Command(BaseCommand):
             new_event_date_start = timezone.make_aware(datetime.strptime(new_event_date_start_str, '%Y-%m-%d %H:%M'))
             new_event_date_end = timezone.make_aware(datetime.strptime(new_event_date_end_str, '%Y-%m-%d %H:%M'))
 
+            # Récupère l'instance du contact de support à partir de la base de données, s'il est spécifié
+            new_support_contact = User.objects.get(full_name=new_support_contact_name) if new_support_contact_name else None
+
             # Met à jour l'événement
-            event.event = new_event
+            event.event_name = new_event_name
             event.event_date_start = new_event_date_start
             event.event_date_end = new_event_date_end
+            event.support_contact = new_support_contact
             event.location = new_location
             event.attendees = new_attendees
             event.notes = new_notes
@@ -220,6 +242,9 @@ class Command(BaseCommand):
 
         except Event.DoesNotExist:
             console.print(f"[bold red]Événement ID {event_id} introuvable.[/bold red]")
+
+        except User.DoesNotExist:
+            console.print(f"[bold red]Le contact de support avec le nom '{new_support_contact_name}' n'existe pas dans la base de données.[/bold red]")
 
         except Exception as e:
             console.print(f"[bold red]Erreur lors de la mise à jour de l'événement :[/bold red] {e}")
@@ -243,7 +268,7 @@ class Command(BaseCommand):
             table.add_column("Valeurs actuelles", style="cyan")
 
             table.add_row("ID", str(event.id))
-            table.add_row("Nom de l'événement", str(event.event))
+            table.add_row("Nom de l'événement", str(event.event_name))
             table.add_row("Nom du client", str(event.client))
             table.add_row("Contact du client", str(event.client_contact))
             table.add_row("Date de début de l'événement", str(event.event_date_start))
