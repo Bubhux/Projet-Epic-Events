@@ -6,7 +6,6 @@ from rich.table import Table
 from django.utils import timezone
 from datetime import datetime
 
-from contracts.models import Contract
 from profiles.models import User, Client
 from events.models import Event
 from events.views import EventViewSet
@@ -178,7 +177,6 @@ class Command(BaseCommand):
             Fonction pour la mise à jour d'un événement.
         """
         console = Console()
-        event_view_set = EventViewSet()
 
         try:
             # Récupère l'événement à mettre à jour
@@ -281,7 +279,6 @@ class Command(BaseCommand):
             Fonction pour la suppression d'un événement.
         """
         console = Console()
-        event_view_set = EventViewSet()
 
         try:
             # Récupére l'événement à supprimer
@@ -315,7 +312,7 @@ class Command(BaseCommand):
             else:
                 console.print("[bold yellow]Suppression annulée.[/bold yellow]")
 
-        except User.DoesNotExist:
+        except Event.DoesNotExist:
             console.print(f"[bold red]Événement ID {event_id} introuvable.[/bold red]")
 
         except Exception as e:

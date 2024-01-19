@@ -1,6 +1,6 @@
 import pytest
 import json
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse, resolve
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -19,7 +19,7 @@ class TestProfilesApp(TestCase):
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
         des fonctionnalités liées aux profiles d'utilisateurs et aux clients dans l'application.
     """
-    def create_superuser(self, email, role, full_name, phone_number, **extra_fields):
+    def create_superuser(self, email, password, role, full_name, phone_number, **extra_fields):
         """
             Crée et retourne un superutilisateur avec les paramètres spécifiés.
         """
@@ -128,7 +128,7 @@ class TestProfilesApp(TestCase):
         password = 'adminpass'
 
         # Utilise la méthode create_superuser de la classe de test
-        superuser = self.create_superuser(email, User.ROLE_MANAGEMENT, 'Admin User', '+123456789')
+        superuser = self.create_superuser(email, password, User.ROLE_MANAGEMENT, 'Admin User', '+123456789')
 
         # Vérifie que les attributs is_staff, is_superuser et role sont correctement définis
         assert superuser.is_staff is True
@@ -181,7 +181,7 @@ class TestProfilesApp(TestCase):
         self.assertEqual(new_client.full_name, 'Jeff Albertson')
         self.assertEqual(new_client.sales_contact, self.sales_user1)
         expected_str = (
-            f"Client ID: {new_client.id} "
+            f"Client ID : {new_client.id} "
             f"Jeff Albertson - Contact commercial {new_client.sales_contact.full_name}"
         )
 

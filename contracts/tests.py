@@ -1,5 +1,7 @@
 import pytest
 import json
+import sys
+from io import StringIO
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
@@ -108,15 +110,28 @@ class TestContractsApp(TestCase):
 
     def test_contract_print_details(self):
         """Teste la méthode print_details du modèle Contract."""
-        expected_output = "\nID du contrat : {}\n" \
-                          "Nom du client : {}\n" \
-                          "E-mail du client : {}\n" \
-                          "Compagnie du client : {}\n\n".format(
-                              self.contract_user.id,
-                              self.client_user.full_name,
-                              self.client_user.email,
-                              self.client_user.company_name
-                          )
+        expected_output = (
+            f"\nID du contrat : {self.contract_user.id}\n"
+            f"Nom du client : {self.client_user.full_name}\n"
+            f"E-mail du client : {self.client_user.email}\n"
+            f"Compagnie du client : {self.client_user.company_name}\n\n"
+        )
+
+        # Capture la sortie standard dans une chaîne
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        # Utilise la méthode print_details
+        self.contract_user.print_details()
+
+        # Restaure la sortie standard
+        sys.stdout = sys.__stdout__
+
+        # Obtient la valeur capturée
+        result = captured_output.getvalue()
+
+        # Compare la sortie de la méthode avec la valeur attendue
+        self.assertEqual(result, expected_output)
 
         # Compare les attributs du contrat avec les valeurs attendues
         self.assertEqual(self.contract_user.id, 1)
