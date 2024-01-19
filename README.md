@@ -34,7 +34,7 @@
 
 <div style="display: flex; align-items: center;">
     <h3>Projet Epic Events</h3>
-    <img src="/static/img/logo_light.png" alt="Logo Epic Events" width="150">
+    <img src="/static/img/logo_dark.png" alt="Logo Epic Events" width="150">
 </div>
 
 - Application conçu pour faciliter une collaboration efficace entre les équipes chez **Epic Events** de la gestion de la relation client **CRM** (Customer Relationship Management).   
