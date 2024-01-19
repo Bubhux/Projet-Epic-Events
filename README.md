@@ -446,7 +446,7 @@ $ python manage.py management_event --delete_event [id_event]
 
 ### Exécution de l'application   
 
-##### Utilisation   
+#### Utilisation   
 
 Lancement du serveur **Django**.   
 - Placez-vous avec le terminal CMD dans le dossier principal.   
@@ -474,7 +474,7 @@ $ python manage.py runserver
 
 >*Note : Pour exécuter les tests il est nécessaire d'avoir activer l'environnement virtuel, mais il n'est pas nécessaire de lancer le serveur **Django**.*    
 
-##### Exécution de Pytest   
+#### Exécution de Pytest   
 
 - Utilisation de **Pytest** pour effectuer les tests. ➔ [Documentation Pytest](https://docs.pytest.org/)   
 - Pour exécuter les tests à l'aide de **Pytest**, utilisez la commande suivante :   
@@ -637,14 +637,14 @@ $ flake8
 
 ### Informations importantes sur les différents fichiers et dossiers   
 
-##### Les dossiers contract, events, profiles   
+#### Les dossiers contract, events, profiles   
 
   - Chacun contient un fichier ``tests.py`` contenant les configurations pour les tests.   
     - ``contracts`` ➔ ([tests.py](contracts/tests.py))   
     - ``events`` ➔ ([tests.py](events/tests.py))   
     - ``profiles`` ➔ ([tests.py](profiles/tests.py))   
 
-##### Les dossiers management/commmands   
+#### Les dossiers management/commmands   
 
   - Chacun contient un fichier contenant les configurations pour le gestionnaire de commandes.   
     - ``contracts`` ➔ ([management_contract.py](/contracts/management/commands/management_contract.py))   
@@ -652,25 +652,25 @@ $ flake8
     - ``profiles`` ➔ ([management_user.py](/profiles/management/commands/management_user.py))   
     - ``profiles`` ➔ ([management_client.py](/profiles/management/commands/management_client.py))   
 
-##### Le dossier utils   
+#### Le dossier utils   
 
   - Le dossier contient le fichier ``creating_environment_variables.py`` qui génère le fichier ``.env`` pour les variables d'environnement ([creating_environment_variables.py](utils/creating_environment_variables.py))   
 
-##### Le dossier static   
+#### Le dossier static   
 
   - Dossier qui contient qui contient les images et les badges nécessaire à l'application.   
     - ``static`` ➔ ([badges](static/badges))   
     - ``static`` ➔ ([img](static/img))   
 
-##### Le fichier EpicEvents.sql   
+#### Le fichier EpicEvents.sql   
 
   - Le fichier ``EpicEvents.sql`` contient la configuration des tables pour la base de données ➔ ([EpicEvents.sql](EpicEvents.sql))   
 
-##### Le fichier .coveragerc   
+#### Le fichier .coveragerc   
 
   - Le fichier contient la configuration de ``Coverage`` ([.coveragerc](.coveragerc))   
 
-##### Le fichier .flake8   
+#### Le fichier .flake8   
 
   - Le fichier contient la configuration de ``Flake8`` ([.flake8](.flake8))   
 
