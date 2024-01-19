@@ -3,7 +3,7 @@ Créer un modèle de fichier .env pour Epic Events
 avec une clé secrète générée aléatoirement et des variables d'environnement préconfigurées.
 
 Ce script génère un fichier .env qui peut être utilisé pour configurer
-l'environnement de l'application oc_lettings_site
+l'environnement de l'application Epic Events
 Il génère une clé secrète aléatoire pour la configuration de Django
 et inclut également des noms de variables d'environnement
 préconfigurés tels que :
@@ -35,7 +35,6 @@ Exemple d'utilisation :
 """
 
 from django.core.management.utils import get_random_secret_key
-import os
 from tkinter import Tk, filedialog
 
 # Liste des noms de variables d'environnement

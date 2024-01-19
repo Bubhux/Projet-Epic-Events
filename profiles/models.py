@@ -54,7 +54,7 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         # Appel la méthode create_user pour créer le superutilisateur
-        superuser = self.create_user(email, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -185,8 +185,8 @@ class Client(models.Model):
         """Renvoie une représentation lisible de l'instance de Client."""
         if self.user_contact:
             return f"Client ID : {self.id} {self.full_name} - Contact commercial {self.user_contact.full_name}"
-        #else:
-        #    return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
+        else:
+            return f"Client ID : {self.id} {self.full_name} - Aucun contact commercial associé"
 
     def print_details(self):
         """Affiche les détails de client dans la console."""
@@ -257,9 +257,6 @@ class Client(models.Model):
             print(f"Erreur d'intégrité : {e}")
             return
         else:
-            # Récupère l'utilisateur associé à partir de user_contact_id
-            user_contact = User.objects.filter(id=self.user_contact_id).first()
-
             # Met à jour la colonne email_contact avec l'e-mail de l'utilisateur associé
             self.email_contact = self.user_contact.email if self.user_contact else None
             self.sales_contact = self.user_contact if self.user_contact else None

@@ -2,8 +2,9 @@ import pytest
 import json
 import datetime
 import pendulum
-from django.test import TestCase, Client
-from django.utils import timezone
+import sys
+from io import StringIO
+from django.test import TestCase
 from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -145,6 +146,10 @@ class TestEventsApp(TestCase):
             notes="Event notes"
         )
 
+        # Met à jour les attributs du client dans l'événement
+        self.event_user1.client = self.client_user1
+        self.event_user1.save()
+
     def tearDown(self):
         """
             Méthode appelée après l'exécution de chaque test.
@@ -181,23 +186,35 @@ class TestEventsApp(TestCase):
         self.event_user1.support_contact = self.support_user1
         self.event_user1.client = self.client_user1
 
-        # Appelle la méthode print_details
+        # Capture la sortie de print_details
+        captured_output = StringIO()
+        sys.stdout = captured_output
         self.event_user1.print_details()
+        sys.stdout = sys.__stdout__
+
+        # Récupère la sortie imprimée
+        printed_output = captured_output.getvalue()
 
         # Chaîne attendue pour les détails de l'événement
-        expected_output = f"\nID de l'événement : {self.event_user1.id}\n" \
-                          f"Nom de l'événement : {self.event_user1.event_name}\n" \
-                          f"ID du contrat associé : {self.event_user1.contract}\n" \
-                          f"Nom du client : {self.client_user1.full_name}\n" \
-                          f"E-mail du client : {self.client_user1.email}\n" \
-                          f"Compagnie du client : {self.client_user1.company_name}\n" \
-                          f"Contact du client : {self.event_user1.client_contact}\n" \
-                          f"Date de début de l'événement : {self.event_user1.event_date_start}\n" \
-                          f"Date de fin de l'événement : {self.event_user1.event_date_end}\n" \
-                          f"Contact de support : {self.support_user1.full_name}\n" \
-                          f"Lieu : {self.event_user1.location}\n" \
-                          f"Nombre d'invités : {self.event_user1.attendees}\n" \
-                          f"Notes : {self.event_user1.notes}\n\n"
+        expected_output = (
+            f"\nID de l'événement : {self.event_user1.id}\n"
+            f"Nom de l'événement : {self.event_user1.event_name}\n"
+            f"ID du contrat associé : {self.event_user1.contract.id}\n"
+            f"Nom du client : {self.client_user1.full_name}\n"
+            f"E-mail du client : {self.client_user1.email}\n"
+            f"Compagnie du client : {self.client_user1.company_name}\n"
+            f"Contact du client : {self.event_user1.client_contact}\n"
+            f"Date de début de l'événement : {self.event_user1.event_date_start}\n"
+            f"Date de fin de l'événement : {self.event_user1.event_date_end}\n"
+            f"Contact de support : User ID : {self.support_user1.id} "
+            f"Équipe Support - {self.support_user1.full_name} ({self.support_user1.email})\n"
+            f"Lieu : {self.event_user1.location}\n"
+            f"Nombre d'invités : {self.event_user1.attendees}\n"
+            f"Notes : {self.event_user1.notes}\n\n"
+        )
+
+        # Compare la sortie avec les valeurs attendues
+        self.assertEqual(printed_output.strip(), expected_output.strip())
 
         # Compare les attributs de l'événement avec les valeurs attendues
         self.assertEqual(self.event_user1.id, 1)
@@ -810,6 +827,9 @@ class TestEventViewSet(TestCase):
 
         # Affiche la réponse pour vérifier que le message spécifié est présent
         print(response.content.decode())
+
+        # Vérifie que la variable existing_client est égale à self.client_user1
+        self.assertEqual(existing_event.client, self.client_user1)
 
         # Vérifie que le message d'erreur est présent dans la réponse
         self.assertIn(

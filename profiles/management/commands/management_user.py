@@ -150,7 +150,6 @@ class Command(BaseCommand):
             Fonction pour la mise à jour d'un utilisateur.
         """
         console = Console()
-        user_view_set = UserViewSet()
 
         try:
             # Récupère l'utilisateur à mettre à jour
@@ -219,7 +218,6 @@ class Command(BaseCommand):
             Fonction pour la suppression d'un utilisateur.
         """
         console = Console()
-        user_view_set = UserViewSet()
 
         try:
             # Récupére l'utilisateur à supprimer

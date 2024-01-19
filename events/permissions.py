@@ -1,9 +1,7 @@
 from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
 from django.http import Http404
 
-from .models import Event
-from profiles.models import User, Client
+from profiles.models import User
 
 
 class EventPermissions(permissions.BasePermission):
@@ -51,11 +49,11 @@ class EventPermissions(permissions.BasePermission):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un événement spécifique.
         # Autorise les membres de l'équipe gestion et les membres de l'équipe support associés aux événements.
         return (
-            request.user.role == User.ROLE_MANAGEMENT or
-            (
+            request.user.role == User.ROLE_MANAGEMENT or (
                 request.user.role == User.ROLE_SUPPORT and (
-                    request.user == user or
-                    (hasattr(user, 'client') and request.user in user.event.support_contact.all())
+                    request.user == user or (
+                        hasattr(user, 'client') and request.user in user.event.support_contact.all()
+                    )
                 )
             )
         )
@@ -64,11 +62,11 @@ class EventPermissions(permissions.BasePermission):
         # Vérifie si l'utilisateur connecté a la permission de supprimer un événement spécifique.
         # Autorise les membres de l'équipe gestion et les membres de l'équipe support associés aux événements.
         return (
-            request.user.role == User.ROLE_MANAGEMENT or
-            (
+            request.user.role == User.ROLE_MANAGEMENT or (
                 request.user.role == User.ROLE_SUPPORT and (
-                    request.user == user or
-                    (hasattr(user, 'client') and request.user in user.event.support_contact.all())
+                    request.user == user or (
+                        hasattr(user, 'client') and request.user in user.event.support_contact.all()
+                    )
                 )
             )
         )

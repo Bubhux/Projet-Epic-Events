@@ -2,6 +2,6 @@
 /env
 /.vscode
 /.env
-/conf.cnf
-htmlcov/
+/reports
+/htmlcov
 .coverage

@@ -109,7 +109,6 @@ class Command(BaseCommand):
             Fonction pour la mise à jour d'un client.
         """
         console = Console()
-        client_view_set = ClientViewSet()
 
         try:
             # Récupère le client à mettre à jour
@@ -152,7 +151,7 @@ class Command(BaseCommand):
 
             console.print(f"[bold green]Client ID {client_id} mis à jour avec succès.[/bold green]")
 
-        except User.DoesNotExist:
+        except Client.DoesNotExist:
             console.print(f"[bold red]Client ID {client_id} introuvable.[/bold red]")
 
         except Exception as e:
@@ -163,7 +162,6 @@ class Command(BaseCommand):
             Fonction pour la suppression d'un client.
         """
         console = Console()
-        client_view_set = ClientViewSet()
 
         try:
             # Récupére le client à supprimer
@@ -192,7 +190,7 @@ class Command(BaseCommand):
             else:
                 console.print("[bold yellow]Suppression annulée.[/bold yellow]")
 
-        except User.DoesNotExist:
+        except Client.DoesNotExist:
             console.print(f"[bold red]Client ID {client_id} introuvable.[/bold red]")
 
         except Exception as e:

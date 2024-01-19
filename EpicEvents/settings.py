@@ -14,7 +14,6 @@ import os
 import pymysql
 import sentry_sdk
 
-from pathlib import Path
 from datetime import timedelta
 from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config

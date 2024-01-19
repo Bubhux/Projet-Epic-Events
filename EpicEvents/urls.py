@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from profiles.views import LoginViewSet, ClientViewSet, UserViewSet
+from profiles.views import ClientViewSet, UserViewSet
 from contracts.views import ContractViewSet
 from events.views import EventViewSet
 

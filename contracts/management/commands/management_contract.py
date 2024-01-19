@@ -127,7 +127,6 @@ class Command(BaseCommand):
             Fonction pour la mise à jour d'un contrat.
         """
         console = Console()
-        contract_view_set = ContractViewSet()
 
         try:
             # Récupère le contrat à mettre à jour
@@ -181,7 +180,6 @@ class Command(BaseCommand):
             Fonction pour la suppression d'un contrat.
         """
         console = Console()
-        contract_view_set = ContractViewSet()
 
         try:
             # Récupére le contrat à supprimer
