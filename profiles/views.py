@@ -13,7 +13,14 @@ from django.views.decorators.csrf import csrf_protect
 
 from .models import User, Client
 from .permissions import ClientPermissions, UserPermissions
-from .serializers import MultipleSerializerMixin, UserLoginSerializer, ClientListSerializer, ClientDetailSerializer, UserListSerializer, UserDetailSerializer
+from .serializers import (
+    MultipleSerializerMixin,
+    UserLoginSerializer,
+    ClientListSerializer,
+    ClientDetailSerializer,
+    UserListSerializer,
+    UserDetailSerializer
+)
 
 
 @method_decorator(csrf_protect, name='dispatch')
@@ -61,7 +68,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
                 *args: Arguments positionnels.
                 **kwargs: Arguments nommés.
 
-            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            Cette méthode appelle d'abord le constructeur de la classe parente (super)
             avec les arguments reçus, puis initialise les permissions du contrat.
         """
         super().__init__(*args, **kwargs)
@@ -74,8 +81,8 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
     serializers = {
         'list': ClientListSerializer,
         'retrieve': ClientDetailSerializer,
-        'create' : ClientDetailSerializer,
-        'update' : ClientDetailSerializer
+        'create': ClientDetailSerializer,
+        'update': ClientDetailSerializer
     }
 
     client_permissions = None
@@ -176,7 +183,7 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
                 *args: Arguments positionnels.
                 **kwargs: Arguments nommés.
 
-            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            Cette méthode appelle d'abord le constructeur de la classe parente (super)
             avec les arguments reçus, puis initialise les permissions du contrat.
         """
         super().__init__(*args, **kwargs)

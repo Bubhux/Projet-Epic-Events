@@ -68,7 +68,9 @@ class EventDetailSerializer(serializers.ModelSerializer):
     """
     # Champs utilisant SlugRelatedField pour la lecture et l'écriture
     client = serializers.SlugRelatedField(slug_field='full_name', queryset=Client.objects.all())
-    support_contact = serializers.SlugRelatedField(slug_field='full_name', queryset=User.objects.filter(role=User.ROLE_SUPPORT))
+    support_contact = serializers.SlugRelatedField(
+        slug_field='full_name', queryset=User.objects.filter(role=User.ROLE_SUPPORT)
+    )
 
     class Meta:
         model = Event

@@ -28,7 +28,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
                 *args: Arguments positionnels.
                 **kwargs: Arguments nommés.
 
-            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            Cette méthode appelle d'abord le constructeur de la classe parente (super)
             avec les arguments reçus, puis initialise les permissions de l'événement.
         """
         super().__init__(*args, **kwargs)

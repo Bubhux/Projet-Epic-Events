@@ -27,7 +27,7 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
                 *args: Arguments positionnels.
                 **kwargs: Arguments nommés.
 
-            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            Cette méthode appelle d'abord le constructeur de la classe parente (super)
             avec les arguments reçus, puis initialise les permissions du contrat.
         """
         super().__init__(*args, **kwargs)
@@ -93,12 +93,12 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
             - Non signés et non entièrement payés
             - Signés mais non entièrement payés
             - Exclue les contrats signés et entièrement payés
-            
+
             :param self: L'instance de la vue.
             :param request: L'objet de requête.
             :return: Une réponse HTTP contenant les données des contrats filtrés.
         """
-        
+
         contracts = Contract.objects.filter(
             Q(sales_contact=request.user, status_contract=False, remaining_amount__gt=0.0) |
             Q(sales_contact=request.user, status_contract=True, remaining_amount__gt=0.0)

@@ -1,6 +1,6 @@
 import pytest
 import json
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -93,7 +93,7 @@ class TestContractsApp(TestCase):
         # Définis les valeurs initiales
         self.contract_user.status_contract = True
         self.contract_user.client = self.client_user
-        
+
         # Chaîne attendue pour "Contrat signé" avec un client
         expected_str_signed = f"Contrat ID : {self.contract_user.id} Contract signed - {self.client_user.full_name}"
         self.assertEqual(str(self.contract_user), expected_str_signed)
@@ -109,14 +109,14 @@ class TestContractsApp(TestCase):
     def test_contract_print_details(self):
         """Teste la méthode print_details du modèle Contract."""
         expected_output = "\nID du contrat : {}\n" \
-                        "Nom du client : {}\n" \
-                        "E-mail du client : {}\n" \
-                        "Compagnie du client : {}\n\n".format(
-                            self.contract_user.id,
-                            self.client_user.full_name,
-                            self.client_user.email,
-                            self.client_user.company_name
-                        )
+                          "Nom du client : {}\n" \
+                          "E-mail du client : {}\n" \
+                          "Compagnie du client : {}\n\n".format(
+                              self.contract_user.id,
+                              self.client_user.full_name,
+                              self.client_user.email,
+                              self.client_user.company_name
+                          )
 
         # Compare les attributs du contrat avec les valeurs attendues
         self.assertEqual(self.contract_user.id, 1)
@@ -150,7 +150,9 @@ class TestContractsApp(TestCase):
         contract_to_save.save()
 
         self.assertEqual(contract_to_save.sales_contact, self.sales_user)
-        self.assertAlmostEqual(contract_to_save.update_date, contract_to_save.creation_date, delta=timezone.timedelta(seconds=1))
+        self.assertAlmostEqual(
+            contract_to_save.update_date, contract_to_save.creation_date, delta=timezone.timedelta(seconds=1)
+        )
 
 
 @pytest.mark.django_db
@@ -286,7 +288,7 @@ class TestContractViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_contract_details(self):
         # Assure que le contrat_user1 est associé à sales_user1
@@ -302,7 +304,7 @@ class TestContractViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
         # Vérifie que la réponse a le statut HTTP 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -323,7 +325,8 @@ class TestContractViewSet(TestCase):
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
-        # Test de la vue contract_details pour le contrat_user1 associé à sales_user1 avec le jeton d'accès de sales_user2
+        # Test de la vue contract_details pour le contrat_user1
+        # associé à sales_user1 avec le jeton d'accès de sales_user2
         url = f'/crm/contracts/{self.contract_user1.pk}/contract_details/'
         response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}')
 
@@ -393,7 +396,9 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau contrat
         url = '/crm/contracts/'
-        response = self.client.post(url, data=new_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.post(
+            url, data=new_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car le contrat a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -427,7 +432,9 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau contrat avec le jeton d'accès de support_user2
         url = '/crm/contracts/'
-        response = self.client.post(url, data=new_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}')
+        response = self.client.post(
+            url, data=new_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -457,7 +464,11 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour contract_user1
         url = f'/crm/contracts/{self.contract_user1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_contract_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_contract_data),
+            content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car le contrat a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -493,7 +504,11 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour contract_user1 avec le jeton d'accès de sales_user2
         url = f'/crm/contracts/{self.contract_user1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_contract_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_contract_data),
+            content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -523,7 +538,11 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer contract_user1
         url = f'/crm/contracts/{self.contract_user1.pk}/'
-        response = self.client.delete(url, data=destroy_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.delete(
+            url,
+            data=destroy_contract_data,
+            format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car le contrat a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -553,7 +572,11 @@ class TestContractViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer le contract_user1 avec le jeton d'accès de sales_user2
         url = f'/crm/contracts/{self.contract_user1.pk}/'
-        response = self.client.delete(url, data=destroy_contract_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}')
+        response = self.client.delete(
+            url,
+            data=destroy_contract_data,
+            format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

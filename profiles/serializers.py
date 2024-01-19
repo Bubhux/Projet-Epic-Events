@@ -154,11 +154,22 @@ class UserDetailSerializer(serializers.ModelSerializer):
         - 'validate_password': Méthode de validation personnalisée pour le champ 'password'.
         Assure que le mot de passe n'est pas vide et le hache avant de l'enregistrer.
 
-        Remarque : Le champ 'password' est en écriture seule et n'est pas inclus lors de la récupération des détails de l'utilisateur.
+        Remarque : Le champ 'password' est en écriture seule
+        et n'est pas inclus lors de la récupération des détails de l'utilisateur.
     """
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'is_superuser', 'password']
+        fields = [
+            'id',
+            'full_name',
+            'email',
+            'role',
+            'phone_number',
+            'is_staff',
+            'is_active',
+            'is_superuser',
+            'password'
+        ]
 
     def validate_password(self, value):
         # Vérifier que le mot de passe n'est pas vide

@@ -92,5 +92,3 @@ with open(env_file_path, "w") as f:
 
 # Affiche un message indiquant que le modèle de fichier .env a été créé
 print("\n.env file created!")
-
-

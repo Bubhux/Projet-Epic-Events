@@ -180,7 +180,11 @@ class TestProfilesApp(TestCase):
 
         self.assertEqual(new_client.full_name, 'Jeff Albertson')
         self.assertEqual(new_client.sales_contact, self.sales_user1)
-        expected_str = f"Client ID : {new_client.id} Jeff Albertson - Contact commercial {new_client.sales_contact.full_name}"
+        expected_str = (
+            f"Client ID: {new_client.id} "
+            f"Jeff Albertson - Contact commercial {new_client.sales_contact.full_name}"
+        )
+
         self.assertEqual(str(new_client), expected_str)
 
     def test_create_client2(self):
@@ -192,7 +196,10 @@ class TestProfilesApp(TestCase):
 
         self.assertEqual(new_client.full_name, 'Troy McClure')
         self.assertEqual(new_client.sales_contact, self.sales_user2)
-        expected_str = f"Client ID : {new_client.id} Troy McClure - Contact commercial {new_client.sales_contact.full_name}"
+        expected_str = (
+            f"Client ID : {new_client.id} "
+            f"Troy McClure - Contact commercial {new_client.sales_contact.full_name}"
+        )
         self.assertEqual(str(new_client), expected_str)
 
     def test_assign_sales_contact(self):
@@ -251,7 +258,14 @@ class TestProfilesApp(TestCase):
             avec le message 'The Email field must be set'.
         """
         with pytest.raises(ValueError, match='The Email field must be set'):
-            User.objects.create_user(email='', password='Pingou123', role=User.ROLE_MANAGEMENT, full_name='John Doe', phone_number='+123456789', is_staff=True)
+            User.objects.create_user(
+                email='',
+                password='Pingou123',
+                role=User.ROLE_MANAGEMENT,
+                full_name='John Doe',
+                phone_number='+123456789',
+                is_staff=True
+            )
 
     def test_create_superuser_invalid_attributes(self):
         """
@@ -520,7 +534,7 @@ class TestClientViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_client_details(self):
         # Assure que le client1 est associé à sales_user1
@@ -547,7 +561,7 @@ class TestClientViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_client_details_unauthorized_user(self):
         # Assure que le client2 est associé à sales_user2
@@ -592,7 +606,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau client
         url = '/crm/clients/'
-        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.post(
+            url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car le client a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -623,7 +639,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau client avec le jeton d'accès de support_user1
         url = '/crm/clients/'
-        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}')
+        response = self.client.post(
+            url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -652,7 +670,12 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour le client1
         url = f'/crm/clients/{self.client1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_client_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_client_data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car le client a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -686,7 +709,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour le client2 avec le jeton d'accès de sales_user1
         url = f'/crm/clients/{self.client2.pk}/'
-        response = self.client.put(url, data=update_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.put(
+            url, data=update_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -715,7 +740,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer le client1
         url = f'/crm/clients/{self.client1.pk}/'
-        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.delete(
+            url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car le client a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -744,7 +771,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer le client2 avec le jeton d'accès de sales_user1
         url = f'/crm/clients/{self.client2.pk}/'
-        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.delete(
+            url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -831,7 +860,7 @@ class TestUserViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_user_details(self):
         # Crée un jeton d'accès pour support_user
@@ -859,7 +888,7 @@ class TestUserViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_all_users_details(self):
         # Test la vue all_users_details
@@ -888,7 +917,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue create pour créer un nouvel utilisateur
         url = '/crm/users/'
-        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.post(
+            url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car l'utilisateur a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -921,7 +952,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue create pour créer un nouvel utilisateur avec le jeton d'accès de sales_user
         url = '/crm/users/'
-        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user}')
+        response = self.client.post(
+            url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -952,7 +985,12 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour l'utilisateur
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.put(url, data=json.dumps(update_user_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_user_data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car l'utilisateur a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -985,7 +1023,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour sales_user avec le jeton d'accès de support_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.put(url, data=update_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}')
+        response = self.client.put(
+            url, data=update_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -1016,7 +1056,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer sales_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.delete(
+            url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car l'utilisateur a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -1044,7 +1086,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer sales_user avec le jeton d'accès de support_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}')
+        response = self.client.delete(
+            url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

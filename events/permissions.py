@@ -9,7 +9,8 @@ from profiles.models import User, Client
 class EventPermissions(permissions.BasePermission):
     """
         Classe de permission personnalisée pour la vue du CRM gérant les opérations CRUD sur les objets Event.
-        Cette classe contrôle l'accès aux opérations CRUD sur les objets Event en fonction du rôle de l'utilisateur connecté.
+        Cette classe contrôle l'accès aux opérations CRUD
+        sur les objets Event en fonction du rôle de l'utilisateur connecté.
 
         - 'ROLE_MANAGEMENT': Rôle pour les menbres de l'équipe gestion.
         - 'ROLE_SALES': Rôle pour les membres de l'équipe commerciale.
@@ -20,21 +21,26 @@ class EventPermissions(permissions.BasePermission):
 
         Méthode has_update_permission:
             Autorise les menbres de l'équipe gestion pour la mise à jour d'un événement spécifique.
-            Autorise les menbres de l'équipe support pour la mise à jour d'un événement spécifique dont ils sont responsables.
+            Autorise les menbres de l'équipe support
+            pour la mise à jour d'un événement spécifique dont ils sont responsables.
 
         Méthode has_delete_permission:
             Autorise les menbres de l'équipe gestion pour la suppression d'un contrat spécifique.
-            Autorise les menbres de l'équipe support pour la suppression d'un événement spécifique dont ils sont responsables.
+            Autorise les menbres de l'équipe support
+            pour la suppression d'un événement spécifique dont ils sont responsables.
 
         Méthode has_permission:
             - Récupère l'événement spécifié par la clé primaire 'event_pk' dans l'URL.
             - Si 'event_pk' n'est pas spécifié dans l'URL, l'accès est autorisé sans restriction de permission.
-            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès uniquement aux membres de l'équipe de gestion.
-            - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est menbre de l'équipe gestion
+            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS),
+              autorise l'accès uniquement aux membres de l'équipe de gestion.
+            - Pour les autres méthodes (POST, PUT, DELETE),
+              vérifie si l'utilisateur connecté est menbre de l'équipe gestion
               ou menbre de l'équipe commerciale ou membre de l'équipe support.
             - Pour la création (POST), autorise uniquement les membres de l'équipe de commerciale.
-            
-        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion, l'équipe commerciale et l'équipe support.
+
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions,
+        avec des autorisations spécifiques pour l'équipe de gestion, l'équipe commerciale et l'équipe support.
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouvel événement.

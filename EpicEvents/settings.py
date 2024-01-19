@@ -21,7 +21,7 @@ from decouple import config
 from django.core.management.utils import get_random_secret_key
 
 
-pymysql.version_info = (1, 4, 6, 'final', 0) # (major, minor, micro, releaselevel, serial)
+pymysql.version_info = (1, 4, 6, 'final', 0)  # (major, minor, micro, releaselevel, serial)
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

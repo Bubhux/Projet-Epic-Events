@@ -34,7 +34,17 @@ class CustomUserAdmin(UserAdmin):
         # Section pour les champs lors de l'ajout d'un nouvel utilisateur
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2', 'phone_number', 'is_active', 'is_staff', 'role', 'date_joined'),
+            'fields': (
+                'email',
+                'full_name',
+                'password1',
+                'password2',
+                'phone_number',
+                'is_active',
+                'is_staff',
+                'role',
+                'date_joined'
+            ),
         }),
     )
 
@@ -83,7 +93,8 @@ class GroupAdmin(admin.ModelAdmin):
         # Cela donne le nombre total d'objets dans le modèle Client associés au groupe actuel.
         # La sous-requête Subquery retourne le nombre total d'objets dans le modèle Client associés au groupe actuel.
         # Cette valeur est utilisée comme annotation 'client_count' pour chaque objet Group dans la requête GroupAdmin.
-        # Annoter chaque objet Group avec le résultat de la sous-requête, représentant le nombre total d'objets associés dans le modèle Client.
+        # Annoter chaque objet Group avec le résultat de la sous-requête,
+        # représentant le nombre total d'objets associés dans le modèle Client.
         # Récupérer les valeurs de l'annotation 'count' pour le premier objet (le seul objet).
         # Extrait la valeur de l'annotation count pour le premier objet (le seul objet en utilisant [:1]).
         # Cela donne le nombre total d'objets dans le modèle Client associés au groupe actuel.

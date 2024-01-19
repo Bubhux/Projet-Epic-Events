@@ -152,13 +152,30 @@ class Client(models.Model):
     """
     email = models.EmailField(unique=True, editable=True)
     full_name = models.CharField(max_length=255, help_text="Full name of the client.")
-    user_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, related_name='user_contact_clients', related_query_name='user_contact_client', default=None)
+    user_contact = models.ForeignKey(
+        "User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='user_contact_clients',
+        related_query_name='user_contact_client',
+        default=None
+    )
+
     phone_number = models.CharField(max_length=20, help_text="Phone number of the client.")
     company_name = models.CharField(max_length=255, help_text="Name of the client's company.")
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True, editable=True)
     last_contact = models.DateTimeField(null=True, blank=True)
-    sales_contact = models.ForeignKey("User", on_delete=models.SET_NULL, null=True, blank=True, editable=True, limit_choices_to={'role': User.ROLE_SALES})
+    sales_contact = models.ForeignKey(
+        "User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=True,
+        limit_choices_to={'role': User.ROLE_SALES}
+    )
+
     email_contact = models.EmailField(null=True, blank=True, editable=True)
 
     class Meta:
@@ -272,7 +289,8 @@ class UserGroup(models.Model):
 def add_client_to_group(sender, instance, **kwargs):
     """
         Fonction de réception appelée après la sauvegarde d'une instance de Client.
-        Ajoute l'instance de Client au groupe "Client" si elle est associée à un contact utilisateur ou un utilisateur commercial.
+        Ajoute l'instance de Client au groupe "Client"
+        si elle est associée à un contact utilisateur ou un utilisateur commercial.
     """
     # Vérifie si le groupe "Client" existe
     client_group, created = Group.objects.get_or_create(name='Client')
@@ -283,6 +301,7 @@ def add_client_to_group(sender, instance, **kwargs):
     elif instance.sales_contact:
         instance.sales_contact.groups.add(client_group)
 
+
 @receiver(pre_delete, sender=User)
 def delete_user_groups(sender, instance, **kwargs):
     """
@@ -291,6 +310,7 @@ def delete_user_groups(sender, instance, **kwargs):
     """
     # Supprime les enregistrements associés dans la table UserGroup
     UserGroup.objects.filter(user=instance).delete()
+
 
 @receiver(pre_save, sender=Client)
 def set_sales_contact_id(sender, instance, **kwargs):

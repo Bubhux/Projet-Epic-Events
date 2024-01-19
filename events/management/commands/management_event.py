@@ -14,7 +14,8 @@ from events.views import EventViewSet
 
 class Command(BaseCommand):
     """
-        Cette commande permet de créer un nouvel événement en utilisant Click pour gérer les arguments en ligne de commande
+        Cette commande permet de créer un nouvel événement en utilisant Click
+        pour gérer les arguments en ligne de commande
         et Rich pour améliorer la sortie dans la console.
     """
     help = 'Afficher, créer, modifier, supprimer des événements'
@@ -91,10 +92,16 @@ class Command(BaseCommand):
             client_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
-            event_date_start_str = self.colored_prompt('Date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
+            event_date_start_str = self.colored_prompt(
+                'Date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
-            event_date_end_str = self.colored_prompt('Date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
+            event_date_end_str = self.colored_prompt(
+                'Date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
 
@@ -140,10 +147,16 @@ class Command(BaseCommand):
                 console.print(f"[bold green]Événement créé avec succès :[/bold green] {event_name}")
 
             except Client.DoesNotExist:
-                console.print(f"[bold red]Le client avec le nom '{client_name}' n'existe pas dans la base de données.[/bold red]")
+                console.print(
+                    f"[bold red]Le client avec le nom '{client_name}' "
+                    f"n'existe pas dans la base de données.[/bold red]"
+                )
 
             except User.DoesNotExist:
-                console.print(f"[bold red]Le contact de support avec le nom '{support_contact_name}' n'existe pas dans la base de données.[/bold red]")
+                console.print(
+                    f"[bold red]Le contact de support avec le nom '{support_contact_name}' "
+                    f"n'existe pas dans la base de données.[/bold red]"
+                )
 
             except Exception as e:
                 console.print(f"[bold red]Erreur lors de la création de l'événement :[/bold red] {e}")
@@ -195,15 +208,24 @@ class Command(BaseCommand):
             new_event_name = self.colored_prompt('Nouveau nom de l\'événement', color=Fore.CYAN)
             if self.should_exit():
                 return
-            new_event_date_start_str = self.colored_prompt('Nouvelle date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
+            new_event_date_start_str = self.colored_prompt(
+                'Nouvelle date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
-            new_event_date_end_str = self.colored_prompt('Nouvelle date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN)
+            new_event_date_end_str = self.colored_prompt(
+                'Nouvelle date de fin de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
 
             # Demande le nom du contact de support seulement si l'utilisateur le souhaite
-            use_new_support_contact = click.confirm('Voulez-vous spécifier un nouveau contact de support ?', default=False)
+            use_new_support_contact = click.confirm(
+                'Voulez-vous spécifier un nouveau contact de support ?', default=False
+            )
+
             new_support_contact_name = None
 
             if use_new_support_contact:
@@ -225,7 +247,9 @@ class Command(BaseCommand):
             new_event_date_end = timezone.make_aware(datetime.strptime(new_event_date_end_str, '%Y-%m-%d %H:%M'))
 
             # Récupère l'instance du contact de support à partir de la base de données, s'il est spécifié
-            new_support_contact = User.objects.get(full_name=new_support_contact_name) if new_support_contact_name else None
+            new_support_contact = User.objects.get(
+                full_name=new_support_contact_name
+            ) if new_support_contact_name else None
 
             # Met à jour l'événement
             event.event_name = new_event_name
@@ -244,7 +268,10 @@ class Command(BaseCommand):
             console.print(f"[bold red]Événement ID {event_id} introuvable.[/bold red]")
 
         except User.DoesNotExist:
-            console.print(f"[bold red]Le contact de support avec le nom '{new_support_contact_name}' n'existe pas dans la base de données.[/bold red]")
+            console.print(
+                f"[bold red]Le contact de support avec le nom '{new_support_contact_name}' "
+                f"n'existe pas dans la base de données.[/bold red]"
+            )
 
         except Exception as e:
             console.print(f"[bold red]Erreur lors de la mise à jour de l'événement :[/bold red] {e}")

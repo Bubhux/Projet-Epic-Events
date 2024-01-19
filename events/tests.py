@@ -57,7 +57,20 @@ class TestEventsApp(TestCase):
             sales_contact=sales_contact,
         )
 
-    def create_event(self, event_name, contract, client, client_name, client_contact, event_date_start, event_date_end, support_contact, location, attendees, notes):
+    def create_event(
+        self,
+        event_name,
+        contract,
+        client,
+        client_name,
+        client_contact,
+        event_date_start,
+        event_date_end,
+        support_contact,
+        location,
+        attendees,
+        notes
+    ):
         """
             Crée et retourne un événement avec les paramètres spécifiés.
         """
@@ -124,7 +137,7 @@ class TestEventsApp(TestCase):
             client=self.client_user1,
             client_name="Ned Flanders",
             client_contact="Ned@EpicEvents.com +987654321",
-            event_date_start = make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
+            event_date_start=make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
             event_date_end=make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
             support_contact=self.support_user1,
             location="Rome",
@@ -149,12 +162,16 @@ class TestEventsApp(TestCase):
         self.event_user1.contract = self.contract_user1
         self.event_user1.support_contact = self.support_user1
         self.event_user1.client = self.client_user1
-        
+
         # Sauvegarde l'événement après avoir lié le client
         self.event_user1.save()
-        
+
         # Chaîne attendue pour l'événement créé avec un client
-        expected_str_event_created = f"Evénement ID: {self.event_user1.id} {self.event_user1.event_name} - {self.event_user1.client_name}"
+        expected_str_event_created = (
+            f"Evénement ID: {self.event_user1.id} "
+            f"{self.event_user1.event_name} - {self.event_user1.client_name}"
+        )
+
         self.assertEqual(str(self.event_user1), expected_str_event_created)
 
     def test_event_print_details(self):
@@ -169,18 +186,18 @@ class TestEventsApp(TestCase):
 
         # Chaîne attendue pour les détails de l'événement
         expected_output = f"\nID de l'événement : {self.event_user1.id}\n" \
-                            f"Nom de l'événement : {self.event_user1.event_name}\n" \
-                            f"ID du contrat associé : {self.event_user1.contract}\n" \
-                            f"Nom du client : {self.client_user1.full_name}\n" \
-                            f"E-mail du client : {self.client_user1.email}\n" \
-                            f"Compagnie du client : {self.client_user1.company_name}\n" \
-                            f"Contact du client : {self.event_user1.client_contact}\n" \
-                            f"Date de début de l'événement : {self.event_user1.event_date_start}\n" \
-                            f"Date de fin de l'événement : {self.event_user1.event_date_end}\n" \
-                            f"Contact de support : {self.support_user1.full_name}\n" \
-                            f"Lieu : {self.event_user1.location}\n" \
-                            f"Nombre d'invités : {self.event_user1.attendees}\n" \
-                            f"Notes : {self.event_user1.notes}\n\n"
+                          f"Nom de l'événement : {self.event_user1.event_name}\n" \
+                          f"ID du contrat associé : {self.event_user1.contract}\n" \
+                          f"Nom du client : {self.client_user1.full_name}\n" \
+                          f"E-mail du client : {self.client_user1.email}\n" \
+                          f"Compagnie du client : {self.client_user1.company_name}\n" \
+                          f"Contact du client : {self.event_user1.client_contact}\n" \
+                          f"Date de début de l'événement : {self.event_user1.event_date_start}\n" \
+                          f"Date de fin de l'événement : {self.event_user1.event_date_end}\n" \
+                          f"Contact de support : {self.support_user1.full_name}\n" \
+                          f"Lieu : {self.event_user1.location}\n" \
+                          f"Nombre d'invités : {self.event_user1.attendees}\n" \
+                          f"Notes : {self.event_user1.notes}\n\n"
 
         # Compare les attributs de l'événement avec les valeurs attendues
         self.assertEqual(self.event_user1.id, 1)
@@ -256,7 +273,7 @@ class TestEventViewSet(TestCase):
             is_staff=is_staff,
         )
 
-    def create_client(self, email, full_name, phone_number, company_name,sales_contact=None):
+    def create_client(self, email, full_name, phone_number, company_name, sales_contact=None):
         """
             Crée et retourne un client avec les paramètres spécifiés.
         """
@@ -280,7 +297,20 @@ class TestEventViewSet(TestCase):
             sales_contact=sales_contact,
         )
 
-    def create_event(self, event_name, contract, client, client_name, client_contact, event_date_start, event_date_end, support_contact, location, attendees, notes):
+    def create_event(
+        self,
+        event_name,
+        contract,
+        client,
+        client_name,
+        client_contact,
+        event_date_start,
+        event_date_end,
+        support_contact,
+        location,
+        attendees,
+        notes
+    ):
         """
             Crée et retourne un événement avec les paramètres spécifiés.
         """
@@ -466,7 +496,7 @@ class TestEventViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
     def test_event_details(self):
         # Assure que event_user1 est associé à support_user1
@@ -482,7 +512,7 @@ class TestEventViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
         # Vérifie que les données de la réponse correspondent aux détails de l'événement
         self.assertEqual(response.data['id'], self.event_user1.pk)
@@ -537,7 +567,7 @@ class TestEventViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
@@ -553,7 +583,7 @@ class TestEventViewSet(TestCase):
 
         # Affiche la totalité de la réponse JSON dans la console
         print("Response Data:", response.data)
-        #print(json.dumps(response.data, indent=2))
+        # print(json.dumps(response.data, indent=2))
 
         # Vérifie que la réponse a le statut HTTP 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -597,7 +627,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user1 est signé
         self.assertTrue(self.contract_user3.status_contract)
 
-        # Créez un jeton d'accès pour sales_user1
+        # Créer un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -617,7 +647,9 @@ class TestEventViewSet(TestCase):
 
         # Test la vue create pour créer un nouvel événement
         url = '/crm/events/'
-        response = self.client.post(url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.post(
+            url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car l'événement a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -660,7 +692,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user3 est signé
         self.assertTrue(self.contract_user3.status_contract)
 
-        # Créez un jeton d'accès pour support_user2
+        # Créee un jeton d'accès pour support_user2
         refresh_support_user2 = RefreshToken.for_user(self.support_user2)
         access_token_support_user2 = str(refresh_support_user2.access_token)
 
@@ -680,7 +712,9 @@ class TestEventViewSet(TestCase):
 
         # Test la vue create pour créer un nouvel événement avec le jeton d'accès de support_user2
         url = '/crm/events/'
-        response = self.client.post(url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}')
+        response = self.client.post(
+            url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -695,7 +729,7 @@ class TestEventViewSet(TestCase):
         # Assure que le contrat pour client_user4 n'est pas signé
         self.assertFalse(self.contract_user4.status_contract)
 
-        # Créez un jeton d'accès pour sales_user1
+        # Créer un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -715,7 +749,9 @@ class TestEventViewSet(TestCase):
 
         # Test la vue create pour créer un nouvel événement avec le jeton d'accès de sales_user1
         url = '/crm/events/'
-        response = self.client.post(url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.post(
+            url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car le contrat n'est pas signé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -730,7 +766,7 @@ class TestEventViewSet(TestCase):
         # Assure que le contrat pour client_user1 est signé
         self.assertTrue(self.contract_user1.status_contract)
 
-        # Assurez-vous qu'un événement existe déjà pour ce contrat
+        # Assure qu'un événement existe déjà pour ce contrat
         existing_event = self.create_event(
             event_name="Event Flanders",
             contract=self.contract_user1,
@@ -745,7 +781,7 @@ class TestEventViewSet(TestCase):
             notes="Event notes"
         )
 
-        # Créez un jeton d'accès pour sales_user1
+        # Créer un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -765,7 +801,9 @@ class TestEventViewSet(TestCase):
 
         # Test la vue create pour créer un nouvel événement avec le même contrat
         url = '/crm/events/'
-        response = self.client.post(url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.post(
+            url, data=new_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car un événement existe déjà pour ce contrat
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -774,7 +812,10 @@ class TestEventViewSet(TestCase):
         print(response.content.decode())
 
         # Vérifie que le message d'erreur est présent dans la réponse
-        self.assertIn("An event already exists for this contract. Cannot create another event.", response.content.decode())
+        self.assertIn(
+            "An event already exists for this contract. Cannot create another event.",
+            response.content.decode()
+        )
 
     def test_update_event(self):
         # Assure que event_user1 est associé à support_user1
@@ -803,7 +844,12 @@ class TestEventViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour event_user1
         url = f'/crm/events/{self.event_user1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_event_data, default=str), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_event_data, default=str),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car l'événement a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -866,7 +912,12 @@ class TestEventViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour event_user1 avec le jeton d'accès de support_user2
         url = f'/crm/events/{self.event_user1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_event_data, default=str), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_event_data, default=str),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -901,7 +952,9 @@ class TestEventViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer event_user1
         url = f'/crm/events/{self.event_user1.pk}/'
-        response = self.client.delete(url, data=destroy_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}')
+        response = self.client.delete(
+            url, data=destroy_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car l'événement a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -936,7 +989,9 @@ class TestEventViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer event_user1 avec le jeton d'accès de support_user2
         url = f'/crm/events/{self.event_user1.pk}/'
-        response = self.client.delete(url, data=destroy_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}')
+        response = self.client.delete(
+            url, data=destroy_event_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user2}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
