@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
 from django.contrib.auth.hashers import make_password
@@ -25,10 +24,8 @@ class MultipleSerializerMixin:
             Si l'action est 'retrieve', 'create', 'update' ou 'destroy' et qu'un sérialiseur détaillé
             est spécifié, retourne le sérialiseur détaillé. Sinon, retourne le sérialiseur par défaut.
         """
-        if (self.action == 'retrieve' or
-                self.action == 'create' or
-                self.action == 'update' or
-                self.action == 'destroy') and self.detail_serializer_class is not None:
+        actions = ['retrieve', 'create', 'update', 'destroy']
+        if self.action in actions and self.detail_serializer_class is not None:
             return self.detail_serializer_class
         return super().get_serializer_class()
 

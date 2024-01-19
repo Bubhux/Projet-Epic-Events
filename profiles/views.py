@@ -2,7 +2,7 @@ import sentry_sdk
 from sentry_sdk import capture_exception
 from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet

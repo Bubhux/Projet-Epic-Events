@@ -1,7 +1,6 @@
 import sentry_sdk
 from sentry_sdk import capture_exception
 from django.http import HttpResponseForbidden
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -98,10 +97,16 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
             :param request: L'objet de requête.
             :return: Une réponse HTTP contenant les données des contrats filtrés.
         """
-
         contracts = Contract.objects.filter(
-            Q(sales_contact=request.user, status_contract=False, remaining_amount__gt=0.0) |
-            Q(sales_contact=request.user, status_contract=True, remaining_amount__gt=0.0)
+            Q(
+                sales_contact=request.user,
+                status_contract=False,
+                remaining_amount__gt=0.0
+            ) | Q(
+                sales_contact=request.user,
+                status_contract=True,
+                remaining_amount__gt=0.0
+            )
         ).exclude(Q(status_contract=True, remaining_amount=0.0))
 
         serializer = ContractDetailSerializer(contracts, many=True)

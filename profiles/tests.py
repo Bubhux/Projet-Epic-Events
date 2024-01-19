@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.status import HTTP_401_UNAUTHORIZED
-from django.contrib.auth import authenticate, login
 from rest_framework.response import Response
 
 from .models import User, Client, Group, add_client_to_group

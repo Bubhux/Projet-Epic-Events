@@ -5,7 +5,6 @@ import pendulum
 import sys
 from io import StringIO
 from django.test import TestCase
-from django.utils import timezone
 from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken

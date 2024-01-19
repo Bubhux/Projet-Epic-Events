@@ -1,9 +1,7 @@
 from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
 from django.http import Http404
 
-from .models import Contract
-from profiles.models import User, Client
+from profiles.models import User
 
 
 class ContractPermissions(permissions.BasePermission):
@@ -46,11 +44,11 @@ class ContractPermissions(permissions.BasePermission):
         # Autorise les membres de l'équipe gestion
         # et les membres de l'équipe commerciale associés au contrat et au client.
         return (
-            request.user.role == User.ROLE_MANAGEMENT or
-            (
+            request.user.role == User.ROLE_MANAGEMENT or (
                 request.user.role == User.ROLE_SALES and (
-                    request.user == user or
-                    (hasattr(user, 'client') and request.user in user.client.sales_contact.all())
+                    request.user == user or (
+                        hasattr(user, 'client') and request.user in user.client.sales_contact.all()
+                    )
                 )
             )
         )
@@ -60,11 +58,11 @@ class ContractPermissions(permissions.BasePermission):
         # Autorise les membres de l'équipe gestion
         # et les membres de l'équipe commerciale associés au contrat et au client.
         return (
-            request.user.role == User.ROLE_MANAGEMENT or
-            (
+            request.user.role == User.ROLE_MANAGEMENT or (
                 request.user.role == User.ROLE_SALES and (
-                    request.user == user or
-                    (hasattr(user, 'client') and request.user in user.client.sales_contact.all())
+                    request.user == user or (
+                        hasattr(user, 'client') and request.user in user.client.sales_contact.all()
+                    )
                 )
             )
         )

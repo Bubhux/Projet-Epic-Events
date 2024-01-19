@@ -35,7 +35,6 @@ Exemple d'utilisation :
 """
 
 from django.core.management.utils import get_random_secret_key
-import os
 from tkinter import Tk, filedialog
 
 # Liste des noms de variables d'environnement
