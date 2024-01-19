@@ -12,14 +12,16 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 import pymysql
+import sentry_sdk
+
 from pathlib import Path
 from datetime import timedelta
-
+from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 from django.core.management.utils import get_random_secret_key
 
 
-pymysql.version_info = (1, 4, 6, 'final', 0) # (major, minor, micro, releaselevel, serial)
+pymysql.version_info = (1, 4, 6, 'final', 0)  # (major, minor, micro, releaselevel, serial)
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -32,6 +34,46 @@ DB_USER = config('DB_USER', default='')
 DB_PASSWORD = config('DB_PASSWORD', default='')
 DB_HOST = config('DB_HOST', default='')
 DB_PORT = config('DB_PORT', default='')
+SENTRY_DSN = config('SENTRY_DSN', default='')
+
+# Affiche le contenu de SENTRY_DSN (pour débogage)
+# Décommenter pour vérifier la clé "SENTRY_DSN"
+# print("SENTRY_DSN:", SENTRY_DSN)
+
+# Initialisation de Sentry
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[
+        DjangoIntegration(
+            transaction_style='url',
+            middleware_spans=True,
+            signals_spans=False,
+            cache_spans=False,
+        ),
+    ],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)
+
+# Configuration du modèle de logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR',  # Niveau de logging minimum à envoyer à Sentry
+            'class': 'sentry_sdk.integrations.logging.EventHandler',
+        },
+        'console': {
+            'level': 'DEBUG',  # Niveau de logging minimum à afficher dans la console
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['sentry', 'console'],  # Utilisez à la fois Sentry et la console
+        'level': 'DEBUG',                   # Niveau de logging minimum global (peut être ajusté)
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -168,3 +210,6 @@ AUTH_USER_MODEL = 'profiles.User'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False

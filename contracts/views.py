@@ -1,3 +1,5 @@
+import sentry_sdk
+from sentry_sdk import capture_exception
 from django.http import HttpResponseForbidden
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -13,15 +15,6 @@ from .permissions import ContractPermissions
 from .serializers import MultipleSerializerMixin, ContractListSerializer, ContractDetailSerializer
 
 
-class AdminContractViewSet(MultipleSerializerMixin, ModelViewSet):
-
-    serializer_class = ContractListSerializer
-    detail_serializer_class = ContractDetailSerializer
-
-    def get_queryset(self):
-        return Contract.objects.all()
-
-
 @method_decorator(csrf_protect, name='dispatch')
 class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
     """ViewSet pour gérer les opérations CRUD sur les objets Contract (CRM)."""
@@ -34,7 +27,7 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
                 *args: Arguments positionnels.
                 **kwargs: Arguments nommés.
 
-            Cette méthode appelle d'abord le constructeur de la classe parente (super) 
+            Cette méthode appelle d'abord le constructeur de la classe parente (super)
             avec les arguments reçus, puis initialise les permissions du contrat.
         """
         super().__init__(*args, **kwargs)
@@ -58,6 +51,12 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
         if self.contract_permissions is None:
             self.contract_permissions = ContractPermissions()
 
+    def get_serializer_class(self):
+        """
+            Retourne la classe du sérialiseur en fonction de l'action de la vue.
+        """
+        return self.serializers.get(self.action, self.serializer_class)
+
     @action(detail=False, methods=['GET'])
     def contracts_list(self, request):
         """Renvoie tous les contrats associé à l'utilisateur connecté."""
@@ -72,6 +71,9 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
 
         # Vérifie si le contrat appartient à l'utilisateur actuellement authentifié
         if contract.sales_contact != request.user:
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to contract_details"))
+
             return HttpResponseForbidden("You do not have permission to access this contract.")
 
         serializer = ContractDetailSerializer(contract)
@@ -91,12 +93,12 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
             - Non signés et non entièrement payés
             - Signés mais non entièrement payés
             - Exclue les contrats signés et entièrement payés
-            
+
             :param self: L'instance de la vue.
             :param request: L'objet de requête.
             :return: Une réponse HTTP contenant les données des contrats filtrés.
         """
-        
+
         contracts = Contract.objects.filter(
             Q(sales_contact=request.user, status_contract=False, remaining_amount__gt=0.0) |
             Q(sales_contact=request.user, status_contract=True, remaining_amount__gt=0.0)
@@ -108,6 +110,9 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         """Crée un nouveau contrat."""
         if not self.contract_permissions.has_create_permission(request):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to create method"))
+
             return HttpResponseForbidden("You do not have permission to create a contract.")
 
         serializer = self.serializers['create'](data=request.data)
@@ -121,6 +126,9 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
         """Met à jour un contrat existant."""
         instance = self.get_object()
         if not self.contract_permissions.has_update_permission(request, instance.sales_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to update method"))
+
             return HttpResponseForbidden("You do not have permission to update this contract.")
 
         serializer = self.serializers['update'](instance, data=request.data)
@@ -133,6 +141,9 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
         """Supprime un contrat existant."""
         instance = self.get_object()
         if not self.contract_permissions.has_delete_permission(request, instance.sales_contact):
+            # Capture l'exception et envoie une alerte à Sentry
+            capture_exception(Exception("Unauthorized access to destroy method"))
+
             return HttpResponseForbidden("You do not have permission to delete this contract.")
 
         self.perform_destroy(instance)

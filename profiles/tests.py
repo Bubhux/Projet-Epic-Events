@@ -5,19 +5,29 @@ from django.urls import reverse, resolve
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.status import HTTP_401_UNAUTHORIZED
+from django.contrib.auth import authenticate, login
+from rest_framework.response import Response
 
-from .models import User, Client, Group
+from .models import User, Client, Group, add_client_to_group
 
 
 @pytest.mark.django_db
 class TestProfilesApp(TestCase):
     """
         Classe de test pour le module Profiles de l'application Epic Events.
-
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
-        des fonctionnalités liées aux profils d'utilisateurs et aux clients dans l'application.
+        des fonctionnalités liées aux profiles d'utilisateurs et aux clients dans l'application.
     """
-    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+    def create_superuser(self, email, role, full_name, phone_number, **extra_fields):
+        """
+            Crée et retourne un superutilisateur avec les paramètres spécifiés.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, role, full_name, phone_number, **extra_fields)
+
+    def create_user(self, email, role, full_name, phone_number, is_staff=True, is_superuser=False):
         """
             Crée et retourne un utilisateur avec les paramètres spécifiés.
         """
@@ -28,9 +38,10 @@ class TestProfilesApp(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             is_staff=is_staff,
+            is_superuser=is_superuser,
         )
 
-    def create_client(self, email, full_name, phone_number, company_name):
+    def create_client(self, email, full_name, phone_number, company_name, user_contact=None, sales_contact=None):
         """
             Crée et retourne un client avec les paramètres spécifiés.
         """
@@ -39,6 +50,8 @@ class TestProfilesApp(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             company_name=company_name,
+            user_contact=user_contact,
+            sales_contact=sales_contact,
         )
 
     def setUp(self):
@@ -82,6 +95,8 @@ class TestProfilesApp(TestCase):
             full_name='Jeff Albertson',
             phone_number='+123456789',
             company_name='Albertson & Co',
+            user_contact=self.sales_user1,
+            sales_contact=self.sales_user1,
         )
 
         self.client2 = self.create_client(
@@ -89,6 +104,8 @@ class TestProfilesApp(TestCase):
             full_name='Troy McClure',
             phone_number='+56781234',
             company_name='McClure & Co',
+            user_contact=None,
+            sales_contact=None,
         )
 
     def tearDown(self):
@@ -99,6 +116,27 @@ class TestProfilesApp(TestCase):
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
         Client.objects.all().delete()
+
+    def test_create_superuser(self):
+        """
+            Teste la création d'un superutilisateur avec la méthode create_superuser.
+
+            Vérifie que la méthode create_superuser crée un superutilisateur avec les paramètres par défaut
+            (is_staff=True, is_superuser=True, role=User.ROLE_MANAGEMENT).
+        """
+        email = 'admin@example.com'
+        password = 'adminpass'
+
+        # Utilise la méthode create_superuser de la classe de test
+        superuser = self.create_superuser(email, User.ROLE_MANAGEMENT, 'Admin User', '+123456789')
+
+        # Vérifie que les attributs is_staff, is_superuser et role sont correctement définis
+        assert superuser.is_staff is True
+        assert superuser.is_superuser is True
+        assert superuser.role == User.ROLE_MANAGEMENT
+
+        # Vérifie que l'utilisateur a été correctement enregistré dans la base de données
+        assert User.objects.filter(email=email).exists()
 
     def test_create_user_management(self):
         """
@@ -142,7 +180,11 @@ class TestProfilesApp(TestCase):
 
         self.assertEqual(new_client.full_name, 'Jeff Albertson')
         self.assertEqual(new_client.sales_contact, self.sales_user1)
-        expected_str = f"Client ID : {new_client.id} Jeff Albertson - Contact commercial {new_client.sales_contact.full_name}"
+        expected_str = (
+            f"Client ID: {new_client.id} "
+            f"Jeff Albertson - Contact commercial {new_client.sales_contact.full_name}"
+        )
+
         self.assertEqual(str(new_client), expected_str)
 
     def test_create_client2(self):
@@ -154,7 +196,10 @@ class TestProfilesApp(TestCase):
 
         self.assertEqual(new_client.full_name, 'Troy McClure')
         self.assertEqual(new_client.sales_contact, self.sales_user2)
-        expected_str = f"Client ID : {new_client.id} Troy McClure - Contact commercial {new_client.sales_contact.full_name}"
+        expected_str = (
+            f"Client ID : {new_client.id} "
+            f"Troy McClure - Contact commercial {new_client.sales_contact.full_name}"
+        )
         self.assertEqual(str(new_client), expected_str)
 
     def test_assign_sales_contact(self):
@@ -205,13 +250,93 @@ class TestProfilesApp(TestCase):
         view = resolve(url)
         self.assertEqual(view.func.view_class, TokenRefreshView)
 
+    def test_create_user_with_empty_email(self):
+        """
+            Teste la levée de l'exception ValueError lorsque la méthode create_user est appelée avec un e-mail vide.
+
+            Vérifie que la création d'un utilisateur avec un e-mail vide déclenche une exception de type ValueError
+            avec le message 'The Email field must be set'.
+        """
+        with pytest.raises(ValueError, match='The Email field must be set'):
+            User.objects.create_user(
+                email='',
+                password='Pingou123',
+                role=User.ROLE_MANAGEMENT,
+                full_name='John Doe',
+                phone_number='+123456789',
+                is_staff=True
+            )
+
+    def test_create_superuser_invalid_attributes(self):
+        """
+            Teste la levée d'exceptions lorsque la méthode create_superuser est appelée avec des paramètres invalides.
+
+            Vérifie que la méthode create_superuser lève une exception ValueError lorsque les paramètres
+            is_staff ou is_superuser sont définis à False.
+        """
+        with pytest.raises(ValueError, match='Superuser must have is_staff=True.'):
+            User.objects.create_superuser('admin@example.com', 'adminpass', is_staff=False)
+
+        with pytest.raises(ValueError, match='Superuser must have is_superuser=True.'):
+            User.objects.create_superuser('admin@example.com', 'adminpass', is_superuser=False)
+
+    def test_has_perm(self):
+        # Teste la méthode has_perm
+        perm = 'some_permission'
+        self.assertTrue(self.management_user.has_perm(perm))
+
+    def test_has_module_perms(self):
+        # Teste la méthode has_module_perms
+        app_label = 'some_app'
+        self.assertTrue(self.management_user.has_module_perms(app_label))
+
+    def test_str_method_with_sales_contact(self):
+        # Teste la méthode __str__ avec un contact commercial associé
+        expected_str = f"Client ID : {self.client1.id} Jeff Albertson - Contact commercial {self.sales_user1.full_name}"
+        self.assertEqual(str(self.client1), expected_str)
+
+    def test_add_client_to_group(self):
+        # Crée une instance de Client avec le contact commercial déjà existant
+        client_instance = Client.objects.create(
+            email='client@example.com',
+            full_name='Test Client',
+            phone_number='1234567890',
+            company_name='Test Company',
+            user_contact=self.sales_user1,
+            sales_contact=self.sales_user1
+        )
+
+        # Supprime tous les groupes "Client" existants avant le test
+        Group.objects.filter(name='Client').delete()
+
+        # Vérifie si le groupe "Client" existe avant l'appel à la fonction add_client_to_group
+        assert not Group.objects.filter(name='Client').exists()
+
+        # Appelle la fonction add_client_to_group
+        add_client_to_group(sender=None, instance=client_instance)
+
+        # Vérifie si le groupe "Client" existe après l'appel à la fonction add_client_to_group
+        assert Group.objects.filter(name='Client').exists()
+
+        # Actualise l'instance avec les données actuelles de la base de données
+        client_instance.refresh_from_db()
+
+        # Vérifie si l'instance de Client est associée au groupe "Client"
+        assert client_instance.sales_contact.groups.filter(name='Client').exists()
+
+        # Vérifie si user_contact est correctement défini après l'appel à add_client_to_group
+        assert client_instance.user_contact is not None
+
+        # Réinitialise les groupes pour éviter des effets de bord sur d'autres tests
+        client_instance.sales_contact.groups.clear()
+
 
 @pytest.mark.django_db
 class TestLoginViewSet(TestCase):
     """
         Classe de tests pour les vues de connexion (LoginViewSet).
     """
-    def create_user(self, email, role, full_name, phone_number, is_staff=True):
+    def create_user(self, email, role, full_name, phone_number, is_staff=True, is_active=True):
         """
             Crée et retourne un utilisateur avec les paramètres spécifiés.
         """
@@ -222,6 +347,7 @@ class TestLoginViewSet(TestCase):
             full_name=full_name,
             phone_number=phone_number,
             is_staff=is_staff,
+            is_active=is_active,
         )
 
     def setUp(self):
@@ -233,7 +359,8 @@ class TestLoginViewSet(TestCase):
             role=User.ROLE_SALES,
             full_name='Timothy Lovejoy',
             phone_number='+345678912',
-            is_staff=True
+            is_staff=True,
+            is_active=True
         )
 
     def tearDown(self):
@@ -248,9 +375,16 @@ class TestLoginViewSet(TestCase):
         """
             Teste la connexion réussie d'un utilisateur.
         """
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
+
+        # Envoie une demande POST à la vue
         url = reverse('obtain_token')
-        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'Pingou123'}
+        data = {'email': user.email, 'password': 'Pingou123'}
         response = self.client.post(url, data, format='json')
+
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -258,13 +392,43 @@ class TestLoginViewSet(TestCase):
         """
             Teste la connexion avec des identifiants invalides.
         """
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
+
+        # Envoie une demande POST à la vue
         url = reverse('obtain_token')
-        data = {'email': 'Timothy@EpicEvents-Sales.com', 'password': 'wrongpassword'}
+        data = {'email': user.email, 'password': 'wrongpassword'}
         response = self.client.post(url, data, format='json')
+
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn('detail', response.data)
         self.assertIn('No active account found', response.data['detail'])
+
+    def test_user_login_inactive_account(self):
+        """
+            Teste la connexion avec un utilisateur inactif.
+        """
+        # Récupère l'utilisateur créé dans la méthode setUp()
+        user = self.user
+
+        # Désactive l'utilisateur
+        user.is_active = False
+        user.save()
+
+        # Envoie une demande POST à la vue
+        url = reverse('obtain_token')
+        data = {'email': user.email, 'password': 'Pingou123'}
+        response = self.client.post(url, data, format='json')
+
+        # Affiche la réponse pour vérifier le message
+        print(response.data)
+
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertIn('detail', response.data)
+        self.assertIn('No active account found with the given credentials', response.data['detail'])
 
 
 @pytest.mark.django_db
@@ -368,6 +532,10 @@ class TestClientViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        # print(json.dumps(response.data, indent=2))
+
     def test_client_details(self):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
@@ -390,6 +558,10 @@ class TestClientViewSet(TestCase):
         # Vérifie que l'accès a bien été autorisé
         self.assertIn('id', response.data)
         self.assertIn('full_name', response.data)
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        # print(json.dumps(response.data, indent=2))
 
     def test_client_details_unauthorized_user(self):
         # Assure que le client2 est associé à sales_user2
@@ -434,7 +606,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau client
         url = '/crm/clients/'
-        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.post(
+            url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car le client a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -465,7 +639,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue create pour créer un nouveau client avec le jeton d'accès de support_user1
         url = '/crm/clients/'
-        response = self.client.post(url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}')
+        response = self.client.post(
+            url, data=new_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -494,7 +670,12 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour le client1
         url = f'/crm/clients/{self.client1.pk}/'
-        response = self.client.put(url, data=json.dumps(update_client_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_client_data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car le client a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -528,7 +709,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour le client2 avec le jeton d'accès de sales_user1
         url = f'/crm/clients/{self.client2.pk}/'
-        response = self.client.put(url, data=update_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.put(
+            url, data=update_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -557,7 +740,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer le client1
         url = f'/crm/clients/{self.client1.pk}/'
-        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.delete(
+            url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car le client a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -586,7 +771,9 @@ class TestClientViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer le client2 avec le jeton d'accès de sales_user1
         url = f'/crm/clients/{self.client2.pk}/'
-        response = self.client.delete(url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}')
+        response = self.client.delete(
+            url, data=destroy_client_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user1}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -671,6 +858,10 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        # print(json.dumps(response.data, indent=2))
+
     def test_user_details(self):
         # Crée un jeton d'accès pour support_user
         refresh_support = RefreshToken.for_user(self.support_user)
@@ -694,6 +885,10 @@ class TestUserViewSet(TestCase):
         # Vérifie que l'utilisateur a les données de l'utilisateur
         self.assertEqual(response.data['id'], self.sales_user.pk)
         self.assertEqual(response.data['full_name'], self.sales_user.full_name)
+
+        # Affiche la totalité de la réponse JSON dans la console
+        print("Response Data:", response.data)
+        # print(json.dumps(response.data, indent=2))
 
     def test_all_users_details(self):
         # Test la vue all_users_details
@@ -722,7 +917,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue create pour créer un nouvel utilisateur
         url = '/crm/users/'
-        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.post(
+            url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 201 (Created) car l'utilisateur a été créé avec succès
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -755,7 +952,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue create pour créer un nouvel utilisateur avec le jeton d'accès de sales_user
         url = '/crm/users/'
-        response = self.client.post(url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user}')
+        response = self.client.post(
+            url, data=new_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_sales_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -786,7 +985,12 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour l'utilisateur
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.put(url, data=json.dumps(update_user_data), content_type='application/json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.put(
+            url,
+            data=json.dumps(update_user_data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 200 (OK) car l'utilisateur a été mis à jour avec succès
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -819,7 +1023,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue update pour mettre à jour sales_user avec le jeton d'accès de support_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.put(url, data=update_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}')
+        response = self.client.put(
+            url, data=update_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -850,7 +1056,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer sales_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}')
+        response = self.client.delete(
+            url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_management_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 204 (No Content) car l'utilisateur a été supprimé avec succès
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -878,7 +1086,9 @@ class TestUserViewSet(TestCase):
 
         # Test de la vue destroy pour supprimer sales_user avec le jeton d'accès de support_user
         url = f'/crm/users/{self.sales_user.pk}/'
-        response = self.client.delete(url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}')
+        response = self.client.delete(
+            url, data=destroy_user_data, format='json', HTTP_AUTHORIZATION=f'Bearer {access_token_support_user}'
+        )
 
         # Vérifie que la réponse a le statut HTTP 403 (Forbidden) car l'utilisateur n'est pas autorisé
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

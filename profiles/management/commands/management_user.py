@@ -70,7 +70,11 @@ class Command(BaseCommand):
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
-            role = self.colored_prompt('Rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN)
+            role = self.colored_prompt(
+                'Rôle de l\'utilisateur (Management team/Sales team/Support team)',
+                color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
 
@@ -100,7 +104,11 @@ class Command(BaseCommand):
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
-            role = self.colored_prompt('Rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN)
+            role = self.colored_prompt(
+                'Rôle de l\'utilisateur (Management team/Sales team/Support team)',
+                color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
             full_name = self.colored_prompt('Nom complet', color=Fore.CYAN)
@@ -118,7 +126,7 @@ class Command(BaseCommand):
                     phone_number=phone_number,
                     is_staff=click.confirm('Est-ce un membre du personnel ?')
                 )
-                console.print(f"[bold green]Administrateur créé avec succès[/bold green]")
+                console.print(f"[bold green]Administrateur créé avec succès[/bold green] {superuser}")
 
             except Exception as e:
                 console.print(f"[bold red]Erreur lors de la création de l'administrateur :[/bold red] {e}")
@@ -168,10 +176,16 @@ class Command(BaseCommand):
             new_email = self.colored_prompt('Nouvel email de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
-            new_password = self.colored_prompt('Nouveau mot de passe de l\'utilisateur', hide_input=True, color=Fore.CYAN)
+            new_password = self.colored_prompt(
+                'Nouveau mot de passe de l\'utilisateur', hide_input=True, color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
-            new_role = self.colored_prompt('Nouveau rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN)
+            new_role = self.colored_prompt(
+                'Nouveau rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN
+            )
+
             if self.should_exit():
                 return
             new_full_name = self.colored_prompt('Nouveau nom complet de l\'utilisateur', color=Fore.CYAN)

@@ -8,7 +8,8 @@ from .models import User, Client
 class ClientPermissions(permissions.BasePermission):
     """
         Classe de permission personnalisée pour la vue du CRM gérant les opérations CRUD sur les objets Client.
-        Cette classe contrôle l'accès aux opérations CRUD sur les objets Client en fonction du rôle de l'utilisateur connecté.
+        Cette classe contrôle l'accès aux opérations CRUD
+        sur les objets Client en fonction du rôle de l'utilisateur connecté.
         ...
         - 'ROLE_SALES': Rôle pour les gestionnaires commerciaux de clients.
         ...
@@ -25,11 +26,14 @@ class ClientPermissions(permissions.BasePermission):
         Méthode has_permission:
             - Récupère le client spécifié par la clé primaire 'client_pk' dans l'URL.
             - Si 'client_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
-            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès uniquement aux membres de l'équipe commerciale.
-            - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe commerciale.
+            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS),
+              autorise l'accès uniquement aux membres de l'équipe commerciale.
+            - Pour les autres méthodes (POST, PUT, DELETE),
+              vérifie si l'utilisateur connecté est le gestionnaire du client ou membre de l'équipe commerciale.
             - Pour la création (POST), autorise uniquement les membres de l'équipe commerciale.
 
-        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe commerciale.
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions,
+        avec des autorisations spécifiques pour l'équipe commerciale.
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouveau client
@@ -71,7 +75,8 @@ class ClientPermissions(permissions.BasePermission):
 class UserPermissions(permissions.BasePermission):
     """
         Classe de permission personnalisée pour la vue du CRM gérant les opérations CRUD sur les objets User.
-        Cette classe contrôle l'accès aux opérations CRUD sur les objets User en fonction du rôle de l'utilisateur connecté.
+        Cette classe contrôle l'accès aux opérations CRUD
+        sur les objets User en fonction du rôle de l'utilisateur connecté.
         ...
         - 'ROLE_MANAGEMENT': Rôle pour les gestionnaires des utilisateurs.
         ...
@@ -86,11 +91,15 @@ class UserPermissions(permissions.BasePermission):
         Méthode has_permission:
             - Récupère l'utilisateur spécifié par la clé primaire 'user_pk' dans l'URL.
             - Si 'user_pk' n'est pas spécifié dans l'URL, l'accès n'est pas autorisé.
-            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS), autorise l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe gestion.
-            - Pour les autres méthodes (POST, PUT, DELETE), vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion.
+            - Pour les méthodes sécurisées (GET, HEAD, OPTIONS),
+              autorise l'accès aux gestionnaires des utilisateurs s'ils sont membres de l'équipe gestion.
+            - Pour les autres méthodes (POST, PUT, DELETE),
+              vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs
+              s'il est membre de l'équipe de gestion.
             - Pour la création (POST), autorise uniquement les membres de l'équipe de gestion.
 
-        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions, avec des autorisations spécifiques pour l'équipe de gestion.
+        Notez que le rôle de l'utilisateur est utilisé pour déterminer les permissions,
+        avec des autorisations spécifiques pour l'équipe de gestion.
     """
     def has_create_permission(self, user):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouvel utilisateur
@@ -120,7 +129,8 @@ class UserPermissions(permissions.BasePermission):
 
             # Vérifie les permissions pour les méthodes non sécurisées (POST, PUT, DELETE)
             else:
-                # Vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs s'il est membre de l'équipe de gestion
+                # Vérifie si l'utilisateur connecté est le gestionnaire des utilisateurs
+                # s'il est membre de l'équipe de gestion
                 if request.method == 'POST':
                     # Autoriser la création uniquement pour les membres de l'équipe de gestion
                     return user.role == User.ROLE_MANAGEMENT

@@ -19,9 +19,9 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from profiles.views import LoginViewSet, ClientViewSet, UserViewSet, AdminUserLoginViewSet, AdminUserViewSet, AdminUserClientViewSet
-from contracts.views import ContractViewSet, AdminContractViewSet
-from events.views import EventViewSet, AdminEventiewSet
+from profiles.views import LoginViewSet, ClientViewSet, UserViewSet
+from contracts.views import ContractViewSet
+from events.views import EventViewSet
 
 
 # Création du routeur simple
@@ -44,12 +44,6 @@ router.register(r"contracts/(?P<contract_pk>\d+)/contract_details", ContractView
 router.register(r"events/(?P<event_pk>\d+)/", EventViewSet, basename="events")
 router.register(r"events/(?P<event_pk>\d+)/event_details", EventViewSet, basename="event-details")
 
-router.register(r"admin/login", AdminUserLoginViewSet, basename="admin-login")
-router.register(r"admin/users", AdminUserViewSet, basename="admin-users")
-router.register(r"admin/clients", AdminUserClientViewSet, basename="admin-clients")
-router.register(r"admin/contracts", AdminContractViewSet, basename="admin-contracts")
-router.register(r"admin/events", AdminEventiewSet, basename="admin-events")
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -66,22 +60,39 @@ urlpatterns = [
     path('crm/users/user_details/<int:pk>/', UserViewSet.as_view({'get': 'user_details'}), name='user-details'),
 
     # Configure le chemin pour l'action 'all_clients_details' et 'client_details'
-    path('crm/clients/all_clients_details/', ClientViewSet.as_view({'get': 'all_clients_details'}), name='all-clients-details'),
-    path('crm/clients/client_details/<int:pk>/', ClientViewSet.as_view({'get': 'client_details'}), name='client-details'),
+    path('crm/clients/all_clients_details/', ClientViewSet.as_view(
+        {'get': 'all_clients_details'}), name='all-clients-details'
+    ),
+
+    path('crm/clients/client_details/<int:pk>/', ClientViewSet.as_view(
+        {'get': 'client_details'}), name='client-details'
+    ),
 
     # Configure le chemin pour l'action 'all_contracts_details' et 'contract_details'
-    path('crm/contract/all_contracts_details/', ContractViewSet.as_view({'get': 'all_contracts_details'}), name='all-contracts-details'),
-    path('crm/contract/contract_details/<int:pk>/', ContractViewSet.as_view({'get': 'contract_details'}), name='contract-details'),
+    path('crm/contract/all_contracts_details/', ContractViewSet.as_view(
+        {'get': 'all_contracts_details'}), name='all-contracts-details'
+    ),
+
+    path('crm/contract/contract_details/<int:pk>/', ContractViewSet.as_view(
+        {'get': 'contract_details'}), name='contract-details'
+    ),
 
     # Ajoutez l'URL pour accéder au filtre des contrats non signés
-    path('crm/contracts/filtered_contracts/', ContractViewSet.as_view({'get': 'filtered_contracts'}), name='filtered-contracts'),
+    path('crm/contracts/filtered_contracts/', ContractViewSet.as_view(
+        {'get': 'filtered_contracts'}), name='filtered-contracts'
+    ),
 
     # Configure le chemin pour l'action 'all_contracts_details' et 'contract_details'
-    path('crm/event/all_events_details/', EventViewSet.as_view({'get': 'all_events_details'}), name='all-events-details'),
+    path('crm/event/all_events_details/', EventViewSet.as_view(
+        {'get': 'all_events_details'}), name='all-events-details'
+    ),
+
     path('crm/event/event_details/<int:pk>/', EventViewSet.as_view({'get': 'event_details'}), name='event-details'),
 
     # Configure le chemin pour l'action 'events_without_support'
-    path('crm/events/events_without_support/', EventViewSet.as_view({'get': 'events_without_support'}), name='events-without-support'),
+    path('crm/events/events_without_support/', EventViewSet.as_view(
+        {'get': 'events_without_support'}), name='events-without-support'
+    ),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))

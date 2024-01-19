@@ -70,7 +70,9 @@ class ContractDetailSerializer(serializers.ModelSerializer):
     """
     # Champs utilisant SlugRelatedField pour la lecture et l'écriture
     client = serializers.SlugRelatedField(slug_field='full_name', queryset=Client.objects.all())
-    sales_contact = serializers.SlugRelatedField(slug_field='full_name', queryset=User.objects.filter(role=User.ROLE_SALES))
+    sales_contact = serializers.SlugRelatedField(
+        slug_field='full_name', queryset=User.objects.filter(role=User.ROLE_SALES)
+    )
 
     class Meta:
         model = Contract

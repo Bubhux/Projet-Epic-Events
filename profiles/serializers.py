@@ -50,8 +50,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
         # Génére les jetons à l'aide de Django REST framework simplejwt
         tokens = RefreshToken.for_user(user)
         data = {
-            "refresh": str(tokens),  # Convertie le jeton d'actualisation en chaîne
-            "access": str(tokens.access_token)  # Convertie le jeton d'accès en chaîne
+            "refresh": str(tokens),  # Convertit le jeton d'actualisation en chaîne
+            "access": str(tokens.access_token)  # Convertit le jeton d'accès en chaîne
         }
         # Retourne le dictionnaire contenant les jetons
         return data
@@ -154,11 +154,22 @@ class UserDetailSerializer(serializers.ModelSerializer):
         - 'validate_password': Méthode de validation personnalisée pour le champ 'password'.
         Assure que le mot de passe n'est pas vide et le hache avant de l'enregistrer.
 
-        Remarque : Le champ 'password' est en écriture seule et n'est pas inclus lors de la récupération des détails de l'utilisateur.
+        Remarque : Le champ 'password' est en écriture seule
+        et n'est pas inclus lors de la récupération des détails de l'utilisateur.
     """
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'email', 'role', 'phone_number', 'is_staff', 'is_active', 'is_superuser', 'password']
+        fields = [
+            'id',
+            'full_name',
+            'email',
+            'role',
+            'phone_number',
+            'is_staff',
+            'is_active',
+            'is_superuser',
+            'password'
+        ]
 
     def validate_password(self, value):
         # Vérifier que le mot de passe n'est pas vide

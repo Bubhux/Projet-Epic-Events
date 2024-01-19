@@ -11,7 +11,8 @@ from contracts.views import ContractViewSet
 
 class Command(BaseCommand):
     """
-        Cette commande permet de créer un nouveau contrat en utilisant Click pour gérer les arguments en ligne de commande
+        Cette commande permet de créer un nouveau contrat en utilisant Click
+        pour gérer les arguments en ligne de commande
         et Rich pour améliorer la sortie dans la console.
     """
     help = 'Afficher, créer, modifier, supprimer des contrats'
@@ -51,7 +52,7 @@ class Command(BaseCommand):
             table.add_column("Status du contrat", style="cyan")
             table.add_column("Montant total du contrat", style="cyan")
             table.add_column("Montant restant à payer sur le contrat", style="cyan")
-            
+
             for contract in data:
                 # Convertit la valeur booléenne en une chaîne lisible
                 status_contract_str = "Signé" if contract.get('status_contract', False) else "Non signé"
@@ -99,7 +100,10 @@ class Command(BaseCommand):
                 console.print(f"[bold green]Contrat créé avec succès pour le client :[/bold green] {client_name}")
 
             except Client.DoesNotExist:
-                console.print(f"[bold red]Le client avec le nom '{client_name}' n'existe pas dans la base de données.[/bold red]")
+                console.print(
+                    f"[bold red]Le client avec le nom '{client_name}' "
+                    f"n'existe pas dans la base de données.[/bold red]"
+                )
 
             except Exception as e:
                 console.print(f"[bold red]Erreur lors de la création du contrat :[/bold red] {e}")
@@ -113,8 +117,9 @@ class Command(BaseCommand):
             self.delete_contract(contract_id)
 
         else:
-            console.print("[bold red]Aucune action spécifiée. Utilisez "
-                          "--display_contracts, --create_contract, --update_contract, --delete_contract.[/bold red]"
+            console.print(
+                "[bold red]Aucune action spécifiée. Utilisez "
+                "--display_contracts, --create_contract, --update_contract, --delete_contract.[/bold red]"
             )
 
     def update_contract(self, contract_id):
@@ -152,7 +157,9 @@ class Command(BaseCommand):
             new_total_amount = self.colored_prompt('Nouveau montant total du contrat', color=Fore.CYAN)
             if self.should_exit():
                 return
-            new_remaining_amount = self.colored_prompt('Nouveau montant restant à payer sur le contrat', color=Fore.CYAN)
+            new_remaining_amount = self.colored_prompt(
+                'Nouveau montant restant à payer sur le contrat', color=Fore.CYAN
+            )
 
             # Met à jour le contrat
             contract.status_contract = new_status_contract

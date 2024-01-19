@@ -46,6 +46,7 @@ env_variable_names = [
     'DB_PASSWORD',
     'DB_HOST',
     'DB_PORT',
+    'SENTRY_DSN',
 ]
 
 # Génére la clé secrète aléatoire
@@ -84,12 +85,10 @@ print(f"Creating .env file at {env_file_path}...")
 
 # Ouvrir le fichier .env en mode écriture
 with open(env_file_path, "w") as f:
-    # Écrire les noms des variables d'environnement avec leurs valeurs
+    # Écris les noms des variables d'environnement avec leurs valeurs
     f.write(f"DJANGO_SECRET_KEY={secret_key}\n")
     for env_var in env_variable_names[1:]:
         f.write(f"{env_var}=\n")
 
 # Affiche un message indiquant que le modèle de fichier .env a été créé
 print("\n.env file created!")
-
-

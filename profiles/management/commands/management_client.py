@@ -10,7 +10,8 @@ from profiles.views import ClientViewSet
 
 class Command(BaseCommand):
     """
-        Cette commande permet de créer un nouveau client en utilisant Click pour gérer les arguments en ligne de commande
+        Cette commande permet de créer un nouveau client en utilisant Click
+        pour gérer les arguments en ligne de commande
         et Rich pour améliorer la sortie dans la console.
     """
     help = 'Afficher, créer, modifier, supprimer des clients.'
@@ -50,7 +51,13 @@ class Command(BaseCommand):
             table.add_column("Contact commercial", style="cyan")
 
             for client in data:
-                table.add_row(str(client['id']), client['full_name'], client['email'], client['company_name'], client['sales_contact'])
+                table.add_row(
+                    str(client['id']),
+                    client['full_name'],
+                    client['email'],
+                    client['company_name'],
+                    client['sales_contact']
+                )
 
             console.print(table)
 
@@ -92,8 +99,9 @@ class Command(BaseCommand):
             self.delete_client(client_id)
 
         else:
-            console.print("[bold red]Aucune action spécifiée. Utilisez "
-                          "--display_clients, --create_client, --update_client, --delete_client.[/bold red]"
+            console.print(
+                "[bold red]Aucune action spécifiée. Utilisez "
+                "--display_clients, --create_client, --update_client, --delete_client.[/bold red]"
             )
 
     def update_client(self, client_id):
