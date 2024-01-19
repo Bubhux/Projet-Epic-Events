@@ -1,11 +1,11 @@
-![Static Badge](/static/badges/Build-with-Python.svg) ![Static Badge](/static/badges/Build-with-Django.svg) ![Static Badge](/static/badges/Build-with-MySQL.svg)
-![Static Badge](/static/badges/Use-Pytest.svg)
-![Static Badge](/static/badges/Use-Sentry.svg)
-![Static Badge](/static/badges/Use-Postman.svg) ➔ [Documentation Postman du projet Epic Events](https://documenter.getpostman.com/view/26427645/2s9Ykkg3Lu)
+![Static Badge](/static/badges/Build-with-Python.svg) ![Static Badge](/static/badges/Build-with-Django.svg) ![Static Badge](/static/badges/Build-with-MySQL.svg)   
+![Static Badge](/static/badges/Use-Pytest.svg)   
+![Static Badge](/static/badges/Use-Sentry.svg)   
+![Static Badge](/static/badges/Use-Postman.svg) ➔ [Documentation Postman du projet Epic Events](https://documenter.getpostman.com/view/26427645/2s9Ykkg3Lu)   
 
-![Static Badge](/static/badges/tests-badge.svg)
-![Static Badge](/static/badges/coverage-badge.svg)
-![Static Badge](/static/badges/flake8-badge.svg) 
+![Static Badge](/static/badges/tests-badge.svg)   
+![Static Badge](/static/badges/coverage-badge.svg)   
+![Static Badge](/static/badges/flake8-badge.svg)   
 
 [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://god.gw.postman.com/run-collection/26427645-f52af692-f8f7-4e4e-8efc-53d8d0c53e5b?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D26427645-f52af692-f8f7-4e4e-8efc-53d8d0c53e5b%26entityType%3Dcollection%26workspaceId%3D6431c2eb-5581-47a5-91d7-1cd5511f9a44)
 
