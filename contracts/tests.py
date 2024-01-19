@@ -13,7 +13,6 @@ from profiles.models import User, Client
 class TestContractsApp(TestCase):
     """
         Classe de test pour le module Contracts de l'application Epic Events.
-
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
         des fonctionnalités liées aux contrats dans l'application.
     """

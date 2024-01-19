@@ -17,9 +17,8 @@ from profiles.models import User, Client
 class TestEventsApp(TestCase):
     """
         Classe de test pour le module Events de l'application Epic Events.
-
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
-        des fonctionnalités liées aux contrats dans l'application.
+        des fonctionnalités liées aux événements dans l'application.
     """
     def create_user(self, email, role, full_name, phone_number, is_staff=True):
         """

@@ -19,9 +19,9 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from profiles.views import LoginViewSet, ClientViewSet, UserViewSet, AdminUserLoginViewSet, AdminUserViewSet, AdminUserClientViewSet
-from contracts.views import ContractViewSet, AdminContractViewSet
-from events.views import EventViewSet, AdminEventiewSet
+from profiles.views import LoginViewSet, ClientViewSet, UserViewSet
+from contracts.views import ContractViewSet
+from events.views import EventViewSet
 
 
 # Création du routeur simple
@@ -43,12 +43,6 @@ router.register(r"contracts/(?P<contract_pk>\d+)/contract_details", ContractView
 
 router.register(r"events/(?P<event_pk>\d+)/", EventViewSet, basename="events")
 router.register(r"events/(?P<event_pk>\d+)/event_details", EventViewSet, basename="event-details")
-
-router.register(r"admin/login", AdminUserLoginViewSet, basename="admin-login")
-router.register(r"admin/users", AdminUserViewSet, basename="admin-users")
-router.register(r"admin/clients", AdminUserClientViewSet, basename="admin-clients")
-router.register(r"admin/contracts", AdminContractViewSet, basename="admin-contracts")
-router.register(r"admin/events", AdminEventiewSet, basename="admin-events")
 
 
 urlpatterns = [

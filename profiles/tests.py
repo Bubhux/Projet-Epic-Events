@@ -16,9 +16,8 @@ from .models import User, Client, Group, add_client_to_group
 class TestProfilesApp(TestCase):
     """
         Classe de test pour le module Profiles de l'application Epic Events.
-
         Cette classe contient plusieurs méthodes de test pour vérifier le bon fonctionnement
-        des fonctionnalités liées aux profils d'utilisateurs et aux clients dans l'application.
+        des fonctionnalités liées aux profiles d'utilisateurs et aux clients dans l'application.
     """
     def create_superuser(self, email, role, full_name, phone_number, **extra_fields):
         """
