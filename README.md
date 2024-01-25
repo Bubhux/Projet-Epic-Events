@@ -52,7 +52,7 @@
 #### Besoins individuels   
 
 ##### Équipe de gestion :   
-- ``Créer``, ``mettre à jour`` et `` supprimer`` des collaborateurs dans le système **CRM**.   
+- ``Créer``, ``mettre à jour`` et ``supprimer`` des collaborateurs dans le système **CRM**.   
 - ``Créer`` et ``modifier`` tous les contrats.   
 - Filtrer l’affichage des événements : afficher tous les événements qui n’ont pas de « support » associé.   
 - ``Modifier`` des événements (pour associer un collaborateur support à l’événement).   
