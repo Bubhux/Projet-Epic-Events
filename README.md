@@ -13,7 +13,7 @@
 
 ## Menu   
 1. **[Informations générales](#informations-générales)**   
-2. **[Fonctionnalitées](#fonctionnalitées)**   
+2. **[Fonctionnalités](#fonctionnalités)**   
 3. **[Liste pré-requis](#liste-pre-requis)**   
 4. **[Création environnement](#creation-environnement)**   
 5. **[Activation environnement](#activation-environnement)**   
@@ -74,10 +74,10 @@
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-<div id="fonctionnalitées"></div>
+<div id="fonctionnalités"></div>
 <a href="#top" style="float: right;">Retour en haut ↑</a>
 
-### Fonctionnalitées   
+### Fonctionnalités   
 
 - Opérations d'administration et de gestion des utilisateurs, des clients, des contrats et des événements.   
 - Visualisation des informations et données des utilisateurs, des clients, des contrats et événements.   
