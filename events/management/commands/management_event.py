@@ -6,6 +6,7 @@ from rich.table import Table
 from django.utils import timezone
 from datetime import datetime
 
+from contracts.models import Contract
 from profiles.models import User, Client
 from events.models import Event
 from events.views import EventViewSet
@@ -49,6 +50,7 @@ class Command(BaseCommand):
             table = Table(show_header=True, header_style="bold magenta")
             table.add_column("ID", style="cyan")
             table.add_column("Nom de l'événement", style="cyan")
+            table.add_column("ID du contrat", style="cyan")
             table.add_column("Nom du client", style="cyan")
             table.add_column("Contact du client", style="cyan")
             table.add_column("Date de début de l'événement", style="cyan")
@@ -59,15 +61,17 @@ class Command(BaseCommand):
             table.add_column("Notes", style="cyan")
 
             for event in data:
-                # Assure que 'client' est présent dans le dictionnaire de l'événement
-                if 'client' in event and isinstance(event['client'], dict):
-                    # Met à jour client_name et client_contact avant l'affichage
+                # Assure que 'client' et 'contract' sont présents dans le dictionnaire de l'événement
+                if 'client' in event and isinstance(event['client'], dict) and 'contract' in event and isinstance(event['contract'], dict):
+                    # Met à jour client_name, client_contact et contract_id avant l'affichage
                     event['client_name'] = event['client']['full_name']
                     event['client_contact'] = f"{event['client']['email']} {event['client']['phone_number']}"
+                    event['contract'] = event['contract']['id']
 
                 table.add_row(
                     str(event['id']),
                     str(event['event_name']),
+                    str(event.get('contract', '')),
                     str(event['client']),
                     str(event.get('client_contact', '')),
                     str(event.get('event_date_start', '')),
@@ -88,9 +92,19 @@ class Command(BaseCommand):
             event_name = self.colored_prompt('Nom de l\'événement', color=Fore.CYAN)
             if self.should_exit():
                 return
+
+            # Le champ contract_id est facultatif
+            use_contract_id = click.confirm('Voulez-vous spécifier un id de contrat ?', default=False)
+            contract_id_number = None
+
+            if use_contract_id:
+                contract_id_number = self.colored_prompt('ID du contact associé à l\'événement', color=Fore.CYAN)
+                if self.should_exit():
+                    return
             client_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             event_date_start_str = self.colored_prompt(
                 'Date de début de l\'événement (format: YYYY-MM-DD HH:MM)', color=Fore.CYAN
             )
@@ -125,6 +139,9 @@ class Command(BaseCommand):
                 # Récupère l'instance du client à partir de la base de données
                 client = Client.objects.get(full_name=client_name)
 
+                # Récupère l'instance du contrat associé au client
+                contract = Contract.objects.get(id=contract_id_number) if use_contract_id else None
+
                 # Récupère l'instance du contact de support à partir de la base de données
                 support_contact = User.objects.get(full_name=support_contact_name) if support_contact_name else None
 
@@ -136,6 +153,7 @@ class Command(BaseCommand):
                 event = Event.objects.create(
                     event_name=event_name,
                     client=client,
+                    contract=contract,
                     event_date_start=event_date_start,
                     event_date_end=event_date_end,
                     support_contact=support_contact,
@@ -191,6 +209,7 @@ class Command(BaseCommand):
 
             table.add_row("ID", str(event.id))
             table.add_row("Nom de l'événement", str(event.event_name))
+            table.add_row("ID du contrat associé à l'événement", str(event.contract_id))
             table.add_row("Nom du client", str(event.client))
             table.add_row("Contact du client", str(event.client_contact))
             table.add_row("Date de début de l'événement", str(event.event_date_start))
@@ -204,6 +223,19 @@ class Command(BaseCommand):
 
             # Demande les nouvelles informations
             new_event_name = self.colored_prompt('Nouveau nom de l\'événement', color=Fore.CYAN)
+            if self.should_exit():
+                return
+
+            # Le champ contract_id est facultatif
+            use_new_contract_id = click.confirm('Voulez-vous spécifier un id de contrat ?', default=False)
+            new_contract_id_number = None
+
+            if use_new_contract_id:
+                new_contract_id_number = self.colored_prompt('ID du contact associé à l\'événement', color=Fore.CYAN)
+                if self.should_exit():
+                    return
+
+            client_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
             new_event_date_start_str = self.colored_prompt(
@@ -244,6 +276,9 @@ class Command(BaseCommand):
             new_event_date_start = timezone.make_aware(datetime.strptime(new_event_date_start_str, '%Y-%m-%d %H:%M'))
             new_event_date_end = timezone.make_aware(datetime.strptime(new_event_date_end_str, '%Y-%m-%d %H:%M'))
 
+            # Récupère l'instance du contrat associé au client
+            new_contract = Contract.objects.get(id=new_contract_id_number) if use_new_contract_id else None
+
             # Récupère l'instance du contact de support à partir de la base de données, s'il est spécifié
             new_support_contact = User.objects.get(
                 full_name=new_support_contact_name
@@ -251,6 +286,7 @@ class Command(BaseCommand):
 
             # Met à jour l'événement
             event.event_name = new_event_name
+            event.contract = new_contract
             event.event_date_start = new_event_date_start
             event.event_date_end = new_event_date_end
             event.support_contact = new_support_contact
@@ -293,6 +329,7 @@ class Command(BaseCommand):
 
             table.add_row("ID", str(event.id))
             table.add_row("Nom de l'événement", str(event.event_name))
+            table.add_row("ID du contrat associé à l'événement", str(event.contract_id))
             table.add_row("Nom du client", str(event.client))
             table.add_row("Contact du client", str(event.client_contact))
             table.add_row("Date de début de l'événement", str(event.event_date_start))

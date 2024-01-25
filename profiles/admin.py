@@ -8,8 +8,8 @@ from .models import User, Client
 
 class CustomUserAdmin(UserAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle User.
-    Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
+        Personnalisation de l'interface d'administration pour le modèle User.
+        Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
     """
 
     list_display = ('full_name', 'email', 'is_active', 'is_staff', 'is_superuser', 'role')
@@ -51,8 +51,8 @@ class CustomUserAdmin(UserAdmin):
 
 class ClientAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Client.
-    Affiche et configure les champs spécifiques pour l'administration des clients.
+        Personnalisation de l'interface d'administration pour le modèle Client.
+        Affiche et configure les champs spécifiques pour l'administration des clients.
     """
 
     list_display = ('full_name', 'email', 'company_name', 'sales_contact', 'last_contact', 'creation_date')
@@ -70,15 +70,15 @@ class ClientAdmin(admin.ModelAdmin):
 
 class GroupAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Group.
-    Affiche le nombre total d'utilisateurs pour chaque groupe.
+        Personnalisation de l'interface d'administration pour le modèle Group.
+        Affiche le nombre total d'utilisateurs pour chaque groupe.
     """
 
     list_display = ('name', 'total_users')
 
     def get_queryset(self, request):
         """
-        Surcharge la méthode get_queryset pour annoter chaque groupe avec le nombre total d'utilisateurs.
+            Surcharge la méthode get_queryset pour annoter chaque groupe avec le nombre total d'utilisateurs.
         """
         # Récupérer le queryset de la classe parent
         queryset = super().get_queryset(request)
@@ -111,7 +111,7 @@ class GroupAdmin(admin.ModelAdmin):
 
     def total_users(self, obj):
         """
-        Retourne le nombre total d'utilisateurs pour chaque groupe.
+            Retourne le nombre total d'utilisateurs pour chaque groupe.
         """
         if obj.name == 'Client':
             return obj.client_count
