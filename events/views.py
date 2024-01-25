@@ -89,7 +89,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=False, methods=['GET'])
     def all_events_details(self, request):
         """Renvoie les détails de tous les événements."""
-        if request.user.role == User.ROLE_SUPPORT:
+        if request and request.user and request.user.role == User.ROLE_SUPPORT:
             # Si l'utilisateur appartient à l'équipe de support, filtre par support_contact
             events = Event.objects.filter(support_contact=request.user)
         else:

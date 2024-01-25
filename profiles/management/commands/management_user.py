@@ -67,14 +67,15 @@ class Command(BaseCommand):
             email = self.colored_prompt('Email de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
+
             role = self.colored_prompt(
                 'Rôle de l\'utilisateur (Management team/Sales team/Support team)',
                 color=Fore.CYAN
             )
-
             if self.should_exit():
                 return
 
@@ -101,19 +102,22 @@ class Command(BaseCommand):
             email = self.colored_prompt('Email de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             password = self.colored_prompt('Mot de passe', hide_input=True, color=Fore.CYAN)
             if self.should_exit():
                 return
+
             role = self.colored_prompt(
                 'Rôle de l\'utilisateur (Management team/Sales team/Support team)',
                 color=Fore.CYAN
             )
-
             if self.should_exit():
                 return
+
             full_name = self.colored_prompt('Nom complet', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             phone_number = self.colored_prompt('Numéro de téléphone', color=Fore.CYAN)
 
             try:
@@ -175,24 +179,27 @@ class Command(BaseCommand):
             new_email = self.colored_prompt('Nouvel email de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_password = self.colored_prompt(
                 'Nouveau mot de passe de l\'utilisateur', hide_input=True, color=Fore.CYAN
             )
-
             if self.should_exit():
                 return
+
             new_role = self.colored_prompt(
                 'Nouveau rôle de l\'utilisateur (Management team/Sales team/Support team)', color=Fore.CYAN
             )
-
             if self.should_exit():
                 return
+
             new_full_name = self.colored_prompt('Nouveau nom complet de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_phone_number = self.colored_prompt('Nouveau numéro de téléphone de l\'utilisateur', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_is_staff = click.confirm('Est-ce un membre du personnel ?')
 
             # Met à jour l'utilisateur
