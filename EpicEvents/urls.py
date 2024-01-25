@@ -83,16 +83,19 @@ urlpatterns = [
     ),
 
     # Configure le chemin pour l'action 'all_contracts_details' et 'contract_details'
-    path('crm/event/all_events_details/', EventViewSet.as_view(
+    path('crm/events/all_events_details/', EventViewSet.as_view(
         {'get': 'all_events_details'}), name='all-events-details'
     ),
 
-    path('crm/event/event_details/<int:pk>/', EventViewSet.as_view({'get': 'event_details'}), name='event-details'),
+    path('crm/events/event_details/<int:pk>/', EventViewSet.as_view({'get': 'event_details'}), name='event-details'),
 
     # Configure le chemin pour l'action 'events_without_support'
     path('crm/events/events_without_support/', EventViewSet.as_view(
         {'get': 'events_without_support'}), name='events-without-support'
     ),
+
+    # Configure le chemin pour l'action 'events_list' sur l'url http://127.0.0.1:8000/crm/events/
+    path('crm/events/', EventViewSet.as_view({'get': 'events_list'}), name='events-list'),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))

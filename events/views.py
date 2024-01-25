@@ -13,6 +13,7 @@ from .models import Event
 from .permissions import EventPermissions
 from .serializers import MultipleSerializerMixin, EventListSerializer, EventDetailSerializer
 from contracts.models import Contract
+from profiles.models import User
 
 
 @method_decorator(csrf_protect, name='dispatch')
@@ -60,7 +61,13 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=False, methods=['GET'])
     def events_list(self, request):
         """Renvoie tous les événements associé à l'utilisateur connecté."""
-        events = Event.objects.filter(support_contact=request.user)
+        if request.user.role == User.ROLE_SUPPORT:
+            # Si l'utilisateur appartient à l'équipe de support, filtre par support_contact
+            events = Event.objects.filter(support_contact=request.user)
+        else:
+            # Pour les autres utilisateurs, renvoie tous les événements
+            events = Event.objects.all()
+
         serializer = EventDetailSerializer(events, many=True)
         return Response(serializer.data)
 
@@ -82,16 +89,25 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
     @action(detail=False, methods=['GET'])
     def all_events_details(self, request):
         """Renvoie les détails de tous les événements."""
-        events = Event.objects.all()
+        if request and request.user and request.user.role == User.ROLE_SUPPORT:
+            # Si l'utilisateur appartient à l'équipe de support, filtre par support_contact
+            events = Event.objects.filter(support_contact=request.user)
+        else:
+            # Pour les autres utilisateurs, renvoie tous les événements
+            events = Event.objects.all()
+
         serializer = EventDetailSerializer(events, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['GET'])
     def events_without_support(self, request):
         """Renvoie tous les événements qui n'ont pas de support associé."""
-        events_without_support = Event.objects.filter(support_contact=None)
-        serializer = EventDetailSerializer(events_without_support, many=True)
-        return Response(serializer.data)
+        if request.user.role == User.ROLE_MANAGEMENT:
+            events_without_support = Event.objects.filter(support_contact=None)
+            serializer = EventDetailSerializer(events_without_support, many=True)
+            return Response(serializer.data)
+        else:
+            return HttpResponseForbidden("You are not authorized to access this view.")
 
     def create(self, request, *args, **kwargs):
         """Crée un nouvel événement."""

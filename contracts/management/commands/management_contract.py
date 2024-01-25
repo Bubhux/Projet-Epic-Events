@@ -81,9 +81,11 @@ class Command(BaseCommand):
             client_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             total_amount = self.colored_prompt('Montant total du contrat', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             remaining_amount = self.colored_prompt('Montant restant à payer sur le contrat', color=Fore.CYAN)
 
             try:
@@ -153,9 +155,11 @@ class Command(BaseCommand):
             new_status_contract = click.confirm('Est-ce que le contrat est signé ?')
             if self.should_exit():
                 return
+
             new_total_amount = self.colored_prompt('Nouveau montant total du contrat', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_remaining_amount = self.colored_prompt(
                 'Nouveau montant restant à payer sur le contrat', color=Fore.CYAN
             )

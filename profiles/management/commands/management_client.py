@@ -69,12 +69,15 @@ class Command(BaseCommand):
             email = self.colored_prompt('Email du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             full_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             phone_number = self.colored_prompt('Numéro de téléphone du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             company_name = self.colored_prompt('Nom de l\'entreprise du client', color=Fore.CYAN)
 
             try:
@@ -133,12 +136,15 @@ class Command(BaseCommand):
             new_email = self.colored_prompt('Nouvel email du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_full_name = self.colored_prompt('Nouveau nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_phone_number = self.colored_prompt('Nouveau numéro de téléphone du client', color=Fore.CYAN)
             if self.should_exit():
                 return
+
             new_company_name = self.colored_prompt('Nouveau nom de l\'entreprise du client', color=Fore.CYAN)
 
             # Met à jour le client

@@ -97,20 +97,23 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
             :param request: L'objet de requête.
             :return: Une réponse HTTP contenant les données des contrats filtrés.
         """
-        contracts = Contract.objects.filter(
-            Q(
-                sales_contact=request.user,
-                status_contract=False,
-                remaining_amount__gt=0.0
-            ) | Q(
-                sales_contact=request.user,
-                status_contract=True,
-                remaining_amount__gt=0.0
-            )
-        ).exclude(Q(status_contract=True, remaining_amount=0.0))
+        if Contract.objects.filter(sales_contact=request.user).exists():
+            contracts = Contract.objects.filter(
+                Q(
+                    sales_contact=request.user,
+                    status_contract=False,
+                    remaining_amount__gt=0.0
+                ) | Q(
+                    sales_contact=request.user,
+                    status_contract=True,
+                    remaining_amount__gt=0.0
+                )
+            ).exclude(Q(status_contract=True, remaining_amount=0.0))
 
-        serializer = ContractDetailSerializer(contracts, many=True)
-        return Response(serializer.data)
+            serializer = ContractDetailSerializer(contracts, many=True)
+            return Response(serializer.data)
+        else:
+            return HttpResponseForbidden("You are not authorized to access this view.")
 
     def create(self, request, *args, **kwargs):
         """Crée un nouveau contrat."""
