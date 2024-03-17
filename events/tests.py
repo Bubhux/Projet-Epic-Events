@@ -138,8 +138,8 @@ class TestEventsApp(TestCase):
             client=self.client_user1,
             client_name="Ned Flanders",
             client_contact="Ned@EpicEvents.com +987654321",
-            event_date_start=make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            event_date_end=make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            event_date_start=make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            event_date_end=make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             support_contact=self.support_user1,
             location="Rome",
             attendees=1,
@@ -223,8 +223,8 @@ class TestEventsApp(TestCase):
         self.assertEqual(self.client_user1.email, 'Ned@EpicEvents.com')
         self.assertEqual(self.client_user1.company_name, 'Flanders & Co')
         self.assertEqual(self.event_user1.client_contact, 'Ned@EpicEvents.com +987654321')
-        self.assertEqual(self.event_user1.event_date_start, make_aware(datetime.datetime(2024, 2, 14, 12, 45)))
-        self.assertEqual(self.event_user1.event_date_end, make_aware(datetime.datetime(2024, 11, 25, 12, 55)))
+        self.assertEqual(self.event_user1.event_date_start, make_aware(datetime.datetime(2025, 2, 14, 12, 45)))
+        self.assertEqual(self.event_user1.event_date_end, make_aware(datetime.datetime(2025, 11, 25, 12, 55)))
         self.assertEqual(self.event_user1.support_contact, self.support_user1)
         self.assertEqual(self.event_user1.location, 'Rome')
         self.assertEqual(self.event_user1.attendees, 1)
@@ -238,8 +238,8 @@ class TestEventsApp(TestCase):
             client=self.client_user1,
             client_name="Ned Flanders",
             client_contact="Ned@EpicEvents.com +987654321",
-            event_date_start=make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            event_date_end=make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            event_date_start=make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            event_date_end=make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             support_contact=self.support_user1,
             location="Rome",
             attendees=1,
@@ -451,8 +451,8 @@ class TestEventViewSet(TestCase):
             client=self.client_user1,
             client_name=self.client_user1.full_name,
             client_contact=f"{self.client_user1.email} {self.client_user1.phone_number}",
-            event_date_start=make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            event_date_end=make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            event_date_start=make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            event_date_end=make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             support_contact=self.support_user1,
             location="Rome",
             attendees=1,
@@ -465,8 +465,8 @@ class TestEventViewSet(TestCase):
             client=self.client_user2,
             client_name=self.client_user2.full_name,
             client_contact=f"{self.client_user2.email} {self.client_user2.phone_number}",
-            event_date_start=make_aware(datetime.datetime(2024, 3, 16, 13, 55)),
-            event_date_end=make_aware(datetime.datetime(2024, 4, 22, 16, 30)),
+            event_date_start=make_aware(datetime.datetime(2025, 3, 16, 13, 55)),
+            event_date_end=make_aware(datetime.datetime(2025, 4, 22, 16, 30)),
             support_contact=None,
             location="Japon",
             attendees=100,
@@ -654,8 +654,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user3.id,
             'client': self.client_user3.full_name,
             'client_contact': f"{self.client_user3.email} {self.client_user3.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 1, 24, 10, 30)),
-            'event_date_end': make_aware(datetime.datetime(2024, 2, 15, 12, 45)),
+            'event_date_start': make_aware(datetime.datetime(2025, 1, 24, 10, 30)),
+            'event_date_end': make_aware(datetime.datetime(2025, 2, 15, 12, 45)),
             'support_contact': self.support_user1.full_name,
             'location': 'Australie',
             'attendees': 50,
@@ -689,8 +689,8 @@ class TestEventViewSet(TestCase):
         self.assertEqual(response.data["data"]["notes"], new_event_data["notes"])
 
         # Vérifie event_date_start et event_date_end
-        expected_start_date = make_aware(datetime.datetime(2024, 1, 24, 10, 30))
-        expected_end_date = make_aware(datetime.datetime(2024, 2, 15, 12, 45))
+        expected_start_date = make_aware(datetime.datetime(2025, 1, 24, 10, 30))
+        expected_end_date = make_aware(datetime.datetime(2025, 2, 15, 12, 45))
 
         # Convertit la chaîne de date dans la réponse JSON en un objet Pendulum
         response_start_date_str = response.data['data']['event_date_start']
@@ -719,8 +719,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user3.id,
             'client': self.client_user3.full_name,
             'client_contact': f"{self.client_user3.email} {self.client_user3.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 1, 24, 10, 30)),
-            'event_date_end': make_aware(datetime.datetime(2024, 2, 15, 12, 45)),
+            'event_date_start': make_aware(datetime.datetime(2025, 1, 24, 10, 30)),
+            'event_date_end': make_aware(datetime.datetime(2025, 2, 15, 12, 45)),
             'support_contact': self.support_user1.full_name,
             'location': 'Australie',
             'attendees': 50,
@@ -756,8 +756,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user4.id,
             'client': self.client_user3.full_name,
             'client_contact': f"{self.client_user3.email} {self.client_user3.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 1, 24, 10, 30)),
-            'event_date_end': make_aware(datetime.datetime(2024, 2, 15, 12, 45)),
+            'event_date_start': make_aware(datetime.datetime(2025, 1, 24, 10, 30)),
+            'event_date_end': make_aware(datetime.datetime(2025, 2, 15, 12, 45)),
             'support_contact': self.support_user1.full_name,
             'location': 'Australie',
             'attendees': 50,
@@ -790,8 +790,8 @@ class TestEventViewSet(TestCase):
             client=self.client_user1,
             client_name=self.client_user1.full_name,
             client_contact=f"{self.client_user1.email} {self.client_user1.phone_number}",
-            event_date_start=make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            event_date_end=make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            event_date_start=make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            event_date_end=make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             support_contact=self.support_user1,
             location="Rome",
             attendees=1,
@@ -808,8 +808,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user1.id,
             'client': self.client_user1.full_name,
             'client_contact': f"{self.client_user1.email} {self.client_user1.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 3, 1, 14, 30)),
-            'event_date_end': make_aware(datetime.datetime(2024, 3, 1, 16, 30)),
+            'event_date_start': make_aware(datetime.datetime(2025, 3, 1, 14, 30)),
+            'event_date_end': make_aware(datetime.datetime(2025, 3, 1, 16, 30)),
             'support_contact': self.support_user1.full_name,
             'location': 'Paris',
             'attendees': 5,
@@ -854,8 +854,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user1.id,
             'client': self.client_user1.full_name,
             'client_contact': f"{self.client_user1.email} {self.client_user1.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 2, 14, 20, 45)),
-            'event_date_end': make_aware(datetime.datetime(2024, 11, 25, 23, 55)),
+            'event_date_start': make_aware(datetime.datetime(2025, 2, 14, 20, 45)),
+            'event_date_end': make_aware(datetime.datetime(2025, 11, 25, 23, 55)),
             'support_contact': self.support_user1.full_name,
             'location': 'Londres',
             'attendees': 200,
@@ -892,8 +892,8 @@ class TestEventViewSet(TestCase):
         self.assertEqual(response.data["data"]["notes"], update_event_data["notes"])
 
         # Vérifie event_date_start et event_date_end
-        expected_start_date = make_aware(datetime.datetime(2024, 2, 14, 20, 45))
-        expected_end_date = make_aware(datetime.datetime(2024, 11, 25, 23, 55))
+        expected_start_date = make_aware(datetime.datetime(2025, 2, 14, 20, 45))
+        expected_end_date = make_aware(datetime.datetime(2025, 11, 25, 23, 55))
 
         # Convertit la chaîne de date dans la réponse JSON en un objet Pendulum
         response_start_date_str = response.data['data']['event_date_start']
@@ -922,8 +922,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user1.id,
             'client': self.client_user1.full_name,
             'client_contact': f"{self.client_user1.email} {self.client_user1.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 2, 14, 20, 45)),
-            'event_date_end': make_aware(datetime.datetime(2024, 11, 25, 23, 55)),
+            'event_date_start': make_aware(datetime.datetime(2025, 2, 14, 20, 45)),
+            'event_date_end': make_aware(datetime.datetime(2025, 11, 25, 23, 55)),
             'support_contact': self.support_user1.full_name,
             'location': 'Londres',
             'attendees': 200,
@@ -962,8 +962,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user1.id,
             'client': self.client_user1.full_name,
             'client_contact': f"{self.client_user1.email} {self.client_user1.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            'event_date_end': make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            'event_date_start': make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            'event_date_end': make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             'support_contact': self.support_user1.full_name,
             'location': 'Rome',
             'attendees': 1,
@@ -999,8 +999,8 @@ class TestEventViewSet(TestCase):
             'contract': self.contract_user1.id,
             'client': self.client_user1.full_name,
             'client_contact': f"{self.client_user1.email} {self.client_user1.phone_number}",
-            'event_date_start': make_aware(datetime.datetime(2024, 2, 14, 12, 45)),
-            'event_date_end': make_aware(datetime.datetime(2024, 11, 25, 12, 55)),
+            'event_date_start': make_aware(datetime.datetime(2025, 2, 14, 12, 45)),
+            'event_date_end': make_aware(datetime.datetime(2025, 11, 25, 12, 55)),
             'support_contact': self.support_user1.full_name,
             'location': 'Rome',
             'attendees': 1,
