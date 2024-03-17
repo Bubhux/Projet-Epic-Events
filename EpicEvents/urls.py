@@ -56,8 +56,13 @@ urlpatterns = [
     path('crm/token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
 
     # Configure le chemin pour l'action 'all_users_details' et 'user_details'
-    path('crm/users/all_users_details/', UserViewSet.as_view({'get': 'all_users_details'}), name='all-users-details'),
-    path('crm/users/user_details/<int:pk>/', UserViewSet.as_view({'get': 'user_details'}), name='user-details'),
+    path('crm/users/all_users_details/', UserViewSet.as_view(
+        {'get': 'all_users_details'}), name='all-users-details'
+    ),
+
+    path('crm/users/user_details/<int:pk>/', UserViewSet.as_view(
+        {'get': 'user_details'}), name='user-details'
+    ),
 
     # Configure le chemin pour l'action 'all_clients_details' et 'client_details'
     path('crm/clients/all_clients_details/', ClientViewSet.as_view(
@@ -77,7 +82,7 @@ urlpatterns = [
         {'get': 'contract_details'}), name='contract-details'
     ),
 
-    # Ajoutez l'URL pour accéder au filtre des contrats non signés
+    # Configure l'URL pour accéder au filtre des contrats non signés
     path('crm/contracts/filtered_contracts/', ContractViewSet.as_view(
         {'get': 'filtered_contracts'}), name='filtered-contracts'
     ),
@@ -87,15 +92,20 @@ urlpatterns = [
         {'get': 'all_events_details'}), name='all-events-details'
     ),
 
-    path('crm/events/event_details/<int:pk>/', EventViewSet.as_view({'get': 'event_details'}), name='event-details'),
+    path('crm/events/event_details/<int:pk>/', EventViewSet.as_view(
+        {'get': 'event_details'}), name='event-details'
+    ),
 
     # Configure le chemin pour l'action 'events_without_support'
     path('crm/events/events_without_support/', EventViewSet.as_view(
         {'get': 'events_without_support'}), name='events-without-support'
     ),
 
-    # Configure le chemin pour l'action 'events_list' sur l'url http://127.0.0.1:8000/crm/events/
-    path('crm/events/', EventViewSet.as_view({'get': 'events_list'}), name='events-list'),
+    # Configure le chemin pour l'action 'events_list' et 'create' sur l'url http://127.0.0.1:8000/crm/events/
+    path('crm/events/', EventViewSet.as_view({
+        'get': 'events_list',
+        'post': 'create'}), name='events'
+    ),
 
     # Inclusion des URLs gérées par le routeur simple sous le préfixe "crm/"
     path('crm/', include(router.urls))

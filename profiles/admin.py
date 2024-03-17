@@ -8,8 +8,8 @@ from .models import User, Client
 
 class CustomUserAdmin(UserAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle User.
-    Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
+        Personnalisation de l'interface d'administration pour le modèle User.
+        Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
     """
 
     list_display = ('full_name', 'email', 'is_active', 'is_staff', 'is_superuser', 'role')
@@ -51,8 +51,8 @@ class CustomUserAdmin(UserAdmin):
 
 class ClientAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Client.
-    Affiche et configure les champs spécifiques pour l'administration des clients.
+        Personnalisation de l'interface d'administration pour le modèle Client.
+        Affiche et configure les champs spécifiques pour l'administration des clients.
     """
 
     list_display = ('full_name', 'email', 'company_name', 'sales_contact', 'last_contact', 'creation_date')
@@ -70,8 +70,8 @@ class ClientAdmin(admin.ModelAdmin):
 
 class GroupAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Group.
-    Affiche le nombre total d'utilisateurs pour chaque groupe.
+        Personnalisation de l'interface d'administration pour le modèle Group.
+        Affiche le nombre total d'utilisateurs pour chaque groupe.
     """
 
     list_display = ('name', 'total_users')
@@ -83,22 +83,12 @@ class GroupAdmin(admin.ModelAdmin):
         # Récupérer le queryset de la classe parent
         queryset = super().get_queryset(request)
 
-        # Annoter avec le nombre total d'utilisateurs
-        # Filtrer les objets du modèle Client associés au groupe en cours d'annotation dans la requête GroupAdmin.
-        # OuterRef('id') fait référence à l'ID du groupe actuel dans la requête GroupAdmin.
-        # Récupérer les valeurs du champ user_contact__groups pour les objets filtrés.
-        # Cela représente les groupes associés aux clients filtrés.
-        # Ajouter une annotation 'count' en comptant le nombre d'objets dans chaque groupe.
-        # Récupérer les valeurs de l'annotation 'count' pour le premier objet (le seul objet).
-        # Cela donne le nombre total d'objets dans le modèle Client associés au groupe actuel.
-        # La sous-requête Subquery retourne le nombre total d'objets dans le modèle Client associés au groupe actuel.
-        # Cette valeur est utilisée comme annotation 'client_count' pour chaque objet Group dans la requête GroupAdmin.
-        # Annoter chaque objet Group avec le résultat de la sous-requête,
-        # représentant le nombre total d'objets associés dans le modèle Client.
-        # Récupérer les valeurs de l'annotation 'count' pour le premier objet (le seul objet).
-        # Extrait la valeur de l'annotation count pour le premier objet (le seul objet en utilisant [:1]).
-        # Cela donne le nombre total d'objets dans le modèle Client associés au groupe actuel.
-        # Retourner le queryset annoté
+        # Annoter avec le nombre total d'utilisateurs dans le modèle Client associés au groupe en cours.
+        # Utiliser OuterRef('id') pour référencer l'ID du groupe actuel dans la requête GroupAdmin.
+        # Compter le nombre d'objets dans chaque groupe en annotant avec 'count'.
+        # Utiliser Subquery pour obtenir le nombre total d'objets associés dans le modèle Client.
+        # Annoter chaque objet Group avec le résultat de la sous-requête 'client_count'.
+        # Retourner le queryset annoté avec le nombre total d'objets associés.
         queryset = queryset.annotate(
             client_count=Subquery(
                 Client.objects.filter(user_contact__groups=OuterRef('id'))
@@ -111,7 +101,7 @@ class GroupAdmin(admin.ModelAdmin):
 
     def total_users(self, obj):
         """
-        Retourne le nombre total d'utilisateurs pour chaque groupe.
+            Retourne le nombre total d'utilisateurs pour chaque groupe.
         """
         if obj.name == 'Client':
             return obj.client_count

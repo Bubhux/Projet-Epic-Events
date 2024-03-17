@@ -5,8 +5,8 @@ from .models import Contract
 
 class ContractAdmin(admin.ModelAdmin):
     """
-    Personnalisation de l'interface d'administration pour le modèle Contract.
-    Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
+        Personnalisation de l'interface d'administration pour le modèle Contract.
+        Affiche et configure les champs spécifiques pour l'administration des utilisateurs.
     """
 
     list_display = ('client', 'status_contract', 'sales_contact', 'creation_date')

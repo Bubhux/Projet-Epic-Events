@@ -12,22 +12,25 @@
 <div id="top"></div>
 
 ## Menu   
+
 1. **[Informations générales](#informations-générales)**   
 2. **[Fonctionnalités](#fonctionnalités)**   
 3. **[Liste pré-requis](#liste-pre-requis)**   
 4. **[Création environnement](#creation-environnement)**   
 5. **[Activation environnement](#activation-environnement)**   
 6. **[Installation des librairies](#installation-librairies)**   
-7. **[Installation de la base de données MySQL](#installation-bdd)**   
-8. **[Connecter l'application à la base de données MySQL](#connexion-bdd)**   
-9. **[Installation des variables d'environnement](#installation-environnement)**   
-10. **[Administration opérations CRUD et gestionnaires de commmandes](#administration-bdd)**   
-11. **[Exécution de l'application](#execution-application)**   
-12. **[Tests avec Pyest](#tests-pytest)**      
-13. **[Tests de couverture de code avec Coverage](#tests-coverage)**
-14. **[Rapport avec flake8](#rapport-flake8)**   
-15. **[Informations importantes sur les différents fichiers et dossiers](#informations-importantes)**   
-16. **[Auteur et contact](#auteur-contact)**   
+7. **[Installation du SGBD MySQL](#installation-SGBD-bdd)**   
+8. **[Installation et chargement de la base de données MySQL](#installation-chargement-bdd)**   
+9. **[Connecter l'application à la base de données MySQL](#connexion-bdd)**   
+10. **[Installation des variables d'environnement](#installation-environnement)**   
+11. **[Administration opérations CRUD et gestionnaires de commmandes](#administration-bdd)**   
+12. **[Exécution de l'application](#execution-application)**   
+13. **[Tests avec Pyest](#tests-pytest)**      
+14. **[Tests de couverture de code avec Coverage](#tests-coverage)**
+15. **[Monitoring avec Sentry](#monitoring-sentry)**
+16. **[Rapport avec flake8](#rapport-flake8)**   
+17. **[Informations importantes sur les différents fichiers et dossiers](#informations-importantes)**   
+18. **[Auteur et contact](#auteur-contact)**   
 
 
 <div id="informations-générales"></div>
@@ -41,9 +44,10 @@
 - L'objectif principal est de mettre en place une base de données qui permette de stocker et de manipuler de manière sécurisée les informations des clients, ainsi que les contrats et les événements.   
 - Application **Python**, incluant la journalisation avec **Sentry**.   
 
->_Note : Plusieurs besoins de l'application **Epic Events** ont été mis en place._   
+>_**Note :** Plusieurs besoins de l'application **Epic Events** ont été mis en place._   
    
 #### Besoins généraux   
+
 - Chaque collaborateur doit avoir ses identifiants pour utiliser la plateforme.   
 - Chaque collaborateur est associé à un rôle (suivant son département).   
 - La plateforme doit permettre de stocker et de mettre à jour les informations sur les clients, les contrats et les événements.   
@@ -52,91 +56,100 @@
 #### Besoins individuels   
 
 ##### Équipe de gestion :   
+
 - ``Créer``, ``mettre à jour`` et ``supprimer`` des collaborateurs dans le système **CRM**.   
 - ``Créer`` et ``modifier`` tous les contrats.   
-- Filtrer l’affichage des événements : afficher tous les événements qui n’ont pas de « support » associé.   
+- ``Filtrer l’affichage des événements`` : afficher tous les événements qui n’ont pas de « support » associé.   
 - ``Modifier`` des événements (pour associer un collaborateur support à l’événement).   
 
 #### Besoins individuels   
 
 ##### Équipe commerciale :   
+
 - ``Créer`` des clients (le client leur sera automatiquement associé).   
 - ``Mettre à jour`` les clients dont ils sont responsables.   
 - ``Modifier`` et ``mettre à jour`` les contrats des clients dont ils sont responsables.   
-- Filtrer l’affichage des contrats : afficher tous les contrats qui ne sont pas encore signés, ou qui ne sont pas encore entièrement payés.   
+- ``Filtrer l’affichage des contrats`` : afficher tous les contrats qui ne sont pas encore signés, ou qui ne sont pas encore entièrement payés.   
 - ``Créer`` un événement pour un de leurs clients qui a signé un contrat.   
 
 #### Besoins individuels   
 
 ##### Équipe support :   
-- Filtrer l’affichage des événements : afficher uniquement les événements qui leur sont attribués.   
+
+- ``Filtrer l’affichage des événements`` : afficher uniquement les événements qui leur sont attribués.   
 - ``Mettre à jour`` les événements dont ils sont responsables.   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="fonctionnalités"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Fonctionnalités   
 
 - Opérations d'administration et de gestion des utilisateurs, des clients, des contrats et des événements.   
 - Visualisation des informations et données des utilisateurs, des clients, des contrats et événements.   
 
->_Note : Testé sous **Windows 10** Professionnel - **Python** 3.12.0_   
+>_**Note :** Testé sous **Windows 10** Professionnel - **Python** 3.12.0_   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="liste-pre-requis"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Liste pré-requis   
 
 - Un compte **Sentry** ➔ https://sentry.io/welcome/   
 - Un compte **Postman** ➔ https://www.postman.com/   
+  &nbsp;   
 
 Application conçue avec les technologies suivantes :   
-- **Python** v3.12.0 choisissez la version adaptée à votre ordinateur et système. **Python** est disponible à l'adresse suivante ➔ https://www.python.org/downloads/   
+
+- **Python** v3.12.0 choisissez la version adaptée à votre ordinateur et système.   
+- **Python** est disponible à l'adresse suivante ➔ https://www.python.org/downloads/   
 - **Django** version 4.2.7 ➔ [Documentation Django](https://docs.djangoproject.com/en/5.0/)    
 - **MySQL** version 8.0 ➔ [Documentation MySQL](https://dev.mysql.com/doc/)    
 - **Windows 10** Professionnel   
+  &nbsp;   
 
 - Les scripts **Python** s'exécutent depuis un terminal.   
-- Pour ouvrir un terminal sur Windows, pressez la touche ``windows + r`` et entrez ``cmd``.   
-- Sur **Mac**, pressez la touche ``command + espace`` et entrez ``terminal``.   
-- Sur **Linux**, vous pouvez ouviri un terminal en pressant les touches ``Ctrl + Alt + T``.   
+  - Pour ouvrir un terminal sur **Windows**, pressez la touche ``windows + r`` et entrez ``cmd``.   
+  - Sur **Mac**, pressez la touche ``command + espace`` et entrez ``terminal``.   
+  - Sur **Linux**, vous pouvez ouviri un terminal en pressant les touches ``Ctrl + Alt + T``.   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="creation-environnement"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Création de l'environnement virtuel   
 
 - Installer une version de **Python** compatible pour votre ordinateur.   
-- Une fois installer ouvrer le cmd (terminal) placer vous dans le dossier principal (dossier racine).   
+- Une fois installer ouvrer **le cmd (terminal)** placer vous dans le dossier principal **(dossier racine)**.   
 
 Taper dans votre terminal :    
 
 ```bash   
 $ python -m venv env
 ```   
-Un répertoire appelé ``env`` doit être créé.   
+
+>_**Note :** Un répertoire appelé **env** doit être créé._   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="activation-environnement"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Activation de l'environnement virtuel   
 
-- Placez-vous avec le terminal dans le dossier principale (dossier racine).   
-  Pour activer l'environnement virtuel créé, il vous suffit de taper dans votre terminal :   
+- Placez-vous avec le terminal dans le dossier principale **(dossier racine)**.   
+
+Pour activer l'environnement virtuel créé, il vous suffit de taper dans votre terminal :   
 
 ```bash
 $ env\Scripts\activate.bat
 ```
 - Ce qui ajoutera à chaque début de ligne de commande de votre terminal ``(env)`` :   
->*Note : Pour désactiver l'environnement virtuel, il suffit de taper dans votre terminal :*   
+>_**Note :** Pour désactiver l'environnement virtuel, il suffit de taper dans votre terminal :_  
 
 ```bash
 $ deactivate
@@ -144,12 +157,12 @@ $ deactivate
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="installation-librairies"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Installation des librairies   
 
 - Le programme utilise plusieurs librairies externes et modules de **Python**, qui sont répertoriés dans le fichier ``requirements.txt``.   
-- Placez-vous dans le dossier où se trouve le fichier ``requirements.txt`` `à la racine du projet, l'environnement virtuel doit être activé.   
+- Placez-vous dans le dossier où se trouve le fichier ``requirements.txt`` à la racine du projet, l'environnement virtuel doit être activé.   
 - Pour faire fonctionner l'application, il vous faudra installer les librairies requises.   
 - À l'aide du fichiers ``requirements.txt`` mis à disposition.   
 
@@ -160,8 +173,8 @@ $ pip install -r requirements.txt
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-<div id="installation-bdd"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<div id="installation-SGBD-bdd"></div>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Installation du SGBD MySQL   
 
@@ -169,15 +182,15 @@ $ pip install -r requirements.txt
 - Installer **MySQL** qui est disponible à l'adresse suivante ➔ https://dev.mysql.com/downloads/installer/   
 
 - Une fois le programme téléchargé, lancez-le en double-cliquant dessus, autorisez le programme à s'installer.   
->_Note : Je vous conseille de choisir la version **Serveur only** lors de l'installation._   
+>_**Note :** Je vous conseille de choisir la version **Serveur only** lors de l'installation._   
 
 - Il y a plusieurs manières d'utiliser **MySQL** soit par ``MySQL 8.0 Command Line Client`` une fois **MySQL** installé.   
 - Soit par le terminal CMD de Windows, pour cela il faut créer une variable d'environnement pour ouvrir **MySQL** d'un terminal CMD.   
->_Note : Je vous conseille de créer une variable d'environnement dans le **PATH**._   
+>_**Note :** Je vous conseille de créer une variable d'environnement dans le **PATH**._   
 
 Allez dans ``Paramères avancés du système`` ➔ ``Variables d'environnement`` ➔ ``Variable système`` ➔ ``Path``   
 
-*Cliquez sur ``modifier`` ajoutez les variables suivantes :*   
+>_**Cliquez** sur ``modifier`` ajoutez les variables suivantes :_   
 
 ```bash   
 C:\Program Files\MySQL\MySQL Server 8.0\bin
@@ -188,12 +201,12 @@ Après ces modifications vous pourrez utiliser **MySQL** depuis le terminal CMD.
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-<div id="installation-bdd"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<div id="installation-chargement-bdd"></div>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Installation et chargement de la base de données MySQL   
 
->_Note : Ces commandes sont fonctionnelles si vous avez installer les variables d'environnement dans le **PATH**._   
+>_**Note :** Ces commandes sont fonctionnelles si vous avez installer les variables d'environnement dans le **PATH**._   
 
 - Pour lancer et vous connectez à **MySQL**   
   Lancer un terminal CMD, puis taper la commande :   
@@ -236,10 +249,10 @@ $ source C:\path\to\directory\Epic Events\EpicEvents.sql
 $ exit;
 ```  
 
-<div id="connexion-bdd"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
-
 --------------------------------------------------------------------------------------------------------------------------------
+
+<div id="connexion-bdd"></div>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Connecter l'application à la base de données MySQL   
 
@@ -303,7 +316,7 @@ $ SHOW CREATE TABLE NomDeLaTable;
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="installation-environnement"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Installation des variables d'environnement   
 
@@ -311,8 +324,10 @@ $ SHOW CREATE TABLE NomDeLaTable;
 - De plus, il est nécessaire d'inclure des noms de variables d'environnement préconfigurées tels que :   
 
 ##### Configuration de l'environnement :   
+
 Il est essentiel de configurer l'environnement de l'application.
 - Générez une clé secrète aléatoire pour la configuration de **Django** et incluez des noms de variables d'environnement préconfigurées.   
+
 Utilisez le fichier ``.env``, voici un exemple d'un fichier ``.env`` une fois configuré avec les paramètres :   
 
 ```bash   
@@ -322,7 +337,7 @@ DB_USER=root
 DB_PASSWORD=************
 DB_HOST=127.0.0.1
 DB_PORT=3306
-SENTRY_DSN=https://4e0c26cb1f6e2b2e0cfa9eb9ab598f9a@o4505744249623232.ingest.sentry.io/4506530972696576
+SENTRY_DSN=https://4e2cb1f62e0cfa9eb9a98f9a@o450496232.ingest.sentry.io/4506596576
 ```   
 
 ##### Création du fichier ``.env`` :   
@@ -330,35 +345,37 @@ SENTRY_DSN=https://4e0c26cb1f6e2b2e0cfa9eb9ab598f9a@o4505744249623232.ingest.sen
 À la racine du dossier principal d'**Epic Events**, exécutez le fichier ``create_env.bat`` ➔ ([create_env.bat](create_env.bat)).   
 Double-cliquez dessus pour enregistrer le fichier ``.env`` à la racine du dossier principal.   
 
+![Create .env](/static/img/screen-create-env.png)    
+
 ##### Configuration du fichier ``.env`` :   
 
 Une fois le fichier ``.env`` créé, ouvrez-le avec un éditeur de texte.   
-Remplissez les champs avec les valeurs appropriées pour chaque variable d'environnement.   
-Ces étapes garantissent une configuration correcte de l'environnement nécessaire au bon fonctionnement de l'application **Epic Events**.   
+- Remplissez les champs avec les valeurs appropriées pour chaque variable d'environnement.   
+- Ces étapes garantissent une configuration correcte de l'environnement nécessaire au bon fonctionnement de l'application **Epic Events**.   
 
-> _Note : La clé **SENTRY_DSN** doit être récupérée dans les paramètres de votre compte **Sentry**._   
+>_**Note :** La clé **SENTRY_DSN** doit être récupérée dans les paramètres de votre compte **Sentry**._   
 
-> _Note : Le fichier .env généré doit être configuré avec des valeurs appropriées pour chaque variable d'environnement avant utilisation._   
+>_**Note :** Le fichier **.env** généré doit être configuré avec des valeurs appropriées pour chaque variable d'environnement avant utilisation._   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="administration-bdd"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Administration opérations CRUD et gestionnaire de commmandes   
 
-La gestion des opérations CRUD peut se faire de plusieurs manières :   
+La gestion des opérations **CRUD** peut se faire de plusieurs manières :   
 
 - En utilisant des requêtes sous forme de commandes dans **MySQL**   
 - En utilisant des commandes dans Le shell **Django**   
 - En utilisant le site d'administration de **Django** à l'adresse suivante ➔ http://127.0.0.1:8000/admin/   
 
->_Note : Le site d'administration de **Django** est accessible seulement aux administrateurs et aux utilisateurs de l'équipe gestion._   
+>_**Note :** Le site d'administration de **Django** est accessible seulement aux administrateurs et aux utilisateurs de l'équipe gestion._   
 
 - Dans ce projet, la mise en place d'un gestionnaire de commandes a été réalisée avec les bibliothèques ``Click`` et ``Rich``, ainsi qu'avec ``BaseCommand`` de **Django**.   
 - Ce gestionnaire de commandes fonctionne avec les privilèges administrateur et ne reflète donc pas les permissions et besoins individuels de chaque département.   
 
-> _Note : Les permissions de chaque département sont fonctionnelles et activées, ceci peut être vérifié en utilisant **Postman**._   
+>_**Note :** Les permissions de chaque département sont fonctionnelles et activées, ceci peut être vérifié en utilisant **Postman**._   
 
 **Postman** ➔ [Documentation Postman du projet Epic Events](https://documenter.getpostman.com/view/26427645/2s9Ykkg3Lu)   
 
@@ -442,7 +459,7 @@ $ python manage.py management_event --delete_event [id_event]
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="execution-application"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Exécution de l'application   
 
@@ -459,20 +476,20 @@ $ python manage.py runserver
 - Démarrer le serveur vous permet d'accéder au site d'administration de **Django** à l'adresse suivante ➔ http://127.0.0.1:8000/admin/   
 - D'utiliser les requêtes ``GET``, ``POST``, ``PUT``, ``DEL`` lors de l'utilisation de **Postman**.   
 
->_Note : Le site d'administration de **Django** est accessible seulement aux administrateurs et aux utilisateurs de l'équipe gestion._   
+>_**Note :** Le site d'administration de **Django** est accessible seulement aux administrateurs et aux utilisateurs de l'équipe gestion._   
 
->*Note navigateur : Les tests ont était fait sur **Firefox** et **Google Chrome**.*   
+>_**Note navigateur :** Les tests ont était fait sur **Firefox** et **Google Chrome**._   
 
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="tests-pytest"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Tests avec Pytest   
 
 - Nous effectuons des tests unitaires et d'intégrations de plusieurs manières pour garantir la qualité du code.   
 
->*Note : Pour exécuter les tests il est nécessaire d'avoir activer l'environnement virtuel, mais il n'est pas nécessaire de lancer le serveur **Django**.*    
+>_**Note :** Pour exécuter les tests il est nécessaire d'avoir activer l'environnement virtuel, mais il n'est pas nécessaire de lancer le serveur **Django**._    
 
 #### Exécution de Pytest   
 
@@ -485,7 +502,7 @@ $ pytest
 
 ```js   
 (env) C:\Epic Events>pytest
-=========================================== test session starts ===========================================
+======================================= test session starts =======================================
 platform win32 -- Python 3.12.0, pytest-7.4.3, pluggy-1.3.0 -- C:\Epic Events\env\Scripts\python.exe
 cachedir: .pytest_cache
 django: version: 4.2.7, settings: EpicEvents.settings (from ini)  
@@ -494,75 +511,75 @@ configfile: setup.cfg
 plugins: cov-4.1.0, django-4.7.0, time-machine-2.13.0
 collected 67 items
 
-contracts/tests.py::TestContractsApp::test_contract_print_details PASSED                             [  1%]
-contracts/tests.py::TestContractsApp::test_contract_str_representation PASSED                        [  2%]
-contracts/tests.py::TestContractsApp::test_save_method PASSED                                        [  4%]
-contracts/tests.py::TestContractViewSet::test_all_contracts_details PASSED                           [  5%]
-contracts/tests.py::TestContractViewSet::test_contract_details PASSED                                [  7%]
-contracts/tests.py::TestContractViewSet::test_contract_details_unauthorized_user PASSED              [  8%]
-contracts/tests.py::TestContractViewSet::test_contracts_list PASSED                                  [ 10%]
-contracts/tests.py::TestContractViewSet::test_create_contract PASSED                                 [ 11%]
-contracts/tests.py::TestContractViewSet::test_create_contract_unauthorized_user PASSED               [ 13%]
-contracts/tests.py::TestContractViewSet::test_destroy_contract PASSED                                [ 14%]
-contracts/tests.py::TestContractViewSet::test_destroy_contract_unauthorized_user PASSED              [ 16%]
-contracts/tests.py::TestContractViewSet::test_filtered_contracts PASSED                              [ 17%]
-contracts/tests.py::TestContractViewSet::test_update_contract PASSED                                 [ 19%]
-contracts/tests.py::TestContractViewSet::test_update_contract_unauthorized_user PASSED               [ 20%]
-events/tests.py::TestEventsApp::test_event_print_details PASSED                                      [ 22%]
-events/tests.py::TestEventsApp::test_event_str_representation PASSED                                 [ 23%]
-events/tests.py::TestEventsApp::test_save_method PASSED                                              [ 25%]
-events/tests.py::TestEventViewSet::test_all_events_details PASSED                                    [ 26%]
-events/tests.py::TestEventViewSet::test_create_event PASSED                                          [ 28%]
-events/tests.py::TestEventViewSet::test_create_event_already_exists PASSED                           [ 29%]
-events/tests.py::TestEventViewSet::test_create_event_contract_not_signed PASSED                      [ 31%]
-events/tests.py::TestEventViewSet::test_create_event_unauthorized_user PASSED                        [ 32%]
-events/tests.py::TestEventViewSet::test_destroy_event PASSED                                         [ 34%]
-events/tests.py::TestEventViewSet::test_destroy_event_unauthorized_user PASSED                       [ 35%]
-events/tests.py::TestEventViewSet::test_event_details PASSED                                         [ 37%]
-events/tests.py::TestEventViewSet::test_event_details_unauthorized_user PASSED                       [ 38%]
-events/tests.py::TestEventViewSet::test_events_list PASSED                                           [ 40%]
-events/tests.py::TestEventViewSet::test_events_without_support PASSED                                [ 41%]
-events/tests.py::TestEventViewSet::test_update_event PASSED                                          [ 43%]
-events/tests.py::TestEventViewSet::test_update_event_unauthorized_user PASSED                        [ 44%]
-profiles/tests.py::TestProfilesApp::test_add_client_to_group PASSED                                  [ 46%]
-profiles/tests.py::TestProfilesApp::test_assign_sales_contact PASSED                                 [ 47%]
-profiles/tests.py::TestProfilesApp::test_create_client1 PASSED                                       [ 49%]
-profiles/tests.py::TestProfilesApp::test_create_client2 PASSED                                       [ 50%]
-profiles/tests.py::TestProfilesApp::test_create_superuser PASSED                                     [ 52%]
-profiles/tests.py::TestProfilesApp::test_create_superuser_invalid_attributes PASSED                  [ 53%]
-profiles/tests.py::TestProfilesApp::test_create_user_management PASSED                               [ 55%]
-profiles/tests.py::TestProfilesApp::test_create_user_sales PASSED                                    [ 56%]
-profiles/tests.py::TestProfilesApp::test_create_user_support PASSED                                  [ 58%]
-profiles/tests.py::TestProfilesApp::test_create_user_with_empty_email PASSED                         [ 59%]
-profiles/tests.py::TestProfilesApp::test_has_module_perms PASSED                                     [ 61%]
-profiles/tests.py::TestProfilesApp::test_has_perm PASSED                                             [ 62%]
-profiles/tests.py::TestProfilesApp::test_obtain_jwt_token_url PASSED                                 [ 64%]
-profiles/tests.py::TestProfilesApp::test_refresh_jwt_token_url PASSED                                [ 65%]
-profiles/tests.py::TestProfilesApp::test_str_method_with_sales_contact PASSED                        [ 67%]
-profiles/tests.py::TestLoginViewSet::test_user_login_inactive_account PASSED                         [ 68%]
-profiles/tests.py::TestLoginViewSet::test_user_login_invalid_credentials PASSED                      [ 70%]
-profiles/tests.py::TestLoginViewSet::test_user_login_successful PASSED                               [ 71%]
-profiles/tests.py::TestClientViewSet::test_all_clients_details PASSED                                [ 73%]
-profiles/tests.py::TestClientViewSet::test_client_details PASSED                                     [ 74%]
-profiles/tests.py::TestClientViewSet::test_client_details_unauthorized_user PASSED                   [ 76%]
-profiles/tests.py::TestClientViewSet::test_clients_list PASSED                                       [ 77%]
-profiles/tests.py::TestClientViewSet::test_create_client PASSED                                      [ 79%]
-profiles/tests.py::TestClientViewSet::test_create_clients_unauthorized_user PASSED                   [ 80%]
-profiles/tests.py::TestClientViewSet::test_destroy_client PASSED                                     [ 82%]
-profiles/tests.py::TestClientViewSet::test_destroy_client_unauthorized_user PASSED                   [ 83%]
-profiles/tests.py::TestClientViewSet::test_update_client PASSED                                      [ 85%]
-profiles/tests.py::TestClientViewSet::test_update_client_unauthorized_user PASSED                    [ 86%]
-profiles/tests.py::TestUserViewSet::test_all_users_details PASSED                                    [ 88%]
-profiles/tests.py::TestUserViewSet::test_create_user PASSED                                          [ 89%]
-profiles/tests.py::TestUserViewSet::test_create_user_unauthorized_user PASSED                        [ 91%]
-profiles/tests.py::TestUserViewSet::test_destroy_user PASSED                                         [ 92%]
-profiles/tests.py::TestUserViewSet::test_destroy_user_unauthorized_user PASSED                       [ 94%]
-profiles/tests.py::TestUserViewSet::test_update_user PASSED                                          [ 95%]
-profiles/tests.py::TestUserViewSet::test_update_user_unauthorized_user PASSED                        [ 97%]
-profiles/tests.py::TestUserViewSet::test_user_details PASSED                                         [ 98%]
-profiles/tests.py::TestUserViewSet::test_users_list PASSED                                           [100%]
+contracts/tests.py::TestContractsApp::test_contract_print_details PASSED                       [1%]
+contracts/tests.py::TestContractsApp::test_contract_str_representation PASSED                  [2%]
+contracts/tests.py::TestContractsApp::test_save_method PASSED                                  [4%]
+contracts/tests.py::TestContractViewSet::test_all_contracts_details PASSED                     [5%]
+contracts/tests.py::TestContractViewSet::test_contract_details PASSED                          [7%]
+contracts/tests.py::TestContractViewSet::test_contract_details_unauthorized_user PASSED        [8%]
+contracts/tests.py::TestContractViewSet::test_contracts_list PASSED                           [10%]
+contracts/tests.py::TestContractViewSet::test_create_contract PASSED                          [11%]
+contracts/tests.py::TestContractViewSet::test_create_contract_unauthorized_user PASSED        [13%]
+contracts/tests.py::TestContractViewSet::test_destroy_contract PASSED                         [14%]
+contracts/tests.py::TestContractViewSet::test_destroy_contract_unauthorized_user PASSED       [16%]
+contracts/tests.py::TestContractViewSet::test_filtered_contracts PASSED                       [17%]
+contracts/tests.py::TestContractViewSet::test_update_contract PASSED                          [19%]
+contracts/tests.py::TestContractViewSet::test_update_contract_unauthorized_user PASSED        [20%]
+events/tests.py::TestEventsApp::test_event_print_details PASSED                               [22%]
+events/tests.py::TestEventsApp::test_event_str_representation PASSED                          [23%]
+events/tests.py::TestEventsApp::test_save_method PASSED                                       [25%]
+events/tests.py::TestEventViewSet::test_all_events_details PASSED                             [26%]
+events/tests.py::TestEventViewSet::test_create_event PASSED                                   [28%]
+events/tests.py::TestEventViewSet::test_create_event_already_exists PASSED                    [29%]
+events/tests.py::TestEventViewSet::test_create_event_contract_not_signed PASSED               [31%]
+events/tests.py::TestEventViewSet::test_create_event_unauthorized_user PASSED                 [32%]
+events/tests.py::TestEventViewSet::test_destroy_event PASSED                                  [34%]
+events/tests.py::TestEventViewSet::test_destroy_event_unauthorized_user PASSED                [35%]
+events/tests.py::TestEventViewSet::test_event_details PASSED                                  [37%]
+events/tests.py::TestEventViewSet::test_event_details_unauthorized_user PASSED                [38%]
+events/tests.py::TestEventViewSet::test_events_list PASSED                                    [40%]
+events/tests.py::TestEventViewSet::test_events_without_support PASSED                         [41%]
+events/tests.py::TestEventViewSet::test_update_event PASSED                                   [43%]
+events/tests.py::TestEventViewSet::test_update_event_unauthorized_user PASSED                 [44%]
+profiles/tests.py::TestProfilesApp::test_add_client_to_group PASSED                           [46%]
+profiles/tests.py::TestProfilesApp::test_assign_sales_contact PASSED                          [47%]
+profiles/tests.py::TestProfilesApp::test_create_client1 PASSED                                [49%]
+profiles/tests.py::TestProfilesApp::test_create_client2 PASSED                                [50%]
+profiles/tests.py::TestProfilesApp::test_create_superuser PASSED                              [52%]
+profiles/tests.py::TestProfilesApp::test_create_superuser_invalid_attributes PASSED           [53%]
+profiles/tests.py::TestProfilesApp::test_create_user_management PASSED                        [55%]
+profiles/tests.py::TestProfilesApp::test_create_user_sales PASSED                             [56%]
+profiles/tests.py::TestProfilesApp::test_create_user_support PASSED                           [58%]
+profiles/tests.py::TestProfilesApp::test_create_user_with_empty_email PASSED                  [59%]
+profiles/tests.py::TestProfilesApp::test_has_module_perms PASSED                              [61%]
+profiles/tests.py::TestProfilesApp::test_has_perm PASSED                                      [62%]
+profiles/tests.py::TestProfilesApp::test_obtain_jwt_token_url PASSED                          [64%]
+profiles/tests.py::TestProfilesApp::test_refresh_jwt_token_url PASSED                         [65%]
+profiles/tests.py::TestProfilesApp::test_str_method_with_sales_contact PASSED                 [67%]
+profiles/tests.py::TestLoginViewSet::test_user_login_inactive_account PASSED                  [68%]
+profiles/tests.py::TestLoginViewSet::test_user_login_invalid_credentials PASSED               [70%]
+profiles/tests.py::TestLoginViewSet::test_user_login_successful PASSED                        [71%]
+profiles/tests.py::TestClientViewSet::test_all_clients_details PASSED                         [73%]
+profiles/tests.py::TestClientViewSet::test_client_details PASSED                              [74%]
+profiles/tests.py::TestClientViewSet::test_client_details_unauthorized_user PASSED            [76%]
+profiles/tests.py::TestClientViewSet::test_clients_list PASSED                                [77%]
+profiles/tests.py::TestClientViewSet::test_create_client PASSED                               [79%]
+profiles/tests.py::TestClientViewSet::test_create_clients_unauthorized_user PASSED            [80%]
+profiles/tests.py::TestClientViewSet::test_destroy_client PASSED                              [82%]
+profiles/tests.py::TestClientViewSet::test_destroy_client_unauthorized_user PASSED            [83%]
+profiles/tests.py::TestClientViewSet::test_update_client PASSED                               [85%]
+profiles/tests.py::TestClientViewSet::test_update_client_unauthorized_user PASSED             [86%]
+profiles/tests.py::TestUserViewSet::test_all_users_details PASSED                             [88%]
+profiles/tests.py::TestUserViewSet::test_create_user PASSED                                   [89%]
+profiles/tests.py::TestUserViewSet::test_create_user_unauthorized_user PASSED                 [91%]
+profiles/tests.py::TestUserViewSet::test_destroy_user PASSED                                  [92%]
+profiles/tests.py::TestUserViewSet::test_destroy_user_unauthorized_user PASSED                [94%]
+profiles/tests.py::TestUserViewSet::test_update_user PASSED                                   [95%]
+profiles/tests.py::TestUserViewSet::test_update_user_unauthorized_user PASSED                 [97%]
+profiles/tests.py::TestUserViewSet::test_user_details PASSED                                  [98%]
+profiles/tests.py::TestUserViewSet::test_users_list PASSED                                   [100%]
 
-===================================== 67 passed in 277.36s (0:04:37) ======================================
+================================= 67 passed in 277.36s (0:04:37) ==================================
 ```   
 - Pour afficher plus d'informations sur les tests lors de leurs exécutions vous pouvez utiliser la commande :   
 
@@ -573,7 +590,7 @@ $ pytest -v -s
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="tests-coverage"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 #### Tests de couverture de code avec Coverage   
 
@@ -599,7 +616,7 @@ profiles\views.py       146     18    88%
 TOTAL                   503     39    92%
 
 
-===================================== 67 passed in 284.05s (0:04:44) ======================================
+=================== 67 passed in 284.05s (0:04:44) ====================
 ```   
 
 Renvoie : **92%** de couverture de code.   
@@ -618,8 +635,25 @@ $ pytest --cov=. --cov-report html
 
 --------------------------------------------------------------------------------------------------------------------------------
 
+<div id="monitoring-sentry"></div>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
+
+### Monitoring avec Sentry   
+
+La surveillance (ou monitoring) sur **Sentry** s'effectue en accédant à votre tableau de bord après avoir créé un projet et récupéré les informations nécessaires (**clé DSN**).   
+
+- **Sentry** ➔ https://sentry.io/welcome/   
+- Des déclencheurs ont été configurés au niveau des vues de l'application.   
+- Ces déclencheurs sont activés lorsqu'un utilisateur tente d'accéder à des opérations d'administration sans autorisation.   
+- Cela déclenchera une alerte qui sera envoyée à **Sentry**.   
+
+Voici un exemple d'alerte sur la capture d'écran suivante :
+![Sentry monitoring](/static/img/screen_sentry.png) 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
 <div id="rapport-flake8"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Rapport avec flake8   
 
@@ -633,7 +667,7 @@ $ flake8
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="informations-importantes"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Informations importantes sur les différents fichiers et dossiers   
 
@@ -677,7 +711,7 @@ $ flake8
 --------------------------------------------------------------------------------------------------------------------------------
 
 <div id="auteur-contact"></div>
-<a href="#top" style="float: right;">Retour en haut ↑</a>
+<a href="#top" style="float: right;">Retour en haut 🡅</a>
 
 ### Auteur et contact   
 
