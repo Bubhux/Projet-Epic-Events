@@ -45,12 +45,12 @@ class EventAdmin(admin.ModelAdmin):
                 - Le formulaire personnalisé.
         """
         form = super().get_form(request, obj, **kwargs)
-        # Limitez les choix du champ contract aux contrats du client associé
+        # Limite les choix du champ contract aux contrats du client associé
         if obj:
             client_id = obj.client_id
             form.base_fields['contract'].queryset = form.base_fields['contract'].queryset.filter(client_id=client_id)
         return form
 
 
-# Enregistrer la classe EventAdmin avec le modèle Event
+# Enregistre la classe EventAdmin avec le modèle Event
 admin.site.register(Event, EventAdmin)

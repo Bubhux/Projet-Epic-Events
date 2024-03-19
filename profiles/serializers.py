@@ -169,9 +169,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ]
 
     def validate_password(self, value):
-        # Vérifier que le mot de passe n'est pas vide
+        # Vérifie que le mot de passe n'est pas vide
         if value is not None:
-            # Hacher le mot de passe avant de l'enregistrer
+            # Hach le mot de passe avant de l'enregistrer
             return make_password(value)
         # Le mot de passe est vide, lever une erreur de validation
         raise ValidationError("Le mot de passe est vide")

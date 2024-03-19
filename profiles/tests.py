@@ -507,11 +507,11 @@ class TestClientViewSet(TestCase):
             user_contact=self.sales_user2
         )
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         self.access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         self.access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -591,7 +591,7 @@ class TestClientViewSet(TestCase):
         self.assertTrue(len(response.data) > 0)
 
     def test_create_client(self):
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -624,7 +624,7 @@ class TestClientViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], new_client_data["email"])
 
     def test_create_clients_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -655,7 +655,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -725,7 +725,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -756,7 +756,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client2 est associé à sales_user2
         self.assertEqual(self.client2.user_contact, self.sales_user2)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -830,15 +830,15 @@ class TestUserViewSet(TestCase):
             is_staff=True
         )
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management = RefreshToken.for_user(self.management_user)
         self.access_token_management = str(refresh_management.access_token)
 
-        # Créer un jeton d'accès pour sales_user
+        # Crée un jeton d'accès pour sales_user
         refresh_sales = RefreshToken.for_user(self.sales_user)
         self.access_token_sales = str(refresh_sales.access_token)
 
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support = RefreshToken.for_user(self.support_user)
         self.access_token_support = str(refresh_support.access_token)
 
@@ -900,7 +900,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -935,7 +935,7 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], new_user_data["email"])
 
     def test_create_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour sales_user
+        # Crée un jeton d'accès pour sales_user
         refresh_sales_user = RefreshToken.for_user(self.sales_user)
         access_token_sales_user = str(refresh_sales_user.access_token)
 
@@ -968,7 +968,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -1039,7 +1039,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -1069,7 +1069,7 @@ class TestUserViewSet(TestCase):
         self.assertIn("User successfully deleted.", response.data.get("message"))
 
     def test_destroy_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support_user = RefreshToken.for_user(self.support_user)
         access_token_support_user = str(refresh_support_user.access_token)
 

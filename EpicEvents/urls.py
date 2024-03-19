@@ -74,11 +74,11 @@ urlpatterns = [
     ),
 
     # Configure le chemin pour l'action 'all_contracts_details' et 'contract_details'
-    path('crm/contract/all_contracts_details/', ContractViewSet.as_view(
+    path('crm/contracts/all_contracts_details/', ContractViewSet.as_view(
         {'get': 'all_contracts_details'}), name='all-contracts-details'
     ),
 
-    path('crm/contract/contract_details/<int:pk>/', ContractViewSet.as_view(
+    path('crm/contracts/contract_details/<int:pk>/', ContractViewSet.as_view(
         {'get': 'contract_details'}), name='contract-details'
     ),
 

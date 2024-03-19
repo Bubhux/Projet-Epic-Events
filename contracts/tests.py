@@ -100,7 +100,7 @@ class TestContractsApp(TestCase):
         expected_str_signed = f"Contrat ID : {self.contract_user.id} Contract signed - {self.client_user.full_name}"
         self.assertEqual(str(self.contract_user), expected_str_signed)
 
-        # Définies de nouvelles valeurs pour "Contrat non signé" et "Aucun client"
+        # Définis de nouvelles valeurs pour "Contrat non signé" et "Aucun client"
         self.contract_user.status_contract = False
         self.contract_user.client = None
 
@@ -272,15 +272,15 @@ class TestContractViewSet(TestCase):
             sales_contact=self.sales_user1
         )
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         self.access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
-        # Créer un jeton d'accès pour sales_user2
+        # Crée un jeton d'accès pour sales_user2
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         self.access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         self.access_token_management_user = str(refresh_management_user.access_token)
 
@@ -362,7 +362,7 @@ class TestContractViewSet(TestCase):
         self.assertTrue(len(response.data) > 0)
 
     def test_filtered_contracts(self):
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -396,7 +396,7 @@ class TestContractViewSet(TestCase):
                 self.assertFalse(contract['status_contract'])
 
     def test_create_contract(self):
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -432,7 +432,7 @@ class TestContractViewSet(TestCase):
         self.assertEqual(response.data["data"]["sales_contact"], new_contract_data["sales_contact"])
 
     def test_create_contract_unauthorized_user(self):
-        # Créer un jeton d'accès pour sales_user2
+        # Crée un jeton d'accès pour sales_user2
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
@@ -464,7 +464,7 @@ class TestContractViewSet(TestCase):
         # Assure que le contract_user1 est associé à sales_user1
         self.assertEqual(self.contract_user1.sales_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -538,7 +538,7 @@ class TestContractViewSet(TestCase):
         # Assure que le contract_user1 est associé à sales_user1
         self.assertEqual(self.contract_user1.sales_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 

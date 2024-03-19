@@ -81,7 +81,7 @@ class Command(BaseCommand):
             company_name = self.colored_prompt('Nom de l\'entreprise du client', color=Fore.CYAN)
 
             try:
-                # Créer un nouveau client
+                # Crée un nouveau client
                 client = Client.objects.create(
                     email=email,
                     full_name=full_name,
