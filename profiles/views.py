@@ -100,7 +100,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def clients_list(self, request):
-        """Renvoie tous les clients."""
+        """Renvoie tous les clients associé à l'utilisateur."""
         clients = Client.objects.filter(user_contact=request.user)
         serializer = ClientDetailSerializer(clients, many=True)
         return Response(serializer.data)
