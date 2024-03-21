@@ -524,6 +524,20 @@ class TestClientViewSet(TestCase):
         User.objects.all().delete()
         Client.objects.all().delete()
 
+    def test_clients_list_associated_to_user(self):
+        # Test de la vue clients_list
+        url = '/crm/clients/clients_list/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales_user1}')
+
+        # Vérifie si le code de statut de la réponse est 200
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les détails du client1
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], 'Jeff@EpicEvents.com')
+
+        print("Response Data:", response.data)
+
     def test_clients_list(self):
         # Test de la vue clients_list
         url = '/crm/clients/'
@@ -849,6 +863,23 @@ class TestUserViewSet(TestCase):
         """
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
+
+    def test_returns_details_specific_user(self):
+        # Test de la vue user_details
+        url = f'/crm/users/{self.support_user.pk}/user_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales}')
+
+        # Vérifie si la réponse est 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les détails de l'utilisateur
+        self.assertEqual(response.data['email'], self.support_user.email)
+        self.assertEqual(response.data['role'], self.support_user.role)
+        self.assertEqual(response.data['full_name'], self.support_user.full_name)
+        self.assertEqual(response.data['phone_number'], self.support_user.phone_number)
+        self.assertEqual(response.data['is_staff'], self.support_user.is_staff)
+
+        print("Response Data:", response.data)
 
     def test_users_list(self):
         # Test la vue users_list
