@@ -1,4 +1,4 @@
 [flake8]
 exclude = env, .git, .gitignore, **/migrations/**
 max-line-length = 120
-ignore = F401, F811
+ignore = F401, F811, F841

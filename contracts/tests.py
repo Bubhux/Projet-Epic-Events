@@ -294,6 +294,21 @@ class TestContractViewSet(TestCase):
         Client.objects.all().delete()
         Contract.objects.all().delete()
 
+    def test_returns_all_contracts_associated_to_user(self):
+        url = '/crm/contracts/contracts_list/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales_user1}')
+
+        # Vérifie si la réponse est 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les détails des contrats associés à l'utilisateur connecté
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(str(response.data[0]['total_amount']), str(self.contract_user1.total_amount))
+        self.assertEqual(str(response.data[1]['total_amount']), str(self.contract_user2.total_amount))
+        self.assertEqual(str(response.data[2]['total_amount']), str(self.contract_user3.total_amount))
+
+        print("Response Data:", response.data)
+
     def test_contracts_list(self):
         # Test de la vue contract_list
         url = '/crm/contracts/'

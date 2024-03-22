@@ -302,8 +302,8 @@ $ SHOW COLUMNS FROM NomDeLaTable;
 ```bash   
 $ SELECT * FROM NomDeLaTable;
 
-#Cette requête est utilisée pour afficher la déclaration SQL complète nécessaire pour recréer une table existante, y compris tous ses indices, contraintes et autres propriétés.
-#Cette requête retourne un ensemble de résultats avec une colonne appelée "Create Table" qui contient la déclaration SQL complète de la table spécifiée.
+# Cette requête est utilisée pour afficher la déclaration SQL complète nécessaire pour recréer une table existante, y compris tous ses indices, contraintes et autres propriétés.
+# Cette requête retourne un ensemble de résultats avec une colonne appelée "Create Table" qui contient la déclaration SQL complète de la table spécifiée.
 $ SHOW CREATE TABLE NomDeLaTable;
 ```   
 
@@ -505,11 +505,11 @@ $ pytest
 ======================================= test session starts =======================================
 platform win32 -- Python 3.12.0, pytest-7.4.3, pluggy-1.3.0 -- C:\Epic Events\env\Scripts\python.exe
 cachedir: .pytest_cache
-django: version: 4.2.7, settings: EpicEvents.settings (from ini)  
+django: version: 4.2.7, settings: EpicEvents.settings (from ini)
 rootdir: C:\Epic Events
 configfile: setup.cfg
 plugins: cov-4.1.0, django-4.7.0, time-machine-2.13.0
-collected 67 items
+collected 70 items
 
 contracts/tests.py::TestContractsApp::test_contract_print_details PASSED                       [1%]
 contracts/tests.py::TestContractsApp::test_contract_str_representation PASSED                  [2%]
@@ -519,18 +519,19 @@ contracts/tests.py::TestContractViewSet::test_contract_details PASSED           
 contracts/tests.py::TestContractViewSet::test_contract_details_unauthorized_user PASSED        [8%]
 contracts/tests.py::TestContractViewSet::test_contracts_list PASSED                           [10%]
 contracts/tests.py::TestContractViewSet::test_create_contract PASSED                          [11%]
-contracts/tests.py::TestContractViewSet::test_create_contract_unauthorized_user PASSED        [13%]
+contracts/tests.py::TestContractViewSet::test_create_contract_unauthorized_user PASSED        [12%]
 contracts/tests.py::TestContractViewSet::test_destroy_contract PASSED                         [14%]
-contracts/tests.py::TestContractViewSet::test_destroy_contract_unauthorized_user PASSED       [16%]
+contracts/tests.py::TestContractViewSet::test_destroy_contract_unauthorized_user PASSED       [15%]
 contracts/tests.py::TestContractViewSet::test_filtered_contracts PASSED                       [17%]
-contracts/tests.py::TestContractViewSet::test_update_contract PASSED                          [19%]
-contracts/tests.py::TestContractViewSet::test_update_contract_unauthorized_user PASSED        [20%]
+contracts/tests.py::TestContractViewSet::test_returns_all_contracts_associated_to_user PASSED [18%]
+contracts/tests.py::TestContractViewSet::test_update_contract PASSED                          [20%]
+contracts/tests.py::TestContractViewSet::test_update_contract_unauthorized_user PASSED        [21%]
 events/tests.py::TestEventsApp::test_event_print_details PASSED                               [22%]
-events/tests.py::TestEventsApp::test_event_str_representation PASSED                          [23%]
+events/tests.py::TestEventsApp::test_event_str_representation PASSED                          [24%]
 events/tests.py::TestEventsApp::test_save_method PASSED                                       [25%]
-events/tests.py::TestEventViewSet::test_all_events_details PASSED                             [26%]
+events/tests.py::TestEventViewSet::test_all_events_details PASSED                             [27%]
 events/tests.py::TestEventViewSet::test_create_event PASSED                                   [28%]
-events/tests.py::TestEventViewSet::test_create_event_already_exists PASSED                    [29%]
+events/tests.py::TestEventViewSet::test_create_event_already_exists PASSED                    [30%]
 events/tests.py::TestEventViewSet::test_create_event_contract_not_signed PASSED               [31%]
 events/tests.py::TestEventViewSet::test_create_event_unauthorized_user PASSED                 [32%]
 events/tests.py::TestEventViewSet::test_destroy_event PASSED                                  [34%]
@@ -539,47 +540,49 @@ events/tests.py::TestEventViewSet::test_event_details PASSED                    
 events/tests.py::TestEventViewSet::test_event_details_unauthorized_user PASSED                [38%]
 events/tests.py::TestEventViewSet::test_events_list PASSED                                    [40%]
 events/tests.py::TestEventViewSet::test_events_without_support PASSED                         [41%]
-events/tests.py::TestEventViewSet::test_update_event PASSED                                   [43%]
+events/tests.py::TestEventViewSet::test_update_event PASSED                                   [42%]
 events/tests.py::TestEventViewSet::test_update_event_unauthorized_user PASSED                 [44%]
-profiles/tests.py::TestProfilesApp::test_add_client_to_group PASSED                           [46%]
+profiles/tests.py::TestProfilesApp::test_add_client_to_group PASSED                           [45%]
 profiles/tests.py::TestProfilesApp::test_assign_sales_contact PASSED                          [47%]
-profiles/tests.py::TestProfilesApp::test_create_client1 PASSED                                [49%]
+profiles/tests.py::TestProfilesApp::test_create_client1 PASSED                                [48%]
 profiles/tests.py::TestProfilesApp::test_create_client2 PASSED                                [50%]
-profiles/tests.py::TestProfilesApp::test_create_superuser PASSED                              [52%]
-profiles/tests.py::TestProfilesApp::test_create_superuser_invalid_attributes PASSED           [53%]
-profiles/tests.py::TestProfilesApp::test_create_user_management PASSED                        [55%]
-profiles/tests.py::TestProfilesApp::test_create_user_sales PASSED                             [56%]
-profiles/tests.py::TestProfilesApp::test_create_user_support PASSED                           [58%]
-profiles/tests.py::TestProfilesApp::test_create_user_with_empty_email PASSED                  [59%]
-profiles/tests.py::TestProfilesApp::test_has_module_perms PASSED                              [61%]
-profiles/tests.py::TestProfilesApp::test_has_perm PASSED                                      [62%]
-profiles/tests.py::TestProfilesApp::test_obtain_jwt_token_url PASSED                          [64%]
-profiles/tests.py::TestProfilesApp::test_refresh_jwt_token_url PASSED                         [65%]
-profiles/tests.py::TestProfilesApp::test_str_method_with_sales_contact PASSED                 [67%]
-profiles/tests.py::TestLoginViewSet::test_user_login_inactive_account PASSED                  [68%]
-profiles/tests.py::TestLoginViewSet::test_user_login_invalid_credentials PASSED               [70%]
-profiles/tests.py::TestLoginViewSet::test_user_login_successful PASSED                        [71%]
-profiles/tests.py::TestClientViewSet::test_all_clients_details PASSED                         [73%]
-profiles/tests.py::TestClientViewSet::test_client_details PASSED                              [74%]
-profiles/tests.py::TestClientViewSet::test_client_details_unauthorized_user PASSED            [76%]
-profiles/tests.py::TestClientViewSet::test_clients_list PASSED                                [77%]
-profiles/tests.py::TestClientViewSet::test_create_client PASSED                               [79%]
+profiles/tests.py::TestProfilesApp::test_create_superuser PASSED                              [51%]
+profiles/tests.py::TestProfilesApp::test_create_superuser_invalid_attributes PASSED           [52%]
+profiles/tests.py::TestProfilesApp::test_create_user_management PASSED                        [54%]
+profiles/tests.py::TestProfilesApp::test_create_user_sales PASSED                             [55%]
+profiles/tests.py::TestProfilesApp::test_create_user_support PASSED                           [57%]
+profiles/tests.py::TestProfilesApp::test_create_user_with_empty_email PASSED                  [58%]
+profiles/tests.py::TestProfilesApp::test_has_module_perms PASSED                              [60%]
+profiles/tests.py::TestProfilesApp::test_has_perm PASSED                                      [61%]
+profiles/tests.py::TestProfilesApp::test_obtain_jwt_token_url PASSED                          [62%]
+profiles/tests.py::TestProfilesApp::test_refresh_jwt_token_url PASSED                         [64%]
+profiles/tests.py::TestProfilesApp::test_str_method_with_sales_contact PASSED                 [65%]
+profiles/tests.py::TestLoginViewSet::test_user_login_inactive_account PASSED                  [67%]
+profiles/tests.py::TestLoginViewSet::test_user_login_invalid_credentials PASSED               [68%]
+profiles/tests.py::TestLoginViewSet::test_user_login_successful PASSED                        [70%]
+profiles/tests.py::TestClientViewSet::test_all_clients_details PASSED                         [71%]
+profiles/tests.py::TestClientViewSet::test_client_details PASSED                              [72%]
+profiles/tests.py::TestClientViewSet::test_client_details_unauthorized_user PASSED            [74%]
+profiles/tests.py::TestClientViewSet::test_clients_list PASSED                                [75%]
+profiles/tests.py::TestClientViewSet::test_clients_list_associated_to_user PASSED             [77%]
+profiles/tests.py::TestClientViewSet::test_create_client PASSED                               [78%]
 profiles/tests.py::TestClientViewSet::test_create_clients_unauthorized_user PASSED            [80%]
-profiles/tests.py::TestClientViewSet::test_destroy_client PASSED                              [82%]
-profiles/tests.py::TestClientViewSet::test_destroy_client_unauthorized_user PASSED            [83%]
-profiles/tests.py::TestClientViewSet::test_update_client PASSED                               [85%]
-profiles/tests.py::TestClientViewSet::test_update_client_unauthorized_user PASSED             [86%]
-profiles/tests.py::TestUserViewSet::test_all_users_details PASSED                             [88%]
-profiles/tests.py::TestUserViewSet::test_create_user PASSED                                   [89%]
-profiles/tests.py::TestUserViewSet::test_create_user_unauthorized_user PASSED                 [91%]
-profiles/tests.py::TestUserViewSet::test_destroy_user PASSED                                  [92%]
-profiles/tests.py::TestUserViewSet::test_destroy_user_unauthorized_user PASSED                [94%]
+profiles/tests.py::TestClientViewSet::test_destroy_client PASSED                              [81%]
+profiles/tests.py::TestClientViewSet::test_destroy_client_unauthorized_user PASSED            [82%]
+profiles/tests.py::TestClientViewSet::test_update_client PASSED                               [84%]
+profiles/tests.py::TestClientViewSet::test_update_client_unauthorized_user PASSED             [85%]
+profiles/tests.py::TestUserViewSet::test_all_users_details PASSED                             [87%]
+profiles/tests.py::TestUserViewSet::test_create_user PASSED                                   [88%]
+profiles/tests.py::TestUserViewSet::test_create_user_unauthorized_user PASSED                 [90%]
+profiles/tests.py::TestUserViewSet::test_destroy_user PASSED                                  [91%]
+profiles/tests.py::TestUserViewSet::test_destroy_user_unauthorized_user PASSED                [92%]
+profiles/tests.py::TestUserViewSet::test_returns_details_specific_user PASSED                 [94%]
 profiles/tests.py::TestUserViewSet::test_update_user PASSED                                   [95%]
 profiles/tests.py::TestUserViewSet::test_update_user_unauthorized_user PASSED                 [97%]
 profiles/tests.py::TestUserViewSet::test_user_details PASSED                                  [98%]
 profiles/tests.py::TestUserViewSet::test_users_list PASSED                                   [100%]
 
-================================= 67 passed in 277.36s (0:04:37) ==================================
+================================= 70 passed in 312.21s (0:05:12) ==================================
 ```   
 - Pour afficher plus d'informations sur les tests lors de leurs exécutions vous pouvez utiliser la commande :   
 
@@ -607,19 +610,19 @@ $ pytest --cov=.
 Name                  Stmts   Miss  Cover
 -----------------------------------------
 contracts\models.py      30      1    97%
-contracts\views.py       79      5    94%
+contracts\views.py       81      3    96%
 events\models.py         30      0   100%
-events\views.py          88      5    94%
+events\views.py          95      5    95%
 profiles\models.py      130     10    92%
-profiles\views.py       146     18    88%
+profiles\views.py       146     12    94%
 -----------------------------------------
-TOTAL                   503     39    92%
+TOTAL                   512     31    94%
 
 
-=================== 67 passed in 284.05s (0:04:44) ====================
+=================== 70 passed in 284.05s (0:04:44) ====================
 ```   
 
-Renvoie : **92%** de couverture de code.   
+Renvoie : **94%** de couverture de code.   
 
 - Pour afficher un rapport de couverture avec plus de détails.   
 
