@@ -35,7 +35,7 @@ class LoginViewSet(generics.CreateAPIView):
     serializer_class = UserLoginSerializer
 
     def create(self, request, *args, **kwargs):
-        # Obtiens le sérialiseur avec les données de la requête
+        # Obtient le sérialiseur avec les données de la requête
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -143,7 +143,7 @@ class ClientViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        """Met à jour un client existant."""
+        """Mets à jour un client existant."""
         instance = self.get_object()
         if not self.client_permissions.has_update_permission(request, instance.user_contact):
             # Capture l'exception et envoie une alerte à Sentry
@@ -250,7 +250,7 @@ class UserViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        """Met à jour un utilisateur existant."""
+        """Mets à jour un utilisateur existant."""
         instance = self.get_object()
         if not self.user_permissions.has_update_permission(self.request.user, instance):
             # Capture l'exception et envoie une alerte à Sentry

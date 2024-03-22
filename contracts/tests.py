@@ -56,7 +56,7 @@ class TestContractsApp(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.sales_user = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -92,7 +92,7 @@ class TestContractsApp(TestCase):
 
     def test_contract_str_representation(self):
         """Teste la méthode __str__ du modèle Contract."""
-        # Définis les valeurs initiales
+        # Définit les valeurs initiales
         self.contract_user.status_contract = True
         self.contract_user.client = self.client_user
 
@@ -100,7 +100,6 @@ class TestContractsApp(TestCase):
         expected_str_signed = f"Contrat ID : {self.contract_user.id} Contract signed - {self.client_user.full_name}"
         self.assertEqual(str(self.contract_user), expected_str_signed)
 
-        # Définis de nouvelles valeurs pour "Contrat non signé" et "Aucun client"
         self.contract_user.status_contract = False
         self.contract_user.client = None
 
@@ -214,7 +213,7 @@ class TestContractViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.sales_user1 = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -519,7 +518,7 @@ class TestContractViewSet(TestCase):
         # Assure que le contract_user1 est associé à sales_user1
         self.assertEqual(self.contract_user1.sales_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
@@ -587,7 +586,7 @@ class TestContractViewSet(TestCase):
         # Assure que le contract_user1 est associé à sales_user1
         self.assertEqual(self.contract_user1.sales_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user2
+        # Crée un jeton d'accès pour sales_user2
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         access_token_sales_user2 = str(refresh_sales_user2.access_token)
 

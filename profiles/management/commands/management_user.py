@@ -202,7 +202,7 @@ class Command(BaseCommand):
 
             new_is_staff = click.confirm('Est-ce un membre du personnel ?')
 
-            # Met à jour l'utilisateur
+            # Mets à jour l'utilisateur
             user.email = new_email
             user.set_password(new_password)
             user.role = new_role

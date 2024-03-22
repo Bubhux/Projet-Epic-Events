@@ -55,7 +55,7 @@ class TestProfilesApp(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.management_user = self.create_user(
             email='Martin@EpicEvents-Management.com',
@@ -225,7 +225,7 @@ class TestProfilesApp(TestCase):
         """
             Vérifie que l'URL pour l'obtention du token JWT lors de la connexion est correcte.
         """
-        # Obtiens l'URL à partir du nom de la vue
+        # Obtient l'URL à partir du nom de la vue
         url = reverse('obtain_token')
 
         # Vérifie que l'URL est correcte
@@ -239,7 +239,7 @@ class TestProfilesApp(TestCase):
         """
             Vérifie que l'URL pour le rafraîchissement du token JWT est correcte.
         """
-        # Obtiens l'URL à partir du nom de la vue
+        # Obtient l'URL à partir du nom de la vue
         url = reverse('refresh_token')
 
         # Vérifie que l'URL est correcte
@@ -351,7 +351,7 @@ class TestLoginViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.user = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -463,7 +463,7 @@ class TestClientViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.sales_user1 = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -818,7 +818,7 @@ class TestUserViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.management_user = self.create_user(
             email='Milhouse@EpicEvents-Management.com',
@@ -1037,7 +1037,7 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], update_user_data["email"])
 
     def test_update_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support_user = RefreshToken.for_user(self.support_user)
         access_token_support_user = str(refresh_support_user.access_token)
 

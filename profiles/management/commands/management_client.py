@@ -74,9 +74,13 @@ class Command(BaseCommand):
             try:
                 # Vérifie si un client avec cette adresse e-mail existe déjà
                 existing_client = Client.objects.get(email=email)
-                console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
+
+                if existing_client:
+                    console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
                 return
 
+                console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
+                return
             except ObjectDoesNotExist:
                 # Le client n'existe pas encore, continue la création
                 pass
@@ -158,7 +162,7 @@ class Command(BaseCommand):
 
             new_company_name = self.colored_prompt('Nouveau nom de l\'entreprise du client', color=Fore.CYAN)
 
-            # Met à jour le client
+            # Mets à jour le client
             client.email = new_email
             client.full_name = new_full_name
             client.phone_number = new_phone_number

@@ -88,7 +88,7 @@ class Event(models.Model):
             Surcharge la méthode save pour mettre à jour client_name et client_contact avant la sauvegarde,
             puis imprime les détails de l'événement.
         """
-        # Met à jour client_name et client_contact avant la sauvegarde si le client est défini
+        # Mets à jour client_name et client_contact avant la sauvegarde si le client est défini
         if self.client:
             self.client_name = self.client.full_name
             # Concatène l'e-mail et le numéro de téléphone pour le champ client_contact

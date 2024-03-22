@@ -66,10 +66,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
             role=validated_data['role'],
             is_staff=True,
             is_active=True,
-            password=password,  # Utiliser le mot de passe récupéré
+            password=password,  # Utilise le mot de passe récupéré
         )
 
-        # Définie le mot de passe haché à partir des données validées
+        # Définit le mot de passe haché à partir des données validées
         user.set_password(password)
         user.save()
         return user

@@ -69,7 +69,7 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['sentry', 'console'],  # Utilisez à la fois Sentry et la console
+        'handlers': ['sentry', 'console'],  # Utilise à la fois Sentry et la console
         'level': 'DEBUG',                   # Niveau de logging minimum global (peut être ajusté)
     },
 }

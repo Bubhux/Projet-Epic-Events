@@ -260,6 +260,7 @@ Dans le cadre de **Django** et de l'utilisation de **MySQL**, la configuration d
 Après avoir installé **MySQL** et chargé les tables depuis le fichier EpicEvents.sql, la configuration de l'application **Django** nécessite la mise en place de cette connexion.   
 
 - Ouvrez un terminal CMD activer l'environnement virtuel.   
+
   Exécutez la commande :   
 
 ```bash   
@@ -321,7 +322,7 @@ $ SHOW CREATE TABLE NomDeLaTable;
 ### Installation des variables d'environnement   
 
 - Pour utiliser l'application, il faut configurer l'environnement de l'application **Epic Events** et générer une clé secrète aléatoire pour la configuration de **Django**.   
-- De plus, il est nécessaire d'inclure des noms de variables d'environnement préconfigurées tels que :   
+- De plus, il est nécessaire d'inclure des noms de variables d'environnement préconfigurées.   
 
 ##### Configuration de l'environnement :   
 
@@ -467,14 +468,17 @@ $ python manage.py management_event --delete_event [id_event]
 
 Lancement du serveur **Django**.   
 - Placez-vous avec le terminal CMD dans le dossier principal.   
-- Activer l'environnement virtuel et ensuite lancer le serveur **Django**. Taper dans votre terminal la commande :   
+- Activer l'environnement virtuel et ensuite lancer le serveur **Django**.   
+
+  Taper dans votre terminal la commande :   
 
 ```bash   
 $ python manage.py runserver
 ```   
 
-- Démarrer le serveur vous permet d'accéder au site d'administration de **Django** à l'adresse suivante ➔ http://127.0.0.1:8000/admin/   
-- D'utiliser les requêtes ``GET``, ``POST``, ``PUT``, ``DEL`` lors de l'utilisation de **Postman**.   
+- Démarrer le serveur vous permet d'accéder au site d'administration de **Django**.   
+- Disponible à l'adresse suivante ➔ http://127.0.0.1:8000/admin/   
+- Permets d'utiliser les requêtes ``GET``, ``POST``, ``PUT``, ``DEL`` lors de l'utilisation de **Postman**.   
 
 >_**Note :** Le site d'administration de **Django** est accessible seulement aux administrateurs et aux utilisateurs de l'équipe gestion._   
 
