@@ -100,7 +100,6 @@ class TestContractsApp(TestCase):
         expected_str_signed = f"Contrat ID : {self.contract_user.id} Contract signed - {self.client_user.full_name}"
         self.assertEqual(str(self.contract_user), expected_str_signed)
 
-        # Définit de nouvelles valeurs pour "Contrat non signé" et "Aucun client"
         self.contract_user.status_contract = False
         self.contract_user.client = None
 

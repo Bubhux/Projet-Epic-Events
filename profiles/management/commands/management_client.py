@@ -78,6 +78,9 @@ class Command(BaseCommand):
                 if existing_client:
                     console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
                 return
+
+                console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
+                return
             except ObjectDoesNotExist:
                 # Le client n'existe pas encore, continue la création
                 pass
