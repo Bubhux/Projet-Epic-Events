@@ -120,6 +120,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         return True
 
     def save(self, *args, **kwargs):
+        # Vérifie si un utilisateur avec cette adresse e-mail existe déjà
+        if User.objects.filter(email=self.email).exclude(id=self.id).exists():
+            raise ValidationError("This user already exists in the database.")
+
         # Appel la méthode save de la classe parent
         super().save(*args, **kwargs)
 
@@ -218,7 +222,7 @@ class Client(models.Model):
         # Obtient le groupe "Client"
         client_group, created = Group.objects.get_or_create(name='Client')
 
-        # Parcourt tous les clients non associés et leur assigne un contact commercial
+        # Parcourt tous les clients non associés et leur assigne un contact commercialf
         unassigned_clients = Client.objects.filter(user_contact=None)
         for client in unassigned_clients:
             # Vérifie si user_contact est défini avant d'assigner le client à un contact commercial
@@ -241,23 +245,23 @@ class Client(models.Model):
     def save(self, *args, **kwargs):
         """
             Sauvegarde l'instance après vérification de la non-existence d'un client avec le même e-mail.
-            Met à jour les colonnes email_id et sales_contact_id.
+            Mets à jour les colonnes email_id et sales_contact_id.
             Appelle la méthode save de la classe parent pour effectuer la sauvegarde réelle.
             Imprime les détails avant et après la sauvegarde.
             Exécute automatiquement la méthode assign_sales_contact après la sauvegarde.
         """
         try:
             # Vérifie si un client avec le même e-mail existe déjà
-            client_existant = Client.objects.filter(email=self.email).exclude(id=self.id).first()
+            existing_user = Client.objects.filter(email=self.email).exclude(id=self.id).first()
 
-            if client_existant:
-                raise IntegrityError("This user already exists in the database.")
+            if existing_user:
+                raise IntegrityError("This client already exists in the database.")
         except IntegrityError as e:
             # Gère l'IntegrityError en imprimant le message d'erreur personnalisé
             print(f"Erreur d'intégrité : {e}")
             return
         else:
-            # Met à jour la colonne email_contact avec l'e-mail de l'utilisateur associé
+            # Mets à jour la colonne email_contact avec l'e-mail de l'utilisateur associé
             self.email_contact = self.user_contact.email if self.user_contact else None
             self.sales_contact = self.user_contact if self.user_contact else None
             self.update_date = timezone.now()

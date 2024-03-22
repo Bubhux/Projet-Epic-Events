@@ -78,17 +78,17 @@ class GroupAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """
-        Surcharge la méthode get_queryset pour annoter chaque groupe avec le nombre total d'utilisateurs.
+            Surcharge la méthode get_queryset pour annoter chaque groupe avec le nombre total d'utilisateurs.
         """
-        # Récupérer le queryset de la classe parent
+        # Récupére le queryset de la classe parent
         queryset = super().get_queryset(request)
 
-        # Annoter avec le nombre total d'utilisateurs dans le modèle Client associés au groupe en cours.
-        # Utiliser OuterRef('id') pour référencer l'ID du groupe actuel dans la requête GroupAdmin.
-        # Compter le nombre d'objets dans chaque groupe en annotant avec 'count'.
-        # Utiliser Subquery pour obtenir le nombre total d'objets associés dans le modèle Client.
-        # Annoter chaque objet Group avec le résultat de la sous-requête 'client_count'.
-        # Retourner le queryset annoté avec le nombre total d'objets associés.
+        # Annote avec le nombre total d'utilisateurs dans le modèle Client associés au groupe en cours.
+        # Utilise OuterRef('id') pour référencer l'ID du groupe actuel dans la requête GroupAdmin.
+        # Compte le nombre d'objets dans chaque groupe en annotant avec 'count'.
+        # Utilise Subquery pour obtenir le nombre total d'objets associés dans le modèle Client.
+        # Annote chaque objet Group avec le résultat de la sous-requête 'client_count'.
+        # Retourne le queryset annoté avec le nombre total d'objets associés.
         queryset = queryset.annotate(
             client_count=Subquery(
                 Client.objects.filter(user_contact__groups=OuterRef('id'))
@@ -113,10 +113,10 @@ class GroupAdmin(admin.ModelAdmin):
     total_users.short_description = "Nombre d'utilisateurs"
 
 
-# Enregistrer la classe CustomUserAdmin avec le modèle User
+# Enregistre la classe CustomUserAdmin avec le modèle User
 admin.site.register(User, CustomUserAdmin)
 
-# Enregistrer la classe ClientAdmin avec le modèle Client
+# Enregistre la classe ClientAdmin avec le modèle Client
 admin.site.register(Client, ClientAdmin)
 
 # Enregistre le nouveau admin.ModelAdmin pour Group

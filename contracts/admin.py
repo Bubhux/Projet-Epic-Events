@@ -38,5 +38,5 @@ class ContractAdmin(admin.ModelAdmin):
         return readonly_fields
 
 
-# Enregistrer la classe ContractAdmin avec le modèle Contract
+# Enregistre la classe ContractAdmin avec le modèle Contract
 admin.site.register(Contract, ContractAdmin)

@@ -1,5 +1,6 @@
 import click
 from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
 from rich.console import Console
 from colorama import Fore, Style
 from rich.table import Table
@@ -70,6 +71,17 @@ class Command(BaseCommand):
             if self.should_exit():
                 return
 
+            try:
+                # Vérifie si un client avec cette adresse e-mail existe déjà
+                existing_client = Client.objects.get(email=email)
+
+                if existing_client:
+                    console.print("[bold red]Erreur : Un client avec cette adresse e-mail existe déjà.[/bold red]")
+                return
+            except ObjectDoesNotExist:
+                # Le client n'existe pas encore, continue la création
+                pass
+
             full_name = self.colored_prompt('Nom complet du client', color=Fore.CYAN)
             if self.should_exit():
                 return
@@ -81,7 +93,7 @@ class Command(BaseCommand):
             company_name = self.colored_prompt('Nom de l\'entreprise du client', color=Fore.CYAN)
 
             try:
-                # Créer un nouveau client
+                # Crée un nouveau client
                 client = Client.objects.create(
                     email=email,
                     full_name=full_name,
@@ -147,7 +159,7 @@ class Command(BaseCommand):
 
             new_company_name = self.colored_prompt('Nouveau nom de l\'entreprise du client', color=Fore.CYAN)
 
-            # Met à jour le client
+            # Mets à jour le client
             client.email = new_email
             client.full_name = new_full_name
             client.phone_number = new_phone_number

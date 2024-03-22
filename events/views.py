@@ -117,21 +117,21 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
 
             return HttpResponseForbidden("You do not have permission to create an event.")
 
-        # Récupérer les données de la requête
+        # Récupére les données de la requête
         data = request.data
 
-        # Vérifier si le contrat associé est signé
+        # Vérifie si le contrat associé est signé
         contract_id = data.get('contract')
         contract = get_object_or_404(Contract, id=contract_id)
         if not contract.status_contract:
             return HttpResponseForbidden("The associated contract is not signed. Cannot create the event.")
 
-        # Vérifier si un événement existe déjà pour ce contrat
+        # Vérifie si un événement existe déjà pour ce contrat
         existing_event = Event.objects.filter(contract=contract).first()
         if existing_event:
             return HttpResponseForbidden("An event already exists for this contract. Cannot create another event.")
 
-        # Créer l'événement uniquement si le contrat est signé
+        # Crée l'événement uniquement si le contrat est signé
         serializer = self.serializers['create'](data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -140,7 +140,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        """Met à jour un événement existant."""
+        """Mets à jour un événement existant."""
         instance = self.get_object()
         if not self.event_permissions.has_update_permission(request, instance.support_contact):
             # Capture l'exception et envoie une alerte à Sentry

@@ -90,7 +90,7 @@ class TestEventsApp(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.sales_user1 = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -146,7 +146,7 @@ class TestEventsApp(TestCase):
             notes="Event notes"
         )
 
-        # Met à jour les attributs du client dans l'événement
+        # Mets à jour les attributs du client dans l'événement
         self.event_user1.client = self.client_user1
         self.event_user1.save()
 
@@ -163,7 +163,7 @@ class TestEventsApp(TestCase):
 
     def test_event_str_representation(self):
         """Teste la méthode __str__ du modèle Event."""
-        # Définis les valeurs initiales
+        # Définit les valeurs initiales
         self.event_user1.contract = self.contract_user1
         self.event_user1.support_contact = self.support_user1
         self.event_user1.client = self.client_user1
@@ -181,7 +181,7 @@ class TestEventsApp(TestCase):
 
     def test_event_print_details(self):
         """Teste la méthode print_details du modèle Event."""
-        # Définis les valeurs initiales
+        # Définit les valeurs initiales
         self.event_user1.contract = self.contract_user1
         self.event_user1.support_contact = self.support_user1
         self.event_user1.client = self.client_user1
@@ -347,7 +347,7 @@ class TestEventViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.management_user1 = self.create_user(
             email='Milhouse@EpicEvents-Management.com',
@@ -473,23 +473,23 @@ class TestEventViewSet(TestCase):
             notes="Event notes"
         )
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         self.access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
-        # Créer un jeton d'accès pour sales_user2
+        # Crée un jeton d'accès pour sales_user2
         refresh_sales_user2 = RefreshToken.for_user(self.sales_user2)
         self.access_token_sales_user2 = str(refresh_sales_user2.access_token)
 
-        # Créer un jeton d'accès pour management_user1
+        # Crée un jeton d'accès pour management_user1
         refresh_management_user1 = RefreshToken.for_user(self.management_user1)
         self.access_token_management_user1 = str(refresh_management_user1.access_token)
 
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         self.access_token_support_user1 = str(refresh_support_user1.access_token)
 
-        # Créer un jeton d'accès pour support_user2
+        # Crée un jeton d'accès pour support_user2
         refresh_support_user2 = RefreshToken.for_user(self.support_user2)
         self.access_token_support_user2 = str(refresh_support_user2.access_token)
 
@@ -590,7 +590,7 @@ class TestEventViewSet(TestCase):
         self.assertTrue(len(response.data) > 0)
 
     def test_events_without_support(self):
-        # Créer un jeton d'accès pour management_user1
+        # Crée un jeton d'accès pour management_user1
         refresh_management_user1 = RefreshToken.for_user(self.management_user1)
         access_token_management_user1 = str(refresh_management_user1.access_token)
 
@@ -644,7 +644,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user1 est signé
         self.assertTrue(self.contract_user3.status_contract)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -709,7 +709,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user3 est signé
         self.assertTrue(self.contract_user3.status_contract)
 
-        # Créee un jeton d'accès pour support_user2
+        # Crée un jeton d'accès pour support_user2
         refresh_support_user2 = RefreshToken.for_user(self.support_user2)
         access_token_support_user2 = str(refresh_support_user2.access_token)
 
@@ -746,7 +746,7 @@ class TestEventViewSet(TestCase):
         # Assure que le contrat pour client_user4 n'est pas signé
         self.assertFalse(self.contract_user4.status_contract)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -798,7 +798,7 @@ class TestEventViewSet(TestCase):
             notes="Event notes"
         )
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -844,7 +844,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user1 est signé
         self.assertTrue(self.contract_user1.status_contract)
 
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -912,7 +912,7 @@ class TestEventViewSet(TestCase):
         # Assure que contract_user1 pour client_user1 est signé
         self.assertTrue(self.contract_user1.status_contract)
 
-        # Créer un jeton d'accès pour support_user2
+        # Crée un jeton d'accès pour support_user2
         refresh_support_user2 = RefreshToken.for_user(self.support_user2)
         access_token_support_user2 = str(refresh_support_user2.access_token)
 
@@ -952,7 +952,7 @@ class TestEventViewSet(TestCase):
         # Assure que le event_user1 est associé à support_user1
         self.assertEqual(self.event_user1.support_contact, self.support_user1)
 
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -989,7 +989,7 @@ class TestEventViewSet(TestCase):
         # Assure que le event_user1 est associé à support_user1
         self.assertEqual(self.event_user1.support_contact, self.support_user1)
 
-        # Créer un jeton d'accès pour support_user2
+        # Crée un jeton d'accès pour support_user2
         refresh_support_user2 = RefreshToken.for_user(self.support_user2)
         access_token_support_user2 = str(refresh_support_user2.access_token)
 

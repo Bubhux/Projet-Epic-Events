@@ -55,7 +55,7 @@ class TestProfilesApp(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.management_user = self.create_user(
             email='Martin@EpicEvents-Management.com',
@@ -225,7 +225,7 @@ class TestProfilesApp(TestCase):
         """
             Vérifie que l'URL pour l'obtention du token JWT lors de la connexion est correcte.
         """
-        # Obtiens l'URL à partir du nom de la vue
+        # Obtient l'URL à partir du nom de la vue
         url = reverse('obtain_token')
 
         # Vérifie que l'URL est correcte
@@ -239,7 +239,7 @@ class TestProfilesApp(TestCase):
         """
             Vérifie que l'URL pour le rafraîchissement du token JWT est correcte.
         """
-        # Obtiens l'URL à partir du nom de la vue
+        # Obtient l'URL à partir du nom de la vue
         url = reverse('refresh_token')
 
         # Vérifie que l'URL est correcte
@@ -351,7 +351,7 @@ class TestLoginViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.user = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -463,7 +463,7 @@ class TestClientViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.sales_user1 = self.create_user(
             email='Timothy@EpicEvents-Sales.com',
@@ -507,11 +507,11 @@ class TestClientViewSet(TestCase):
             user_contact=self.sales_user2
         )
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         self.access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         self.access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -523,6 +523,20 @@ class TestClientViewSet(TestCase):
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
         Client.objects.all().delete()
+
+    def test_clients_list_associated_to_user(self):
+        # Test de la vue clients_list
+        url = '/crm/clients/clients_list/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales_user1}')
+
+        # Vérifie si le code de statut de la réponse est 200
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les détails du client1
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], 'Jeff@EpicEvents.com')
+
+        print("Response Data:", response.data)
 
     def test_clients_list(self):
         # Test de la vue clients_list
@@ -591,7 +605,7 @@ class TestClientViewSet(TestCase):
         self.assertTrue(len(response.data) > 0)
 
     def test_create_client(self):
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -624,7 +638,7 @@ class TestClientViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], new_client_data["email"])
 
     def test_create_clients_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user1
+        # Crée un jeton d'accès pour support_user1
         refresh_support_user1 = RefreshToken.for_user(self.support_user1)
         access_token_support_user1 = str(refresh_support_user1.access_token)
 
@@ -655,7 +669,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -725,7 +739,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client1 est associé à sales_user1
         self.assertEqual(self.client1.user_contact, self.sales_user1)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -756,7 +770,7 @@ class TestClientViewSet(TestCase):
         # Assure que le client2 est associé à sales_user2
         self.assertEqual(self.client2.user_contact, self.sales_user2)
 
-        # Créer un jeton d'accès pour sales_user1
+        # Crée un jeton d'accès pour sales_user1
         refresh_sales_user1 = RefreshToken.for_user(self.sales_user1)
         access_token_sales_user1 = str(refresh_sales_user1.access_token)
 
@@ -804,7 +818,7 @@ class TestUserViewSet(TestCase):
 
     def setUp(self):
         """
-            Met en place les données nécessaires pour les tests.
+            Mets en place les données nécessaires pour les tests.
         """
         self.management_user = self.create_user(
             email='Milhouse@EpicEvents-Management.com',
@@ -830,15 +844,15 @@ class TestUserViewSet(TestCase):
             is_staff=True
         )
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management = RefreshToken.for_user(self.management_user)
         self.access_token_management = str(refresh_management.access_token)
 
-        # Créer un jeton d'accès pour sales_user
+        # Crée un jeton d'accès pour sales_user
         refresh_sales = RefreshToken.for_user(self.sales_user)
         self.access_token_sales = str(refresh_sales.access_token)
 
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support = RefreshToken.for_user(self.support_user)
         self.access_token_support = str(refresh_support.access_token)
 
@@ -849,6 +863,23 @@ class TestUserViewSet(TestCase):
         """
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
+
+    def test_returns_details_specific_user(self):
+        # Test de la vue user_details
+        url = f'/crm/users/{self.support_user.pk}/user_details/'
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales}')
+
+        # Vérifie si la réponse est 200 (OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les détails de l'utilisateur
+        self.assertEqual(response.data['email'], self.support_user.email)
+        self.assertEqual(response.data['role'], self.support_user.role)
+        self.assertEqual(response.data['full_name'], self.support_user.full_name)
+        self.assertEqual(response.data['phone_number'], self.support_user.phone_number)
+        self.assertEqual(response.data['is_staff'], self.support_user.is_staff)
+
+        print("Response Data:", response.data)
 
     def test_users_list(self):
         # Test la vue users_list
@@ -900,7 +931,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -935,7 +966,7 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], new_user_data["email"])
 
     def test_create_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour sales_user
+        # Crée un jeton d'accès pour sales_user
         refresh_sales_user = RefreshToken.for_user(self.sales_user)
         access_token_sales_user = str(refresh_sales_user.access_token)
 
@@ -968,7 +999,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -1006,7 +1037,7 @@ class TestUserViewSet(TestCase):
         self.assertEqual(response.data["data"]["email"], update_user_data["email"])
 
     def test_update_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support_user = RefreshToken.for_user(self.support_user)
         access_token_support_user = str(refresh_support_user.access_token)
 
@@ -1039,7 +1070,7 @@ class TestUserViewSet(TestCase):
         # Assure que le management_user a bien le rôle ROLE_MANAGEMENT
         self.assertEqual(self.management_user.role, User.ROLE_MANAGEMENT)
 
-        # Créer un jeton d'accès pour management_user
+        # Crée un jeton d'accès pour management_user
         refresh_management_user = RefreshToken.for_user(self.management_user)
         access_token_management_user = str(refresh_management_user.access_token)
 
@@ -1069,7 +1100,7 @@ class TestUserViewSet(TestCase):
         self.assertIn("User successfully deleted.", response.data.get("message"))
 
     def test_destroy_user_unauthorized_user(self):
-        # Créer un jeton d'accès pour support_user
+        # Crée un jeton d'accès pour support_user
         refresh_support_user = RefreshToken.for_user(self.support_user)
         access_token_support_user = str(refresh_support_user.access_token)
 

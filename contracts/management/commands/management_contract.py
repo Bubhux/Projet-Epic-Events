@@ -164,7 +164,7 @@ class Command(BaseCommand):
                 'Nouveau montant restant à payer sur le contrat', color=Fore.CYAN
             )
 
-            # Met à jour le contrat
+            # Mets à jour le contrat
             contract.status_contract = new_status_contract
             contract.total_amount = new_total_amount
             contract.remaining_amount = new_remaining_amount

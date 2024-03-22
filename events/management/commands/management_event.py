@@ -65,7 +65,7 @@ class Command(BaseCommand):
                 if 'client' in event and isinstance(
                     event['client'], dict
                 ) and 'contract' in event and isinstance(event['contract'], dict):
-                    # Met à jour client_name, client_contact et contract_id avant l'affichage
+                    # Mets à jour client_name, client_contact et contract_id avant l'affichage
                     event['client_name'] = event['client']['full_name']
                     event['client_contact'] = f"{event['client']['email']} {event['client']['phone_number']}"
                     event['contract'] = event['contract']['id']
@@ -285,7 +285,7 @@ class Command(BaseCommand):
                 full_name=new_support_contact_name
             ) if new_support_contact_name else None
 
-            # Met à jour l'événement
+            # Mets à jour l'événement
             event.event_name = new_event_name
             event.contract = new_contract
             event.event_date_start = new_event_date_start

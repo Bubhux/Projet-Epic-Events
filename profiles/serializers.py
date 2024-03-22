@@ -66,10 +66,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
             role=validated_data['role'],
             is_staff=True,
             is_active=True,
-            password=password,  # Utiliser le mot de passe récupéré
+            password=password,  # Utilise le mot de passe récupéré
         )
 
-        # Définie le mot de passe haché à partir des données validées
+        # Définit le mot de passe haché à partir des données validées
         user.set_password(password)
         user.save()
         return user
@@ -169,9 +169,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ]
 
     def validate_password(self, value):
-        # Vérifier que le mot de passe n'est pas vide
+        # Vérifie que le mot de passe n'est pas vide
         if value is not None:
-            # Hacher le mot de passe avant de l'enregistrer
+            # Hach le mot de passe avant de l'enregistrer
             return make_password(value)
         # Le mot de passe est vide, lever une erreur de validation
         raise ValidationError("Le mot de passe est vide")

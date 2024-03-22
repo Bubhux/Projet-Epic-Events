@@ -131,7 +131,7 @@ class ContractViewSet(MultipleSerializerMixin, ModelViewSet):
         return Response({"message": success_message, "data": serializer.data}, status=201, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        """Met à jour un contrat existant."""
+        """Mets à jour un contrat existant."""
         instance = self.get_object()
         if not self.contract_permissions.has_update_permission(request, instance.sales_contact):
             # Capture l'exception et envoie une alerte à Sentry
