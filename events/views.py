@@ -68,7 +68,7 @@ class EventViewSet(MultipleSerializerMixin, ModelViewSet):
             # Pour les autres utilisateurs, renvoie tous les événements
             events = Event.objects.all()
 
-        serializer = EventDetailSerializer(events, many=True)
+        serializer = EventListSerializer(events, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['GET'])
