@@ -387,16 +387,18 @@ La gestion des opérations **CRUD** peut se faire de plusieurs manières :
 #### Ouvrez un terminal CMD et activez l'environnement virtuel.   
 
 Les commandes d'administration et de gestion pour utiliser le gestionnaire de commandes.   
-##### - Afficher tous les utilisateurs :   
+
+#### - Afficher tous les utilisateurs.   
 
 * Exemple de sortie dans le terminal :   
+
 ![Display users](/static/img/screen_display_users.png)   
 
 ```bash   
 $ python manage.py management_user --display_users
 ```   
 
-##### - Création d'un utilisateur ou d'un administrateur :   
+##### - Création, mise à jour, suppression d'un utilisateur ou d'un administrateur.   
 
 ```bash   
 $ python manage.py management_user --create_user
@@ -405,9 +407,10 @@ $ python manage.py management_user --update_user [id_user]
 $ python manage.py management_user --delete_user [id_user]
 ```   
 
-##### - Afficher tous les clients :   
+#### - Afficher tous les clients.   
 
 * Exemple de sortie dans le terminal :   
+
 ![Display clients](/static/img/screen_display_clients.png)   
 
 
@@ -415,7 +418,7 @@ $ python manage.py management_user --delete_user [id_user]
 $ python manage.py management_client --display_clients
 ```   
 
-##### - Création d'un client :   
+##### - Création, mise à jour, suppression d'un client.   
 
 ```bash   
 $ python manage.py management_client --create_client
@@ -423,9 +426,10 @@ $ python manage.py management_client --update_client [id_client]
 $ python manage.py management_client --delete_client [id_client]
 ```   
 
-##### - Afficher tous les contrats :   
+#### - Afficher tous les contrats.   
 
 * Exemple de sortie dans le terminal :   
+
 ![Display contracts](/static/img/screen_display_contracts.png)   
 
 
@@ -433,16 +437,18 @@ $ python manage.py management_client --delete_client [id_client]
 $ python manage.py management_contract --display_contracts
 ```   
 
-- Création d'un contrat :   
+##### - Création, mise à jour, suppression d'un contrat.   
+
 ```bash   
 $ python manage.py management_contract --create_contract
 $ python manage.py management_contract --update_contract [id_contract]
 $ python manage.py management_contract --delete_contract [id_contract]
 ```   
 
-##### - Afficher tous les événements :   
+#### - Afficher tous les événements.   
 
 * Exemple de sortie dans le terminal :   
+
 ![Display events](/static/img/screen_display_events.png)   
 
 
@@ -450,7 +456,7 @@ $ python manage.py management_contract --delete_contract [id_contract]
 $ python manage.py management_event --display_events
 ```   
 
-##### - Création d'un événement :   
+##### - Création, mise à jour, suppression d'un événement.   
 
 ```bash   
 $ python manage.py management_event --create_event
@@ -464,7 +470,7 @@ $ python manage.py management_event --delete_event [id_event]
 
 ### Exécution de l'application   
 
-#### Utilisation   
+#### Utilisation de l'application.   
 
 Lancement du serveur **Django**.   
 - Placez-vous avec le terminal CMD dans le dossier principal.   
@@ -654,7 +660,8 @@ La surveillance (ou monitoring) sur **Sentry** s'effectue en accédant à votre 
 - Ces déclencheurs sont activés lorsqu'un utilisateur tente d'accéder à des opérations d'administration sans autorisation.   
 - Cela déclenchera une alerte qui sera envoyée à **Sentry**.   
 
-Voici un exemple d'alerte sur la capture d'écran suivante :
+Voici un exemple d'alerte sur la capture d'écran suivante :   
+
 ![Sentry monitoring](/static/img/screen_sentry.png) 
 
 --------------------------------------------------------------------------------------------------------------------------------
