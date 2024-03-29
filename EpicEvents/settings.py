@@ -210,5 +210,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# Lorsqu'il est défini sur True.
+# Cela signifie que le navigateur ne doit envoyer le cookie CSRF qu'à travers des connexions HTTPS sécurisées.
+# En le définissant sur False.
+# Vous autorisez le navigateur à envoyer le cookie CSRF via des connexions non sécurisées (HTTP).
 CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
+
+# Sécurise les cookies de session et CSRF pour qu'ils ne soient envoyés que via HTTPS
+SESSION_COOKIE_SECURE = False
+
+# Lorsqu'il est défini sur True.
+# Cela signifie que le cookie CSRF ne peut être accessible que via HTTP et n'est pas accessible via JavaScript.
+# En le définissant sur False, vous autorisez le cookie CSRF à être accessible via JavaScript.
+CSRF_COOKIE_HTTPONLY = True
+
+# Autorise les cookies à être accessibles uniquement via HTTP et pas via JavaScript.
+SESSION_COOKIE_HTTPONLY = True
+
+# Lorsqu'il est défini sur True, redirige toutes les connexions HTTP vers HTTPS.
+SECURE_SSL_REDIRECT = False
