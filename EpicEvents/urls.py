@@ -101,7 +101,7 @@ urlpatterns = [
         {'get': 'events_without_support'}), name='events-without-support'
     ),
 
-    # Configure le chemin pour l'action 'events_list' et 'create' sur l'url http://127.0.0.1:8000/crm/events/
+    # Configure le chemin pour l'action 'events_list' et 'create'
     path('crm/events/', EventViewSet.as_view({
         'get': 'events_list',
         'post': 'create'}), name='events'
