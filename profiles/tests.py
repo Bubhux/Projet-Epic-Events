@@ -864,6 +864,28 @@ class TestUserViewSet(TestCase):
         # Supprime toutes les instances des modèles après chaque test
         User.objects.all().delete()
 
+    def test_retrieve_all_user_list(self):
+        url = '/crm/users/users_list/'
+        # Envoie une requête GET
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.access_token_sales}')
+
+        # Vérifie si le code de statut de la réponse est 200
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Vérifie si la réponse contient les utilisateurs attendus
+        self.assertEqual(len(response.data), 3)
+
+        # Vérifie si les détails du premier utilisateur correspondent à ceux attendus
+        self.assertEqual(response.data[0]['email'], 'Milhouse@epicevents-management.com')
+
+        # Vérifie si les détails du deuxième utilisateur correspondent à ceux attendus
+        self.assertEqual(response.data[1]['email'], 'Joe@epicevents-sales.com')
+
+        # Vérifie si les détails du troisième utilisateur correspondent à ceux attendus
+        self.assertEqual(response.data[2]['email'], 'Homer@epicevents-support.com')
+
+        print("Response Data:", response.data)
+
     def test_returns_details_specific_user(self):
         # Test de la vue user_details
         url = f'/crm/users/{self.support_user.pk}/user_details/'
