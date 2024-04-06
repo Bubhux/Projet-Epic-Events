@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from django.http import Http404
 
-from profiles.models import User
+from profiles.models import User, Client
 
 
 class EventPermissions(permissions.BasePermission):
@@ -15,7 +15,8 @@ class EventPermissions(permissions.BasePermission):
         - 'ROLE_SUPPORT' Rôle pour les menbres de l'équipe support.
 
         Méthode has_create_permission:
-            Autorise la création d'un nouvel événement uniquement pour les membres de l'équipe commerciale.
+            Autorise la création d'un nouvel événement uniquement
+            pour les membres de l'équipe commerciale associés au client concerné.
 
         Méthode has_update_permission:
             Autorise les menbres de l'équipe gestion pour la mise à jour d'un événement spécifique.
@@ -42,8 +43,14 @@ class EventPermissions(permissions.BasePermission):
     """
     def has_create_permission(self, request):
         # Vérifie si l'utilisateur connecté a la permission de créer un nouvel événement.
-        # Autorise uniquement les membres de l'équipe commerciale.
-        return request.user.role == User.ROLE_SALES
+        # Autorise uniquement si le membres de l'équipe commerciale est associés au client concerné.
+        if request.user.role == User.ROLE_SALES:
+            client_name = request.data.get('client')
+            if client_name:
+                client = Client.objects.filter(full_name=client_name).first()
+                if client and client.sales_contact == request.user:
+                    return True
+        return False
 
     def has_update_permission(self, request, user):
         # Vérifie si l'utilisateur connecté a la permission de mettre à jour un événement spécifique.
