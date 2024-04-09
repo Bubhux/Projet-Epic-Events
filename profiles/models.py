@@ -222,7 +222,7 @@ class Client(models.Model):
         # Obtient le groupe "Client"
         client_group, created = Group.objects.get_or_create(name='Client')
 
-        # Parcourt tous les clients non associés et leur assigne un contact commercialf
+        # Parcourt tous les clients non associés et leur assigne un contact commercial
         unassigned_clients = Client.objects.filter(user_contact=None)
         for client in unassigned_clients:
             # Vérifie si user_contact est défini avant d'assigner le client à un contact commercial
